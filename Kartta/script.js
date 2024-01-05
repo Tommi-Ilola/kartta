@@ -1,6 +1,26 @@
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
-const map = L.map('map').setView([62.070149, 26.232580], 7);
+
+// Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
+let defaultCoords = [62.070149, 26.232580];
+let defaultZoom = 7;
+
+// Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
+let mobileCoords = [63.000, 27.000]; // Esimerkiksi toiset koordinaatit
+let mobileZoom = 6; // Esimerkiksi pienempi zoomaustaso
+
+// Funktio laitetunnistukseen
+function isMobileDevice() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+// Tarkistetaan, onko laite mobiililaite
+let map;  // Alustetaan ensin muuttuja
+if (isMobileDevice()) {
+    map = L.map('map').setView(mobileCoords, mobileZoom);
+} else {
+    map = L.map('map').setView(defaultCoords, defaultZoom);
+}
 
 // Karttanäkymä (OSM)
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -222,7 +242,7 @@ document.getElementById('menuButton').addEventListener('click', function() {
 });
 
 // Tunnelien lisääminen karttaan
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/tunnelit.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
+fetch('tunnelit.geojson')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -275,7 +295,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/tunnelit.geojson?time=202
     });
 
 // Siltojen lisääminen karttaan
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/sillat.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
+fetch('sillat.geojson')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -327,7 +347,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/sillat.geojson?time=2023-
         console.error("Virhe ladattaessa siltojen geometriaa:", error);
     });	
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
+fetch('tasoristeykset.geojson')
   .then(response => {
     if (!response.ok) {
       throw new Error('Verkkovirhe' + response.status);
@@ -362,7 +382,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?ti
   });
 
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
+fetch('tilirataosat.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
@@ -393,7 +413,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time
     });
 
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12678/kilometrimerkit.geojson?time=2023-10-27T09:58:00Z/2023-10-27T09:58:00Z')
+fetch('ratakm.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
