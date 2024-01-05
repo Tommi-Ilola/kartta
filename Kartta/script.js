@@ -475,6 +475,8 @@ function onMoveEnd() {
 }
 
 // Funktio sijainnin hakemiseen ja seuraamiseen
+let userMarker;  // Globaali muuttuja käyttäjän merkkiä varten
+
 function startTracking() {
     if ("geolocation" in navigator) {
         // Aloita käyttäjän sijainnin seuraaminen
