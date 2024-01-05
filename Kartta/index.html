@@ -8,60 +8,83 @@
     <link rel="icon" href="Logo.png">
 	<link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <script>
+	function verifyPassword() {
+		var password = prompt("Anna salasana päästäksesi sivulle:");
+		if (password == "ratakilometri") {
+			// Salasana oikein, näytä sisältö
+			document.getElementById("protected-content").style.display = "block";
+			
+			// Pyydä Leafletiä päivittämään kartan koko
+			setTimeout(function() {
+				map.invalidateSize();
+			}, 400);
+		} else {
+			// Salasana väärin, ilmoita käyttäjälle
+			alert("Väärä salasana!");
+		}
+	}
+    </script>
+	
 </head>
 
-<body>
+<body onload="verifyPassword();">
 
-<div id="map"></div>
+  <div id="protected-content" style="display:none">
 
-</div>
-<div id="menuContainer">
-    <button id="menuButton">
-        <img src="funnel.svg" alt="Suodatin">
-    </button>
-    <div id="menuContent" style="display: none; font-family: calibri;">
-		<label><input type="checkbox" id="tunnelitCheckbox"> Näytä tunnelit</label><br>
-		<label><input type="checkbox" id="sillatCheckbox"> Näytä sillat</label><br>
-        <label><input type="checkbox" id="tasoristeyksetCheckbox"> Näytä tasoristeykset</label><br>
-		<label><input type="checkbox" id="tilirataosatCheckbox"> Näytä tilirataosat</label><br>
-        <label><input type="checkbox" id="kilometrimerkitCheckbox" checked> Näytä kilometrimerkit</label>
-    </div>
-</div>
+	<div id="map"></div>
 
-<span>
-<button id="toggleView">
-<img src="maa.png" alt="Maapallo" style="
-    width: auto;
-    height: -webkit-fill-available;
-">
-</button>
-</span>
+	<div id="menuContainer">
+		<button id="menuButton">
+			<img src="funnel.svg" alt="Suodatin">
+		</button>
+		<div id="menuContent" style="display: none; font-family: calibri;">
+			<label><input type="checkbox" id="tunnelitCheckbox"> Näytä tunnelit</label><br>
+			<label><input type="checkbox" id="sillatCheckbox"> Näytä sillat</label><br>
+			<label><input type="checkbox" id="tasoristeyksetCheckbox"> Näytä tasoristeykset</label><br>
+			<label><input type="checkbox" id="tilirataosatCheckbox"> Näytä tilirataosat</label><br>
+			<label><input type="checkbox" id="kilometrimerkitCheckbox" checked> Näytä kilometrimerkit</label>
+		</div>
+	</div>
 
 	<span>
-	<button id="locateUser">
-	<img src="locate.png" alt="tähtäin" style="
+	<button id="toggleView">
+	<img src="maa.png" alt="Maapallo" style="
 		width: auto;
 		height: -webkit-fill-available;
 	">
 	</button>
 	</span>
-	
-<div class="searchContainer">
-    <div class="searchBox">
-        <input type="text" id="searchInput" placeholder="Syötä ratakm...">
-        <button id="searchButton" type="button">
-            <span class="magnifier">&#x1F50E;&#xFE0E;</span>
-            <span class="close-icon" style="display: none;">&#x2715;</span>
-        </button>
-    </div>
-    <div id="results">...</div>
-</div>
+
+		<span>
+		<button id="locateUser">
+		<img src="locate.png" alt="tähtäin" style="
+			width: auto;
+			height: -webkit-fill-available;
+		">
+		</button>
+		</span>
+		
+	<div class="searchContainer">
+		<div class="searchBox">
+			<input type="text" id="searchInput" placeholder="Syötä ratakm...">
+			<button id="searchButton" type="button">
+				<span class="magnifier">&#x1F50E;&#xFE0E;</span>
+				<span class="close-icon" style="display: none;">&#x2715;</span>
+			</button>
+		</div>
+		<div id="results">...</div>
+	</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="script.js"></script>
+<script src="script.js"></script>  
 
+</div>
+  
 </body>
 
 </html>
+
 
