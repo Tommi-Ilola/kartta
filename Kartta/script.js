@@ -358,7 +358,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?ti
     }).addTo(tasoristeyksetLayerGroup); // Lisää geojsonLayer suoraan tasoristeyksetLayerGroupiin
   })
   .catch(error => {
-    console.error('Latausvirhe:', error);
+    console.error('Virhe ladattaessa tasoristeysten geometriaa:', error);
   });
 
 
@@ -389,7 +389,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time
         });
     })
     .catch(error => {
-        console.error('There was a problem:', error);
+        console.error('Virhe ladattaessa tilirataosien geometriaa', error);
     });
 
 
@@ -423,7 +423,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12678/kilometrimerkit.geojson?t
         onZoomEnd();  // Tarkista zoom-taso heti, kun markerit on lisätty.
     })
     .catch(error => {
-        console.error('There was a problem:', error);
+        console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
 map.on('zoomend', onZoomEnd);
