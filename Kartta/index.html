@@ -1,18 +1,58 @@
 <!DOCTYPE html>
 <html lang="fi">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oma Karttapalvelu</title>
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ratakilometri kartta</title>
+    <link rel="icon" href="Logo.png">
+	<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
+
 <body>
 
-    <div id="map"></div>
+<div id="map"></div>
 
-	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="script.js"></script>
+</div>
+<div id="menuContainer">
+    <button id="menuButton">
+        <img src="funnel.svg" alt="Suodatin">
+    </button>
+    <div id="menuContent" style="display: none; font-family: calibri;">
+		<label><input type="checkbox" id="tunnelitCheckbox"> Näytä tunnelit</label><br>
+		<label><input type="checkbox" id="sillatCheckbox"> Näytä sillat</label><br>
+        <label><input type="checkbox" id="tasoristeyksetCheckbox"> Näytä tasoristeykset</label><br>
+		<label><input type="checkbox" id="tilirataosatCheckbox"> Näytä tilirataosat</label><br>
+        <label><input type="checkbox" id="kilometrimerkitCheckbox" checked> Näytä kilometrimerkit</label>
+    </div>
+</div>
+
+<span>
+<button id="toggleView">
+<img src="maa.png" alt="Maapallo" style="
+    width: auto;
+    height: -webkit-fill-available;
+">
+</button>
+</span>
+
+<div class="searchContainer">
+    <div class="searchBox">
+        <input type="text" id="searchInput" placeholder="Syötä ratakm...">
+        <button id="searchButton" type="button">
+            <span class="magnifier">&#x1F50E;&#xFE0E;</span>
+            <span class="close-icon" style="display: none;">&#x2715;</span>
+        </button>
+    </div>
+    <div id="results">...</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
 </body>
+
 </html>
+

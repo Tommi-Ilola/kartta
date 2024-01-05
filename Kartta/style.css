@@ -3,8 +3,277 @@ body, html {
     margin: 0;
     padding: 0;
 }
+#layerControl {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;  /* Asetetaan korkea z-indeksi varmistaaksemme, että se näkyy muiden elementtien päällä */
+}
 
 #map {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+}
+
+.resultItem {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+	cursor: pointer;
+}
+
+.resultItem:last-child {
+    border-bottom: none;
+}
+
+.searchContainer {
+    position: absolute;
+    z-index: 1000;
+    top: 0.6em;
+    left: 4em;
+    overflow: hidden;
+    width: 20em;
+    top: 10px;
+    border-radius: 10px;
+    border-width: 0px;
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+}
+
+.searchBox {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    height: 2.5em;
+    border-width: 0px;
+    background-clip: padding-box;
+}
+
+#searchInput {
+    padding-left: 1em;
+    border: none;
+    flex-grow: 1;
+    border-radius: 2em 0 0 2em;
+}
+
+#searchButton {
+    background: white;
+    border: none;
+    cursor: pointer;
+    padding-right: 1em;
+    padding-top: 0pt;
+    padding-bottom: 2pt;
+    border-radius: 0 2em 2em 0;
+	font-size: 12pt;
+}
+
+#toggleView {
+    position: absolute;
+    z-index: 2000;
+    top: 80px;
+    left: 10px;
+    background-color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 5px;
+    border-width: 0px;
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+    padding: 3pt 3pt 3pt 3pt;
+    cursor: pointer;
+}
+
+.magnifier-icon {
+    color: black;
+    font-size: 12pt;
+    cursor: pointer;
+}
+
+#searchButton .close-icon { 
+	color: black;
+    font-weight: bold;
+    font-size: 10pt; 
+}
+
+#results {
+    z-index: 1001;
+    width: 100%;
+    font-family: calibri;
+	display: none;
+	background-color: white;
+}
+
+#searchInput:focus {
+    border: 0px solid #0099FF;
+    outline: none;               
+    box-shadow: 0 0 0px rgba(0, 153, 255, 0.5);
+}
+
+.leaflet-tooltip::before {
+    border: none !important;
+    background-color: transparent !important;
+}
+
+.leaflet-tooltip {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+	font-weight: bold;
+}
+
+.leaflet-tooltip.rataosat {
+  background-color: #fff !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  padding: 6px !important;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
+}
+
+.leaflet-tooltip.rataosat::before {
+  border-top-color: #fff;
+}
+
+.leaflet-tooltip.rataosat:hover {
+  background-color: #f8f8f8;
+}
+
+.custom-tooltip {
+  background-color: #fff !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  padding: 6px !important;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
+}
+
+#menuContainer {
+    position: absolute;
+    top: 118px;
+    left: 10px;
+    z-index: 1001;
+    background-color: white;
+    border-radius: 5px;
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+}
+
+#menuButton {
+    display: flex;
+    background-color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    justify-content: center;
+    align-items: center;
+}
+
+#menuContent {
+    margin-top: 5px;
+    padding: 0px 5px 3px 5px;
+}
+
+@media (max-width: 768px) {
+
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+	display: none;
+}
+
+.searchContainer {
+    position: absolute;
+    z-index: 1000;
+    top: 1em;
+    left: 0;
+    margin-left: 1em;
+    margin-right: 1em;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    border-radius: 1em;
+    width: -webkit-fill-available;
+}
+
+.searchBox {
+	display: flex;
+    align-items: center;
+    border-radius: 1em 1em 0 0;
+    background-color: white;
+    height: 2.5em;
+}
+
+#searchInput {
+    padding-left: 1em;
+    border: none;
+    flex-grow: 1;
+    border-radius: 2em 0 0 2em;
+	font-size: 16px;
+}
+
+#searchButton {
+    background: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding-right: 1em;
+	border-radius: 0 2em 2em 0;
+}
+
+#results {
+    z-index: 1001;
+    width: 100%;
+    font-family: calibri;
+	display: none;
+	border-radius: 0 0 1em 1em; 
+	background-color: white;
+	max-height: 80pt;
+	overflow: auto;
+}
+
+#menuContainer {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+	top: unset;
+    right: unset;
+    z-index: 2000;
+    background-color: white;
+    padding: 6px 3px 3px 3px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	border: 0px solid rgba(0,0,0,0.2);
+}
+
+#toggleView {
+    position: absolute;
+    bottom: 46px;
+    left: 10px;
+    top: unset;
+    right: unset;
+    z-index: 1000;
+    background-color: white;
+    padding: 3pt 3pt 3pt 3pt;
+    border-radius: 5px;
+    border-width: 0;
+    width: 25pt;
+    height: 25pt;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#menuButton {
+    background-color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 20pt;
+    height: 17pt;
+	padding: 0pt 0pt 0pt 0pt;
+}
+
 }
