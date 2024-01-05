@@ -242,7 +242,7 @@ document.getElementById('menuButton').addEventListener('click', function() {
 });
 
 // Tunnelien lisääminen karttaan
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/tunnelit.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
+fetch('tunnelit.geojson')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -295,7 +295,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/tunnelit.geojson?time=202
     });
 
 // Siltojen lisääminen karttaan
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/sillat.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
+fetch('sillat.geojson')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -347,7 +347,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/sillat.geojson?time=2023-
         console.error("Virhe ladattaessa siltojen geometriaa:", error);
     });	
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
+fetch('tasoristeykset.geojson')
   .then(response => {
     if (!response.ok) {
       throw new Error('Verkkovirhe' + response.status);
@@ -382,7 +382,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?ti
   });
 
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
+fetch('tilirataosat.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
@@ -413,7 +413,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time
     });
 
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12678/kilometrimerkit.geojson?time=2023-10-27T09:58:00Z/2023-10-27T09:58:00Z')
+fetch('kilometrimerkit.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
