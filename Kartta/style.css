@@ -88,6 +88,22 @@ body, html {
     cursor: pointer;
 }
 
+#locateUser {
+    position: absolute;
+    z-index: 2000;
+    top: 156px;
+    left: 10px;
+    background-color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 5px;
+    border-width: 0px;
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+    padding: 3pt 3pt 3pt 3pt;
+    cursor: pointer;
+}
+
 .magnifier-icon {
     color: black;
     font-size: 12pt;
@@ -252,8 +268,24 @@ body, html {
 
 #toggleView {
     position: absolute;
-    bottom: 46px;
+    bottom: 47px;
     left: 10px;
+    top: unset;
+    right: unset;
+    z-index: 1000;
+    background-color: white;
+    padding: 3pt 3pt 3pt 3pt;
+    border-radius: 5px;
+    border-width: 0;
+    width: 25pt;
+    height: 25pt;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#locateUser {
+    position: absolute;
+    bottom: 10px;
+    left: 47px;
     top: unset;
     right: unset;
     z-index: 1000;
@@ -271,9 +303,9 @@ body, html {
     border: none;
     border-radius: 3px;
     cursor: pointer;
-    width: 20pt;
-    height: 17pt;
+    width: 27px;
+    height: 24px;
 	padding: 0pt 0pt 0pt 0pt;
 }
-
 }
+
