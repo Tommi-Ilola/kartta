@@ -474,31 +474,39 @@ function onMoveEnd() {
     });
 }
 
-// Funktio käyttäjän sijainnin hakemiseen ja näyttämiseen
-function locateUser() {
+// Funktio sijainnin hakemiseen ja seuraamiseen
+function startTracking() {
     if ("geolocation" in navigator) {
-        // Geolokaatio on saatavilla
-        navigator.geolocation.getCurrentPosition(function(position) {
-            // Haetaan käyttäjän sijainti
+        // Aloita käyttäjän sijainnin seuraaminen
+        navigator.geolocation.watchPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
-            // Asetetaan kartan keskipiste käyttäjän sijaintiin ja zoomataan lähemmäs
-            map.setView([lat, lon], 13);
+            // Päivitä kartan keskipiste ja zoomaa lähemmäs, jos merkkiä ei ole vielä luotu
+            if (!userMarker) {
+                userMarker = L.marker([lat, lon]).addTo(map)
+                    .bindPopup("Olet tässä!");
+                map.setView([lat, lon], 13);
+            } else {
+                // Päivitä olemassa olevan merkin sijainti
+                userMarker.setLatLng([lat, lon]);
+            }
 
-            // Lisätään merkki käyttäjän sijaintiin
-            L.marker([lat, lon]).addTo(map)
-                .bindPopup("Olet tässä!").openPopup();
+            userMarker.getPopup().setContent("Olet tässä: " + lat.toFixed(5) + ", " + lon.toFixed(5));
+            userMarker.openPopup();
 
-        }, function() {
-            // Käyttäjä ei antanut lupaa sijainnin käyttöön tai muu virhe tapahtui
-            alert("Sijaintitietojen haku epäonnistui.");
+        }, function(error) {
+            // Käsittele mahdolliset virheet täällä
+            console.error("Sijainnin seuranta epäonnistui: ", error);
+        }, {
+            enableHighAccuracy: true,  // Pyydä tarkempaa sijaintia, jos mahdollista
+            maximumAge: 10000,        // Hyväksy enintään 10 sekuntia vanha sijaintitieto
+            timeout: 5000             // Aikakatkaisu 5 sekunnin kuluttua, jos sijaintia ei saada
         });
     } else {
-        // Geolokaatio ei ole saatavilla
         alert("Selaimesi ei tue sijainnin hakua.");
     }
 }
 
-// Lisää napin kuuntelija tai vastaava aktivoidaksesi sijainnin haun
-document.getElementById('locateUser').addEventListener('click', locateUser);
+// Aloita sijainnin seuranta, esimerkiksi painikkeesta:
+document.getElementById('locateUser').addEventListener('click', startTracking);
