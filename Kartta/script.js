@@ -221,7 +221,176 @@ document.getElementById('menuButton').addEventListener('click', function() {
     }
 });
 
+// Tunnelien lisääminen karttaan
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/tunnelit.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
+    .then(response => response.json())
+    .then(data => {
+        railGeometryData = data;
+        
+        const transformedData = {
+            ...railGeometryData,
+            features: railGeometryData.features.map(feature => {
+                if (feature.geometry && feature.geometry.coordinates) {
+                    if (feature.geometry.type === 'MultiLineString') {
+                        return {
+                            ...feature,
+                            geometry: {
+                                ...feature.geometry,
+                                coordinates: feature.geometry.coordinates.map(line => 
+                                    line.map(coord => {
+                                        const latlng = proj4('EPSG:3067', 'WGS84', coord);
+                                        return [latlng[0], latlng[1]];
+                                    })
+                                )
+                            }
+                        };
+                    } else {
+                        return feature;
+                    }
+                } else {
+                    return feature;
+                }
+            })
+        };
 
+        const geoLayer = L.geoJSON(transformedData, {
+			style: function(feature) {
+				return { color: "blue", weight: 5, zIndex: 1000 };
+			},
+			onEachFeature: function(feature, layer) {
+				if (feature.properties && feature.properties.nimi) {
+					layer.bindTooltip(feature.properties.nimi, {
+						className: 'custom-tooltip',
+						sticky: true  // Tämä saa tooltipin seuraamaan hiirtä
+					});
+				}
+			}
+
+		}).addTo(tunnelitLayerGroup);
+
+        map.fitBounds(geoLayer.getBounds());
+    })
+    .catch(error => {
+        console.error("Virhe ladattaessa tunneleiden geometriaa:", error);
+    });
+
+// Siltojen lisääminen karttaan
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/sillat.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
+    .then(response => response.json())
+    .then(data => {
+        railGeometryData = data;
+        
+        const transformedData = {
+            ...railGeometryData,
+            features: railGeometryData.features.map(feature => {
+                if (feature.geometry && feature.geometry.coordinates) {
+                    if (feature.geometry.type === 'MultiLineString') {
+                        return {
+                            ...feature,
+                            geometry: {
+                                ...feature.geometry,
+                                coordinates: feature.geometry.coordinates.map(line => 
+                                    line.map(coord => {
+                                        const latlng = proj4('EPSG:3067', 'WGS84', coord);
+                                        return [latlng[0], latlng[1]];
+                                    })
+                                )
+                            }
+                        };
+                    } else {
+                        return feature;
+                    }
+                } else {
+                    return feature;
+                }
+            })
+        };
+
+        const geoLayer = L.geoJSON(transformedData, {
+			style: function(feature) {
+				return { color: "#56ff00", weight: 7, zIndex: 1000 };
+			},
+			onEachFeature: function(feature, layer) {
+				if (feature.properties && feature.properties.nimi) {
+					layer.bindTooltip(feature.properties.nimi, {
+						className: 'custom-tooltip',
+						sticky: true  // Tämä saa tooltipin seuraamaan hiirtä
+					});
+				}
+			}
+
+		}).addTo(sillatLayerGroup);
+
+        map.fitBounds(geoLayer.getBounds());
+    })
+    .catch(error => {
+        console.error("Virhe ladattaessa siltojen geometriaa:", error);
+    });	
+
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Verkkovirhe' + response.status);
+    }
+    return response.json();
+  })
+  .then(data => {
+    geojsonLayer = L.geoJSON(data, {
+      onEachFeature: function (feature, layer) {
+        // Popupin määrittely tulee tänne...
+      },
+      pointToLayer: function (feature, latlng) {
+
+        const transformedCoords = proj4('EPSG:3067', 'EPSG:4326', [latlng.lng, latlng.lat]);
+        return L.circleMarker([transformedCoords[1], transformedCoords[0]], {
+           radius: 8,
+          fillColor: "#ff7800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        }).bindTooltip(`Tunnus: ${feature.properties.tunnus}<br>Nimi: ${feature.properties.nimi}`, {
+		  permanent: false,
+		  direction: 'top',
+		  className: 'custom-tooltip'
+		});
+      }
+    }).addTo(tasoristeyksetLayerGroup); // Lisää geojsonLayer suoraan tasoristeyksetLayerGroupiin
+  })
+  .catch(error => {
+    console.error('Latausvirhe:', error);
+  });
+
+
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        data.features.forEach(feature => {
+            if (feature.geometry && feature.geometry.type === "MultiPolygon") {
+                let allPolygons = [];
+                feature.geometry.coordinates.forEach(polygon => {
+                    let polygonCoordinates = polygon[0].map(coord => {
+                        let converted = proj4('EPSG:3067', 'WGS84', coord);
+                        return [converted[1], converted[0]];
+                    });
+                    allPolygons.push(polygonCoordinates);
+                });
+                // Yhdistä tiedot ja luo yksi tooltip
+                let tooltipContent = `Numero: ${feature.properties.numero}<br>Nimi: ${feature.properties.nimi}`;
+                L.polygon(allPolygons)
+                  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
+                  .addTo(tilirataosatLayerGroup);
+            }
+        });
+    })
+    .catch(error => {
+        console.error('There was a problem:', error);
+    });
 
 
 fetch('https://rata.digitraffic.fi/infra-api/0.7/12678/kilometrimerkit.geojson?time=2023-10-27T09:58:00Z/2023-10-27T09:58:00Z')
@@ -284,6 +453,3 @@ function onMoveEnd() {
         }
     });
 }
-
-
-
