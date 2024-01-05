@@ -413,7 +413,7 @@ fetch('tilirataosat.geojson')
     });
 
 
-fetch('kilometrimerkit.geojson')
+fetch('ratakm.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
