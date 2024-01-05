@@ -242,7 +242,7 @@ document.getElementById('menuButton').addEventListener('click', function() {
 });
 
 // Tunnelien lisääminen karttaan
-fetch('tunnelit.geojson')
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/tunnelit.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -295,7 +295,7 @@ fetch('tunnelit.geojson')
     });
 
 // Siltojen lisääminen karttaan
-fetch('sillat.geojson')
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12814/sillat.geojson?time=2023-11-22T08:30:00Z/2023-11-22T08:30:00Z')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -347,7 +347,7 @@ fetch('sillat.geojson')
         console.error("Virhe ladattaessa siltojen geometriaa:", error);
     });	
 
-fetch('tasoristeykset.geojson')
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12714/tasoristeykset.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
   .then(response => {
     if (!response.ok) {
       throw new Error('Verkkovirhe' + response.status);
@@ -382,7 +382,7 @@ fetch('tasoristeykset.geojson')
   });
 
 
-fetch('tilirataosat.geojson')
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12713/tilirataosat.geojson?time=2023-11-02T22:00:00Z/2023-11-02T22:00:00Z')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
@@ -413,7 +413,7 @@ fetch('tilirataosat.geojson')
     });
 
 
-fetch('ratakm.geojson')
+fetch('https://rata.digitraffic.fi/infra-api/0.7/12678/kilometrimerkit.geojson?time=2023-10-27T09:58:00Z/2023-10-27T09:58:00Z')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
@@ -473,3 +473,32 @@ function onMoveEnd() {
         }
     });
 }
+
+// Funktio käyttäjän sijainnin hakemiseen ja näyttämiseen
+function locateUser() {
+    if ("geolocation" in navigator) {
+        // Geolokaatio on saatavilla
+        navigator.geolocation.getCurrentPosition(function(position) {
+            // Haetaan käyttäjän sijainti
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Asetetaan kartan keskipiste käyttäjän sijaintiin ja zoomataan lähemmäs
+            map.setView([lat, lon], 13);
+
+            // Lisätään merkki käyttäjän sijaintiin
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup("Olet tässä!").openPopup();
+
+        }, function() {
+            // Käyttäjä ei antanut lupaa sijainnin käyttöön tai muu virhe tapahtui
+            alert("Sijaintitietojen haku epäonnistui.");
+        });
+    } else {
+        // Geolokaatio ei ole saatavilla
+        alert("Selaimesi ei tue sijainnin hakua.");
+    }
+}
+
+// Lisää napin kuuntelija tai vastaava aktivoidaksesi sijainnin haun
+document.getElementById('locateUser').addEventListener('click', locateUser);
