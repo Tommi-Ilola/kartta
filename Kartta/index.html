@@ -8,32 +8,14 @@
     <link rel="icon" href="Logo.png">
 	<link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-
-    <script>
-	function verifyPassword() {
-		var password = prompt("Anna salasana päästäksesi sivulle:");
-		if (password == "ratakilometri") {
-			// Salasana oikein, näytä sisältö
-			document.getElementById("protected-content").style.display = "block";
-			
-			// Pyydä Leafletiä päivittämään kartan koko
-			setTimeout(function() {
-				map.invalidateSize();
-			}, 400);
-		} else {
-			// Salasana väärin, ilmoita käyttäjälle
-			alert("Väärä salasana!");
-		}
-	}
-    </script>
 	
 </head>
 
 <body onload="verifyPassword();">
-
+<div id="map" style="display:none"></div>	
   <div id="protected-content" style="display:none">
 
-	<div id="map"></div>
+	
 
 	<div id="menuContainer">
 		<button id="menuButton">
