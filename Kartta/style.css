@@ -302,8 +302,6 @@ body, html {
 }
 
 #menuButton {
-    z-index: 1001;
-    position: relative;
     background-color: white;
     border: none;
     border-radius: 3px;
