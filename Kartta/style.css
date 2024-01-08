@@ -91,7 +91,7 @@ body, html {
 
 #locateUser {
     position: absolute;
-    z-index: 2000;
+    z-index: 1000;
     top: 156px;
     left: 10px;
     background-color: white;
