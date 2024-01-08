@@ -107,14 +107,12 @@ body, html {
 
 .magnifier-icon {
     color: black;
-    font-size: 12pt;
     cursor: pointer;
 }
 
 #searchButton .close-icon { 
-	color: black;
+    color: black;
     font-weight: bold;
-    font-size: 10pt; 
 }
 
 #results {
