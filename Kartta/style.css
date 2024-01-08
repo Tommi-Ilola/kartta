@@ -284,6 +284,7 @@ body, html {
 }
 
 #locateUser {
+    z.index: 1000;
     position: absolute;
     bottom: 10px;
     left: 47px;
@@ -301,6 +302,8 @@ body, html {
 }
 
 #menuButton {
+    z.index: 1001;
+    position: relative;
     background-color: white;
     border: none;
     border-radius: 3px;
