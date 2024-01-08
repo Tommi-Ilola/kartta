@@ -257,14 +257,14 @@ body, html {
     position: absolute;
     bottom: 10px;
     left: 10px;
-	top: unset;
+    top: unset;
     right: unset;
     z-index: 2000;
     background-color: white;
-    padding: 6px 3px 3px 3px;
+    padding: 4px 3.5px 5.5px 3.5px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	border: 0px solid rgba(0,0,0,0.2);
+    border: 0px solid rgba(0,0,0,0.2);
 }
 
 #toggleView {
@@ -306,7 +306,6 @@ body, html {
     cursor: pointer;
     width: 27px;
     height: 24px;
-	padding: 0pt 0pt 0pt 0pt;
 }
 
 }
