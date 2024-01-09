@@ -580,7 +580,7 @@ function updateUserMarker(lat, lon, heading) {
         if (!userHeadingMarker) {
             const icon = L.divIcon({
                 className: 'heading-icon', // Määrittele tarvittavat tyylit .heading-icon-luokalle CSS:ssä
-                html: '<div style="transform: rotate(' + heading + 'deg);">↑</div>', // Nuolen HTML
+                html: '<div style="transform: rotate(' + heading + 'deg);">◁</div>', // Nuolen HTML
                 iconSize: [30, 30],
                 iconAnchor: [15, 15]
             });
