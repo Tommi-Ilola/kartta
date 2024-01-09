@@ -612,7 +612,6 @@ map.on('dragstart', function() {
     if (isTracking) {
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
-        userMarker.remove(); // Poista merkki kartalta
         userMarker = null;
     }
 });
