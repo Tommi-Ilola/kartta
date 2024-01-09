@@ -157,6 +157,22 @@ body, html {
   background-color: #f8f8f8;
 }
 
+.leaflet-tooltip.kayttokeskusalueet {
+  background-color: #fff !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  padding: 6px !important;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
+}
+
+.leaflet-tooltip.kayttokeskusalueet::before {
+  border-top-color: #fff;
+}
+
+.leaflet-tooltip.kayttokeskusalueet:hover {
+  background-color: #f8f8f8;
+}
+
 .custom-tooltip {
   background-color: #fff !important;
   border: 1px solid #ddd !important;
