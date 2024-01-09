@@ -581,7 +581,6 @@ function startTracking() {
         // Jos seuranta on päällä, lopeta se
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
-        userMarker.remove(); // Poista merkki kartalta
         userMarker = null;
     } else {
         // Aloita käyttäjän sijainnin seuranta
@@ -591,7 +590,7 @@ function startTracking() {
                 const lon = position.coords.longitude;
 
                 updateUserMarker(lat, lon);
-                map.setView([lat, lon], map.getZoom());
+                map.setView([lat, lon], 13);
             }, function(error) {
                 console.error("Sijainnin seuranta epäonnistui: ", error);
             }, {
@@ -612,11 +611,13 @@ map.on('dragstart', function() {
     if (isTracking) {
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
+        userMarker.remove(); // Poista merkki kartalta
         userMarker = null;
     }
 });
 
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
 
 
 
