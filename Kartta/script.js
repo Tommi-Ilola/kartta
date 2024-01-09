@@ -208,6 +208,7 @@ let tilirataosatLayerGroup = L.layerGroup();
 let kilometrimerkitLayerGroup = L.layerGroup();
 let tasoristeyksetLayerGroup = L.layerGroup();
 kilometrimerkitLayerGroup.addTo(map);
+let kayttokeskusalueetLayerGroup = L.layerGroup();
 
 document.getElementById('tunnelitCheckbox').addEventListener('change', function() {
     if (this.checked) {
@@ -246,6 +247,14 @@ document.getElementById('kilometrimerkitCheckbox').addEventListener('change', fu
         kilometrimerkitLayerGroup.addTo(map);
     } else {
         kilometrimerkitLayerGroup.removeFrom(map);
+    }
+});
+
+document.getElementById('kayttokeskusalueetCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        kayttokeskusalueetLayerGroup.addTo(map);
+    } else {
+        kayttokeskusalueetLayerGroup.removeFrom(map);
     }
 });
 
@@ -465,6 +474,63 @@ fetch('ratakm.geojson')
 
 map.on('zoomend', onZoomEnd);
 map.on('moveend', onMoveEnd);
+
+fetch('https://rata.digitraffic.fi/infra-api/0.7/13008/kayttokeskukset.geojson?time=2024-01-07T22:00:00Z/2024-01-07T22:00:00Z')
+    .then(response => response.json())
+    .then(data => {
+        const transformedData = transformGeoJSONData(data);
+
+        L.geoJSON(transformedData, {
+            style: function(feature) {
+                return {
+                    color: '#ff7800',
+                    weight: 1,
+                    fillOpacity: 0.1
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                // Tarkistetaan, onko ominaisuustietoja
+                if (feature.properties) {
+                    if (feature.properties.nimi) {
+                        // Luodaan tooltip jokaiselle polygonille
+                        layer.bindTooltip(feature.properties.nimi, {
+                            className: 'kayttokeskusalueet',
+							sticky: true,
+                            direction: 'top'
+                        });
+                    }
+                }
+            }
+        }).addTo(KayttokeskusalueetLayerGroup);
+    })
+    .catch(error => console.error('Error loading GeoJSON data:', error));
+
+function transformGeoJSONData(geojsonData) {
+    return {
+        ...geojsonData,
+        features: geojsonData.features.map(feature => {
+            if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+                return {
+                    ...feature,
+                    geometry: {
+                        ...feature.geometry,
+                        coordinates: transformCoordinates(feature.geometry.coordinates, feature.geometry.type)
+                    }
+                };
+            }
+            return feature;
+        })
+    };
+}
+
+function transformCoordinates(coordinates, type) {
+    if (type === 'Polygon') {
+        return coordinates.map(ring => ring.map(coord => proj4('EPSG:3067', 'EPSG:4326', coord)));
+    } else if (type === 'MultiPolygon') {
+        return coordinates.map(polygon => polygon.map(ring => ring.map(coord => proj4('EPSG:3067', 'EPSG:4326', coord))));
+    }
+    return coordinates;
+}
 
 function onZoomEnd() {
     const zoomLevel = map.getZoom();
