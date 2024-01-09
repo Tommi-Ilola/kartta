@@ -4,6 +4,14 @@ body, html {
     padding: 0;
 }
 
+.heading-icon {
+    /* Oletetaan, että olet määritellyt mukautetun luokan ikonillesi */
+    transform-origin: center;
+    /* Alkuperäinen kääntöasetus, jota JavaScript-koodi päivittää */
+    transform: rotate(0deg);
+}
+
+
 #layerControl {
     position: absolute;
     top: 10px;
