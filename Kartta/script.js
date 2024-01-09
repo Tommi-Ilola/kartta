@@ -501,7 +501,7 @@ fetch('kayttokeskusalueet.geojson')
                     }
                 }
             }
-        }).addTo(KayttokeskusalueetLayerGroup);
+        }).addTo(kayttokeskusalueetLayerGroup);
     })
     .catch(error => console.error('Virhe ladattaessa käyttökeskusalueiden geometriaa', error));
 
