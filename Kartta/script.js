@@ -557,6 +557,7 @@ function onMoveEnd() {
     });
 }
 
+let userMarker;  // Globaali muuttuja käyttäjän merkkiä varten
 function startTracking() {
     if ("geolocation" in navigator) {
         navigator.geolocation.watchPosition(function(position) {
