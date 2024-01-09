@@ -557,41 +557,46 @@ function onMoveEnd() {
     });
 }
 
-// Funktio sijainnin hakemiseen ja seuraamiseen
-let userMarker;  // Globaali muuttuja käyttäjän merkkiä varten
-
 function startTracking() {
     if ("geolocation" in navigator) {
-        // Aloita käyttäjän sijainnin seuraaminen
         navigator.geolocation.watchPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
+            const heading = position.coords.heading; // Suunta, johon laite osoittaa, astetta (0 = pohjoinen)
 
-            // Päivitä kartan keskipiste ja zoomaa lähemmäs, jos merkkiä ei ole vielä luotu
+            // Päivitä tai luo käyttäjän sijaintia osoittava merkki
             if (!userMarker) {
-                userMarker = L.marker([lat, lon]).addTo(map)
-                    .bindPopup("Olet tässä!");
+                userMarker = L.circleMarker([lat, lon], {
+                    radius: 8,
+                    fillColor: "#3186cc",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
                 map.setView([lat, lon], 13);
             } else {
-                // Päivitä olemassa olevan merkin sijainti
                 userMarker.setLatLng([lat, lon]);
             }
 
-            userMarker.getPopup().setContent("Olet tässä: " + lat.toFixed(5) + ", " + lon.toFixed(5));
-            userMarker.openPopup();
+            // Päivitä tooltip sisältämään ilmansuunta, jos se on saatavilla
+            let popupContent = "Olet tässä: " + lat.toFixed(5) + ", " + lon.toFixed(5);
+            if (heading !== undefined) {
+                popupContent += "<br>Ilmansuunta: " + heading.toFixed(1) + "°";
+            }
+            userMarker.bindPopup(popupContent).openPopup();
 
         }, function(error) {
-            // Käsittele mahdolliset virheet täällä
             console.error("Sijainnin seuranta epäonnistui: ", error);
         }, {
-            enableHighAccuracy: true,  // Pyydä tarkempaa sijaintia, jos mahdollista
-            maximumAge: 10000,        // Hyväksy enintään 10 sekuntia vanha sijaintitieto
-            timeout: 5000             // Aikakatkaisu 5 sekunnin kuluttua, jos sijaintia ei saada
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 5000
         });
     } else {
         alert("Selaimesi ei tue sijainnin hakua.");
     }
 }
 
-// Aloita sijainnin seuranta, esimerkiksi painikkeesta:
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
