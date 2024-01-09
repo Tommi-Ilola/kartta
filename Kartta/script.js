@@ -475,7 +475,7 @@ fetch('ratakm.geojson')
 map.on('zoomend', onZoomEnd);
 map.on('moveend', onMoveEnd);
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/13008/kayttokeskukset.geojson?time=2024-01-07T22:00:00Z/2024-01-07T22:00:00Z')
+fetch('kayttokeskusalueet.geojson')
     .then(response => response.json())
     .then(data => {
         const transformedData = transformGeoJSONData(data);
@@ -503,7 +503,7 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/13008/kayttokeskukset.geojson?t
             }
         }).addTo(KayttokeskusalueetLayerGroup);
     })
-    .catch(error => console.error('Error loading GeoJSON data:', error));
+    .catch(error => console.error('Virhe ladattaessa käyttökeskusalueiden geometriaa', error));
 
 function transformGeoJSONData(geojsonData) {
     return {
