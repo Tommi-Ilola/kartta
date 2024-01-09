@@ -557,11 +557,11 @@ function onMoveEnd() {
     });
 }
 
-let userMarker; // Globaali muuttuja käyttäjän merkkiä varten
-let userHeading; // Globaali muuttuja käyttäjän suunnalle
+let userMarker;  // Globaali muuttuja käyttäjän merkkiä varten
+let watchID;     // Globaali muuttuja watchPositionin ID:lle
+let isTracking = false; // Globaali muuttuja seurannan tilalle
 
-function updateMarker(lat, lon, heading) {
-    // Päivitä käyttäjän sijaintia osoittavaa merkkiä
+function updateUserMarker(lat, lon) {
     if (userMarker) {
         userMarker.setLatLng([lat, lon]);
     } else {
@@ -574,39 +574,50 @@ function updateMarker(lat, lon, heading) {
             fillOpacity: 0.8
         }).addTo(map);
     }
-
-    // Päivitä popup sisältämään ilmansuunta, jos se on saatavilla
-    let popupContent = "Olet tässä: " + lat.toFixed(5) + ", " + lon.toFixed(5);
-    if (heading !== undefined) {
-        popupContent += "<br>Ilmansuunta: " + heading.toFixed(1) + "°";
-        userHeading = heading;
-    }
-    userMarker.bindPopup(popupContent).openPopup();
 }
 
 function startTracking() {
-    if ("geolocation" in navigator) {
-        navigator.geolocation.watchPosition(function(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            const heading = position.coords.heading; // Suunta, johon laite osoittaa, astetta (0 = pohjoinen)
-            
-            updateMarker(lat, lon, heading);
-            
-            // Zoomaa ja keskitä kartta uuteen sijaintiin
-            map.setView([lat, lon], map.getZoom());
-        }, function(error) {
-            console.error("Sijainnin seuranta epäonnistui: ", error);
-        }, {
-            enableHighAccuracy: true,
-            maximumAge: 10000,
-            timeout: 5000
-        });
+    if (isTracking) {
+        // Jos seuranta on päällä, lopeta se
+        navigator.geolocation.clearWatch(watchID);
+        isTracking = false;
+        userMarker.remove(); // Poista merkki kartalta
+        userMarker = null;
     } else {
-        alert("Selaimesi ei tue sijainnin hakua.");
+        // Aloita käyttäjän sijainnin seuranta
+        if ("geolocation" in navigator) {
+            watchID = navigator.geolocation.watchPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                updateUserMarker(lat, lon);
+                map.setView([lat, lon], map.getZoom());
+            }, function(error) {
+                console.error("Sijainnin seuranta epäonnistui: ", error);
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 10000,
+                timeout: 5000
+            });
+
+            isTracking = true;
+        } else {
+            alert("Selaimesi ei tue sijainnin hakua.");
+        }
     }
 }
 
+// Kartan liikuttaminen lopettaa käyttäjän seurannan
+map.on('dragstart', function() {
+    if (isTracking) {
+        navigator.geolocation.clearWatch(watchID);
+        isTracking = false;
+        userMarker.remove(); // Poista merkki kartalta
+        userMarker = null;
+    }
+});
+
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
 
 
