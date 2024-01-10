@@ -5,7 +5,8 @@ body, html {
 }
 
 .user-marker-icon {
-    transform-origin: center;
+    -webkit-transform-origin-x: center;
+    -webkit-transform-origin-y: center;
     transform: rotate(0deg);
 }
 
