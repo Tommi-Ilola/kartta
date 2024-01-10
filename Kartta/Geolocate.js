@@ -120,7 +120,7 @@ function startTracking() {
             watchID = navigator.geolocation.watchPosition(function(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                const heading = position.coords.heading;
+                const heading = position.coords.heading || 0;
 
                 updateUserLocation(lat, lon);
                 updateHeading(lat, lon, heading);
