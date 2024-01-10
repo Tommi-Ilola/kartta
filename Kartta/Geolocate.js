@@ -88,6 +88,7 @@ function updateUserLocation(lat, lon) {
 }
 
 function updateHeading(lat, lon, heading) {
+    console.log("Heading:", heading); // Debuggaus: Tulosta heading-arvo
     if (!headingMarker) {
         headingMarker = L.marker([lat, lon], {
             icon: headingIcon,
