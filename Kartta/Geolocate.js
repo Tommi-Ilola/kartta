@@ -7,7 +7,8 @@ let isTracking = false;
 let userIcon = L.icon({
     iconUrl: 'circle-icon.png',
     iconSize: [24, 24],
-    iconAnchor: [12, 12]
+    iconAnchor: [12, 12],
+	className: 'marker-icon'
 });
 
 let headingIcon = L.icon({
@@ -33,8 +34,8 @@ function updateHeading(lat, lon, heading) {
     }
 
     if (heading !== null && heading !== undefined && headingMarker._icon) {
-        // Käytä suoraa transformaatiota CSS:n kautta
-        headingMarker._icon.style.transform = 'rotate(' + heading + 'deg)';
+        // Käytä Leafletin sisäänrakennettua funktiota transformaation asettamiseen
+        L.DomUtil.setTransform(headingMarker._icon, null, heading);
     }
 }
 
