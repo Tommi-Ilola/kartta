@@ -32,11 +32,9 @@ function updateHeading(lat, lon, heading) {
         headingMarker.setLatLng([lat, lon]);
     }
 
-    if (heading !== null && heading !== undefined) {
-        // Päivitä suunnan rotaatio
-        const transform = 'rotate(' + heading + 'deg)';
-        headingMarker._icon.style[L.DomUtil.TRANSFORM] += transform;
-        headingMarker._icon.style[L.DomUtil.TRANSFORM_ORIGIN] = 'center';
+    if (heading !== null && heading !== undefined && headingMarker._icon) {
+        // Käytä suoraa transformaatiota CSS:n kautta
+        headingMarker._icon.style.transform = 'rotate(' + heading + 'deg)';
     }
 }
 
@@ -87,7 +85,7 @@ map.on('dragstart', function() {
         if (userMarker) userMarker.remove();
         userMarker = null;
         // Muuta painikkeen tekstiä tai ulkoasua tarvittaessa
-        document.getElementById('locateUser').textContent = "Locate Me";
+        document.querySelector('#locateUser img').src = "locate-active.png";
     }
 });
 
