@@ -1,40 +1,24 @@
 let userMarker, userHeadingMarker;
 let watchID;
 let isTracking = false;
+let userIcon = L.icon({
+    iconUrl: 'arrow-icon.png', // Korvaa tämä polku nuolen kuvan polulla
+    iconSize: [24, 24], // Aseta sopiva koko
+    iconAnchor: [12, 12], // Oletetaan, että nuoli on keskitetty
+    className: 'user-marker-icon' // Käytä määriteltyä luokkaa
+});
 
 function updateUserMarker(lat, lon, heading) {
-    if (!userMarker) {
-        userMarker = L.circleMarker([lat, lon], {
-            radius: 8,
-            fillColor: "#3186cc",
-            color: "#3186cc",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-        }).addTo(map);
-    } else {
+    if (userMarker) {
         userMarker.setLatLng([lat, lon]);
-    }
-
-    // Päivitä suuntaa osoittavaa nuolta
-    if (heading !== undefined && heading !== null) {
-        if (!userHeadingMarker) {
-            const icon = L.divIcon({
-                className: 'heading-icon', // Määrittele tarvittavat tyylit .heading-icon-luokalle CSS:ssä
-                html: '<div class="heading-icon" style="transform: rotate(' + heading + 'deg);">▲</div>', // Nuolen HTML
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-            userHeadingMarker = L.marker([lat, lon], {icon: icon}).addTo(map);
-        } else {
-            userHeadingMarker.setLatLng([lat, lon]);
-            userHeadingMarker.setIcon(L.divIcon({
-                className: 'heading-icon',
-                html: '<div class="heading-icon" style="transform: rotate(' + heading + 'deg);">▲</div>',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            }));
+        if (heading !== null && heading !== undefined) {
+            // Ota olemassa oleva transform-tyyli ja lisää siihen kääntö
+            const currentTransform = userMarker._icon.style.transform;
+            const rotateTransform = ' rotate(' + heading + 'deg)';
+            userMarker._icon.style.transform = currentTransform + rotateTransform;
         }
+    } else {
+        userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
     }
 }
 
