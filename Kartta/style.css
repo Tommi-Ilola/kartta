@@ -5,14 +5,11 @@ body, html {
 }
 
 .marker-icon {
-    -webkit-transform-origin-x: center;
-    -webkit-transform-origin-y: center;
-    transform: rotate(0deg);
+    transform-origin: center;
 }
 
 .heading-icon {
-    transform-origin: center center;
-    transform: rotate(0deg);
+    transform-origin: center;
 }
 
 #layerControl {
