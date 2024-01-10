@@ -5,10 +5,15 @@ body, html {
 }
 
 .heading-icon {
-    /* Oletetaan, että olet määritellyt mukautetun luokan ikonillesi */
+    display: flex;
     transform-origin: center;
-    /* Alkuperäinen kääntöasetus, jota JavaScript-koodi päivittää */
     transform: rotate(0deg);
+    justify-content: center;
+    position: relative;
+    top: -13px;
+    color: #3186cc;
+    opacity: 0.8;
+    font-size: large;
 }
 
 
