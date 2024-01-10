@@ -7,8 +7,7 @@ let isTracking = false;
 let userIcon = L.icon({
     iconUrl: 'circle-icon.png',
     iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    className: 'marker-icon'
+    iconAnchor: [12, 12]
 });
 
 let headingIcon = L.icon({
