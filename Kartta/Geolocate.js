@@ -13,7 +13,7 @@ function updateUserMarker(lat, lon, heading) {
         userMarker.setLatLng([lat, lon]);
         // Päivitä nuolen suuntaa vain, jos heading on saatavilla
         if (heading !== null && heading !== undefined && userMarker._icon) {
-            userMarker._icon.style.transform += ' rotate(' + heading + 'deg) !important';
+            userMarker._icon.style.transform += ' rotate(' + heading + 'deg)';
         }
     } else {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
