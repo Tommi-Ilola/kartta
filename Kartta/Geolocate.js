@@ -5,7 +5,7 @@ let isTracking = false;
 
 // Määritellään kaksi eri ikonia: yksi käyttäjän sijainnille, toinen suunnalle
 let userIcon = L.icon({
-    iconUrl: 'arrow-icon.png',
+    iconUrl: 'circle-icon.png',
     iconSize: [24, 24],
     iconAnchor: [12, 12]
 });
@@ -60,7 +60,7 @@ function startTracking() {
 				updateHeading(lat, lon, heading);
 
 				if (isTracking) {
-					map.setView([lat, lon], map.getZoom());
+					map.setView([lat, lon], 16);
 				}
 			}, function(error) {
 				console.error("Sijainnin seuranta epäonnistui: ", error);
@@ -76,7 +76,6 @@ function startTracking() {
     }
 }
 
-
 // Kartan liikuttaminen lopettaa käyttäjän seurannan
 map.on('dragstart', function() {
     if (isTracking) {
@@ -90,3 +89,4 @@ map.on('dragstart', function() {
 });
 
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
