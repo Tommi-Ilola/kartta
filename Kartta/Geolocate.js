@@ -12,10 +12,8 @@ function updateUserMarker(lat, lon, heading) {
     if (userMarker) {
         userMarker.setLatLng([lat, lon]);
         if (heading !== null && heading !== undefined) {
-            // Ota olemassa oleva transform-tyyli ja lisää siihen kääntö
-            const currentTransform = userMarker._icon.style.transform;
-            const rotateTransform = ' rotate(' + heading + 'deg)';
-            userMarker._icon.style.transform = currentTransform + rotateTransform;
+            // Käytä Leafletin sisäänrakennettua funktiota transformaation asettamiseen
+            L.DomUtil.setTransform(userMarker._icon, null, heading);
         }
     } else {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
