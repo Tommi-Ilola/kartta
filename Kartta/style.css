@@ -10,6 +10,9 @@ body, html {
     transform: rotate(0deg);
 }
 
+.heading-icon {
+    transform-origin: center;
+}
 
 #layerControl {
     position: absolute;
