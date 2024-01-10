@@ -120,6 +120,17 @@ body, html {
     cursor: pointer;
 }
 
+.locate-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.locate-button img {
+    width: 30px;
+    height: 30px;
+}
+
 .magnifier-icon {
     color: black;
     cursor: pointer;
