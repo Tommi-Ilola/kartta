@@ -11,9 +11,9 @@ let userIcon = L.icon({
 function updateUserMarker(lat, lon, heading) {
     if (userMarker) {
         userMarker.setLatLng([lat, lon]);
-        if (heading !== null && heading !== undefined) {
-            // Käytä Leafletin sisäänrakennettua funktiota transformaation asettamiseen
-            L.DomUtil.setTransform(userMarker._icon, null, heading);
+        // Päivitä nuolen suuntaa vain, jos heading on saatavilla
+        if (heading !== null && heading !== undefined && userMarker._icon) {
+            userMarker._icon.style.transform += ' rotate(' + heading + 'deg)';
         }
     } else {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
@@ -22,49 +22,30 @@ function updateUserMarker(lat, lon, heading) {
 
 function startTracking() {
     if (isTracking) {
-        // Jos seuranta on jo päällä, lopeta se ja poista merkki
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
-        if (userMarker) {
-            userMarker.remove();
-            userMarker = null;
-        }
+        if (userMarker) userMarker.remove();
+        userMarker = null;
+
+        // Muuta painikkeen kuvaa
+        document.querySelector('#locateUser img').src = "locate.png";
     } else {
-        // Aloita käyttäjän sijainnin seuranta
         if ("geolocation" in navigator) {
-            // Zoomaa käyttäjän nykyiseen sijaintiin ja lisää merkki kartalle
-            navigator.geolocation.getCurrentPosition(function(position) {
+            isTracking = true;
+            document.querySelector('#locateUser img').src = "locate-active.png";
+            watchID = navigator.geolocation.watchPosition(function(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                const heading = position.coords.heading || 0; // Oletusarvo, jos suuntaa ei ole saatavilla
-
-                // Lisää merkki kartalle tai päivitä olemassa olevaa
-                updateUserMarker(lat, lon, heading);
+                const heading = position.coords.heading || 0;
                 
-                // Keskity käyttäjän sijaintiin ja zoomaa sisään
-                map.setView([lat, lon], 16);
-
-                // Aloita sijainnin jatkuva seuranta
-                watchID = navigator.geolocation.watchPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    const heading = position.coords.heading || 0; // Päivitä suuntaa tarvittaessa
-
-                    updateUserMarker(lat, lon, heading);
-                    // Keskity kartta automaattisesti käyttäjän liikkuessa
-                    map.panTo([lat, lon]);
-
-                }, function(error) {
-                    console.error("Sijainnin seuranta epäonnistui: ", error);
-                }, {
-                    enableHighAccuracy: true,
-                    maximumAge: 10000,
-                    timeout: 5000
-                });
-
-                isTracking = true;
+                updateUserMarker(lat, lon, heading);
+                if (isTracking) {
+                    // Keskity ja zoomaa käyttäjän sijaintiin
+                    map.setView([lat, lon], 16); // Voit säätää zoom-tasoa
+                }
             }, function(error) {
-                console.error("Sijainnin haku epäonnistui: ", error);
+                console.error("Sijainnin seuranta epäonnistui: ", error);
+                isTracking = false;
             }, {
                 enableHighAccuracy: true,
                 maximumAge: 10000,
@@ -76,15 +57,16 @@ function startTracking() {
     }
 }
 
+
 // Kartan liikuttaminen lopettaa käyttäjän seurannan
 map.on('dragstart', function() {
     if (isTracking) {
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
-        if (userMarker) {
-            userMarker.remove();
-            userMarker = null;
-        }
+        if (userMarker) userMarker.remove();
+        userMarker = null;
+        // Muuta painikkeen tekstiä tai ulkoasua tarvittaessa
+        document.getElementById('locateUser').textContent = "Locate Me";
     }
 });
 
