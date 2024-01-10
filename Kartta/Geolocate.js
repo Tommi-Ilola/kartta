@@ -1,6 +1,6 @@
-// Varmista, että L.RotatedMarker on ladattu ja käytettävissä
-if (!L.rotatedMarker) {
-    console.error("L.RotatedMarker-kirjastoa ei löydy. Varmista, että olet lisännyt sen.");
+// Varmista, että L.marker on ladattu ja käytettävissä
+if (!L.marker) {
+    console.error("L.marker-kirjastoa ei löydy. Varmista, että olet lisännyt sen.");
 }
 
 let userMarker; // Käyttäjän sijaintia varten
@@ -31,7 +31,7 @@ function updateUserLocation(lat, lon) {
 
 function updateHeading(lat, lon, heading) {
     if (!headingMarker) {
-        headingMarker = L.rotatedMarker([lat, lon], {
+        headingMarker = L.marker([lat, lon], {
             icon: headingIcon,
             rotationAngle: heading
         }).addTo(map);
