@@ -1,6 +1,18 @@
 let userMarker; // Käyttäjän sijaintia varten
 let headingMarker; // Suuntaa osoittavaa nuolta varten
 
+let userIcon = L.icon({
+    iconUrl: 'circle-icon.png',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+});
+
+let headingIcon = L.icon({
+    iconUrl: 'arrow-icon.png',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+});
+
 function updateUserLocation(lat, lon) {
     if (!userMarker) {
         userMarker = L.circleMarker([lat, lon], {
