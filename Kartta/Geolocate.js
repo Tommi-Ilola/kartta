@@ -51,10 +51,11 @@ function startTracking() {
         navigator.geolocation.watchPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            const heading = position.coords.heading;
-
-            updateUserLocation(lat, lon);
-            updateHeading(lat, lon, heading);
+            const heading = position.coords.heading; // Suunta, johon laite osoittaa, astetta (0 = pohjoinen)
+            
+            updateMarker(lat, lon, heading);
+            
+            // Zoomaa ja keskitä kartta uuteen sijaintiin
             map.setView([lat, lon], map.getZoom());
         }, function(error) {
             console.error("Sijainnin seuranta epäonnistui: ", error);
@@ -67,7 +68,6 @@ function startTracking() {
         alert("Selaimesi ei tue sijainnin hakua.");
     }
 }
-
 document.getElementById('locateUser').addEventListener('click', startTracking);
 
 
