@@ -22,40 +22,61 @@ function updateUserMarker(lat, lon, heading) {
 
 function startTracking() {
     if (isTracking) {
-        // Jos seuranta on päällä, lopeta se
+        // Jos seuranta on jo päällä, lopeta se ja poista merkki
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
         if (userMarker) {
-            userMarker.remove(); // Poista käyttäjän merkki kartalta
+            userMarker.remove();
             userMarker = null;
         }
     } else {
         // Aloita käyttäjän sijainnin seuranta
         if ("geolocation" in navigator) {
-            watchID = navigator.geolocation.watchPosition(function(position) {
+            // Zoomaa käyttäjän nykyiseen sijaintiin ja lisää merkki kartalle
+            navigator.geolocation.getCurrentPosition(function(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 const heading = position.coords.heading || 0; // Oletusarvo, jos suuntaa ei ole saatavilla
 
+                // Lisää merkki kartalle tai päivitä olemassa olevaa
                 updateUserMarker(lat, lon, heading);
-                // Zoomaa käyttäjän sijaintiin. Voit säätää zoom-tasoa tarpeen mukaan.
+                
+                // Keskity käyttäjän sijaintiin ja zoomaa sisään
                 map.setView([lat, lon], 16);
 
+                // Aloita sijainnin jatkuva seuranta
+                watchID = navigator.geolocation.watchPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const heading = position.coords.heading || 0; // Päivitä suuntaa tarvittaessa
+
+                    updateUserMarker(lat, lon, heading);
+                    // Keskity kartta automaattisesti käyttäjän liikkuessa
+                    map.panTo([lat, lon]);
+
+                }, function(error) {
+                    console.error("Sijainnin seuranta epäonnistui: ", error);
+                }, {
+                    enableHighAccuracy: true,
+                    maximumAge: 10000,
+                    timeout: 5000
+                });
+
+                isTracking = true;
             }, function(error) {
-                console.error("Sijainnin seuranta epäonnistui: ", error);
+                console.error("Sijainnin haku epäonnistui: ", error);
             }, {
                 enableHighAccuracy: true,
                 maximumAge: 10000,
                 timeout: 5000
             });
-
-            isTracking = true;
         } else {
             alert("Selaimesi ei tue sijainnin hakua.");
         }
     }
 }
 
+// Kartan liikuttaminen lopettaa käyttäjän seurannan
 map.on('dragstart', function() {
     if (isTracking) {
         navigator.geolocation.clearWatch(watchID);
@@ -63,10 +84,6 @@ map.on('dragstart', function() {
         if (userMarker) {
             userMarker.remove();
             userMarker = null;
-        }
-        if (userHeadingMarker) {
-            userHeadingMarker.remove();
-            userHeadingMarker = null;
         }
     }
 });
