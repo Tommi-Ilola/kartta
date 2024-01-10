@@ -57,7 +57,7 @@
 })();
 
 // Varmista, että L.RotatedMarker on ladattu ja käytettävissä
-if (!L.RotatedMarker) {
+if (!L.rotatedMarker) {
     console.error("L.RotatedMarker-kirjastoa ei löydy. Varmista, että olet lisännyt sen.");
 }
 
@@ -89,9 +89,9 @@ function updateUserLocation(lat, lon) {
 
 function updateHeading(lat, lon, heading) {
     if (!headingMarker) {
-        headingMarker = new L.RotatedMarker([lat, lon], {
+        headingMarker = L.rotatedMarker([lat, lon], {
             icon: headingIcon,
-            rotationAngle: heading // Asetetaan alkuperäinen kulma
+            rotationAngle: heading
         }).addTo(map);
     } else {
         headingMarker.setLatLng([lat, lon]);
@@ -150,3 +150,4 @@ map.on('dragstart', function() {
 });
 
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
