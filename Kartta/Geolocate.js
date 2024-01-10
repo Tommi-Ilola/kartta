@@ -88,15 +88,18 @@ function updateUserLocation(lat, lon) {
 }
 
 function updateHeading(lat, lon, heading) {
-    console.log("Heading:", heading); // Debuggaus: Tulosta heading-arvo
     if (!headingMarker) {
         headingMarker = L.marker([lat, lon], {
-            icon: headingIcon,
-            rotationAngle: heading
+            icon: headingIcon
         }).addTo(map);
+
+        // Luo tooltip alustavalla suunnalla
+        headingMarker.bindTooltip("Suunta: " + heading + "°", { permanent: true, offset: L.point(0, -20) });
     } else {
         headingMarker.setLatLng([lat, lon]);
-        headingMarker.setRotationAngle(heading);
+
+        // Päivitä tooltip uudella suunnalla
+        headingMarker.setTooltipContent("Suunta: " + heading + "°");
     }
 }
 
