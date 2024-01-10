@@ -11,31 +11,11 @@ let userIcon = L.icon({
 	className: 'marker-icon'
 });
 
-let headingIcon = L.icon({
-    iconUrl: 'arrow-icon.png',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    className: 'heading-icon' // Määritellään erillinen luokka suunnalle
-});
-
 function updateUserLocation(lat, lon) {
     if (!userMarker) {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
     } else {
         userMarker.setLatLng([lat, lon]);
-    }
-}
-
-function updateHeading(lat, lon, heading) {
-    if (!headingMarker) {
-        headingMarker = L.marker([lat, lon], {icon: headingIcon}).addTo(map);
-    } else {
-        headingMarker.setLatLng([lat, lon]);
-    }
-
-    if (heading !== null && heading !== undefined && headingMarker._icon) {
-        // Käytä Leafletin sisäänrakennettua funktiota transformaation asettamiseen
-        L.DomUtil.setTransform(headingMarker._icon, null, heading);
     }
 }
 
