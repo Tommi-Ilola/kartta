@@ -19,13 +19,14 @@ function updateUserLocation(lat, lon) {
 function updateHeading(lat, lon, heading) {
     if (!headingMarker) {
         headingMarker = L.marker([lat, lon], {
-            icon: headingIcon
+            icon: headingIcon,
+            rotationAngle: heading
         }).addTo(map);
     } else {
         headingMarker.setLatLng([lat, lon]);
+        headingMarker.setRotationAngle(heading);
     }
 
-    // Päivitä käyttäjän sijaintia osoittavan merkin tooltip
     let popupContent = "Olet tässä: " + lat.toFixed(5) + ", " + lon.toFixed(5);
     if (heading !== undefined) {
         popupContent += "<br>Ilmansuunta: " + heading.toFixed(1) + "°";
@@ -56,4 +57,5 @@ function startTracking() {
 }
 
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
 
