@@ -7,8 +7,15 @@ let isTracking = false;
 let userIcon = L.icon({
     iconUrl: 'circle-icon.png',
     iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    iconAnchor: [12, 12]
 	className: 'marker-icon'
+});
+
+let headingIcon = L.icon({
+    iconUrl: 'arrow-icon.png',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    className: 'heading-icon' // Määritellään erillinen luokka suunnalle
 });
 
 function updateUserLocation(lat, lon) {
@@ -16,6 +23,19 @@ function updateUserLocation(lat, lon) {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
     } else {
         userMarker.setLatLng([lat, lon]);
+    }
+}
+
+function updateHeading(lat, lon, heading) {
+    if (!headingMarker) {
+        headingMarker = L.marker([lat, lon], {icon: headingIcon}).addTo(map);
+    } else {
+        headingMarker.setLatLng([lat, lon]);
+    }
+
+    if (heading !== null && heading !== undefined && headingMarker._icon) {
+        // Käytä suoraa transformaatiota CSS:n kautta
+        headingMarker._icon.style.transform = 'rotate(' + heading + 'deg)';
     }
 }
 
@@ -70,4 +90,3 @@ map.on('dragstart', function() {
 });
 
 document.getElementById('locateUser').addEventListener('click', startTracking);
-
