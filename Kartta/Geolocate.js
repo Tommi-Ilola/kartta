@@ -22,17 +22,15 @@ function updateUserMarker(lat, lon, heading) {
 
 function startTracking() {
     if (isTracking) {
+        // Jos seuranta on päällä, lopeta se
         navigator.geolocation.clearWatch(watchID);
         isTracking = false;
         if (userMarker) {
             userMarker.remove(); // Poista käyttäjän merkki kartalta
             userMarker = null;
         }
-        if (userHeadingMarker) {
-            userHeadingMarker.remove(); // Poista suuntaa osoittava nuoli
-            userHeadingMarker = null;
-        }
     } else {
+        // Aloita käyttäjän sijainnin seuranta
         if ("geolocation" in navigator) {
             watchID = navigator.geolocation.watchPosition(function(position) {
                 const lat = position.coords.latitude;
@@ -40,7 +38,9 @@ function startTracking() {
                 const heading = position.coords.heading || 0; // Oletusarvo, jos suuntaa ei ole saatavilla
 
                 updateUserMarker(lat, lon, heading);
-                map.setView([lat, lon], map.getZoom());
+                // Zoomaa käyttäjän sijaintiin. Voit säätää zoom-tasoa tarpeen mukaan.
+                map.setView([lat, lon], 16);
+
             }, function(error) {
                 console.error("Sijainnin seuranta epäonnistui: ", error);
             }, {
