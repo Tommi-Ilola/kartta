@@ -1,22 +1,42 @@
-let userMarker, userHeadingMarker;
+let userMarker; // Käyttäjän sijaintia varten
+let headingMarker; // Suuntaa osoittavaa nuolta varten
 let watchID;
 let isTracking = false;
+
+// Määritellään kaksi eri ikonia: yksi käyttäjän sijainnille, toinen suunnalle
 let userIcon = L.icon({
-    iconUrl: 'arrow-icon.png', // Korvaa tämä polku nuolen kuvan polulla
-    iconSize: [24, 24], // Aseta sopiva koko
-    iconAnchor: [12, 12], // Oletetaan, että nuoli on keskitetty
-    className: 'user-marker-icon' // Käytä määriteltyä luokkaa
+    iconUrl: 'arrow-icon.png',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
 });
 
-function updateUserMarker(lat, lon, heading) {
-    if (userMarker) {
-        userMarker.setLatLng([lat, lon]);
-        // Päivitä nuolen suuntaa vain, jos heading on saatavilla
-        if (heading !== null && heading !== undefined && userMarker._icon) {
-            userMarker._icon.style.transform += ' rotate(' + heading + 'deg)';
-        }
-    } else {
+let headingIcon = L.icon({
+    iconUrl: 'arrow-icon.png',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    className: 'heading-icon' // Määritellään erillinen luokka suunnalle
+});
+
+function updateUserLocation(lat, lon) {
+    if (!userMarker) {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
+    } else {
+        userMarker.setLatLng([lat, lon]);
+    }
+}
+
+function updateHeading(lat, lon, heading) {
+    if (!headingMarker) {
+        headingMarker = L.marker([lat, lon], {icon: headingIcon}).addTo(map);
+    } else {
+        headingMarker.setLatLng([lat, lon]);
+    }
+
+    if (heading !== null && heading !== undefined) {
+        // Päivitä suunnan rotaatio
+        const transform = 'rotate(' + heading + 'deg)';
+        headingMarker._icon.style[L.DomUtil.TRANSFORM] += transform;
+        headingMarker._icon.style[L.DomUtil.TRANSFORM_ORIGIN] = 'center';
     }
 }
 
@@ -33,24 +53,25 @@ function startTracking() {
         if ("geolocation" in navigator) {
             isTracking = true;
             document.querySelector('#locateUser img').src = "locate-active.png";
-            watchID = navigator.geolocation.watchPosition(function(position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                const heading = position.coords.heading || 0;
-                
-                updateUserMarker(lat, lon, heading);
-                if (isTracking) {
-                    // Keskity ja zoomaa käyttäjän sijaintiin
-                    map.setView([lat, lon], 16); // Voit säätää zoom-tasoa
-                }
-            }, function(error) {
-                console.error("Sijainnin seuranta epäonnistui: ", error);
-                isTracking = false;
-            }, {
-                enableHighAccuracy: true,
-                maximumAge: 10000,
-                timeout: 5000
-            });
+			watchID = navigator.geolocation.watchPosition(function(position) {
+				const lat = position.coords.latitude;
+				const lon = position.coords.longitude;
+				const heading = position.coords.heading;
+
+				updateUserLocation(lat, lon);
+				updateHeading(lat, lon, heading);
+
+				if (isTracking) {
+					map.setView([lat, lon], map.getZoom());
+				}
+			}, function(error) {
+				console.error("Sijainnin seuranta epäonnistui: ", error);
+				isTracking = false;
+			}, {
+				enableHighAccuracy: true,
+				maximumAge: 10000,
+				timeout: 5000
+			});
         } else {
             alert("Selaimesi ei tue sijainnin hakua.");
         }
