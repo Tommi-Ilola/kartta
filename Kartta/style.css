@@ -49,6 +49,14 @@ body, html {
     border-bottom: none;
 }
 
+p {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-weight: bold;
+}
+
 .searchContainer {
     position: absolute;
     z-index: 1000;
