@@ -122,11 +122,13 @@ function showMarkersByRatakm(ratakmValue) {
     resultsDiv.innerHTML = '';
     resetMarkerStyles();
 
+    let found = false;
     allMarkers.forEach(marker => {
         const featureProps = marker.featureProperties;
         const parsedRatakm = parseRatakmValue(featureProps.ratakm.toString());
 
         if (parsedRatakm === ratakmValue) {
+            found = true;
             // Hae kaupunki tälle markerille
             const lat = marker.getLatLng().lat;
             const lon = marker.getLatLng().lng;
@@ -163,6 +165,10 @@ function showMarkersByRatakm(ratakmValue) {
             });
         }
     });
+
+    if (!found) {
+        resultsDiv.innerHTML = '<p>Ei hakutuloksia.</p>';
+    }
 
     document.getElementById('results').style.display = 'block';
 }
