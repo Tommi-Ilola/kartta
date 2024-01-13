@@ -258,17 +258,8 @@ function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero)
 
         resultsDiv.appendChild(resultItem);
     });
-    if (!document.getElementById('clearMarkersButton')) {
-        const clearButton = document.createElement('button');
-        clearButton.id = 'clearMarkersButton';
-        clearButton.innerText = 'Poista Markkerit Kartalta';
-        clearButton.addEventListener('click', clearMarkers);
-        resultsDiv.appendChild(clearButton);
-    }
-
     document.getElementById('results').style.display = 'block';
 }
-
 
 function interpolateLatLng(latlng1, latlng2, fraction) {
     const lat = latlng1.lat + (latlng2.lat - latlng1.lat) * fraction;
