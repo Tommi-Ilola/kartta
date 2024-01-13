@@ -120,7 +120,6 @@ function highlightMarker(marker) {
     map.setView(marker.getLatLng(), 11); // Keskitytään markeriin ja zoomataan lähemmäs
 }
 
-
 function showMarkersByRatakm(ratakmValue) {
     document.getElementById('results').innerHTML = '';
 	const resultsDiv = document.getElementById('results');
@@ -165,11 +164,16 @@ function showMarkersByRatakm(ratakmValue) {
                     <strong>Ratanumero:</strong> ${featureProps.ratanumero || 'Ei määritelty'}
                 `;
 
-                resultItem.addEventListener('click', function() {
-                    highlightMarker(marker);
+            // Lisää data-attribuutti markerin indeksillä
+            resultItem.setAttribute('data-marker-index', index);
+
+            // Lisää kuuntelija, joka korostaa markerin kun tulosta klikataan
+            resultItem.addEventListener('click', function() {
+                const markerIndex = this.getAttribute('data-marker-index');
+                highlightMarker(allMarkers[markerIndex]);
                 });
 
-                resultsDiv.appendChild(resultItem);
+
             });
         }
     });
@@ -212,7 +216,7 @@ function findAndShowIntermediatePoint(searchValue) {
         );
         
         // Luo markeri interpoloidulle sijainnille
-        L.marker(interpolatedLatLng).addTo(map).bindPopup(`Ratakm: ${searchValue} Ratanumero: ${ratanumero}`).openPopup();
+        L.marker(interpolatedLatLng).addTo(map).bindPopup(`Ratakm: ${searchValue} Ratanumero: ${ratanumero}`);
         // Päivitä hakutulokset
         updateResultsDivWithIntermediatePoints(searchValue, interpolatedLatLng, ratanumero);
         break;
@@ -222,19 +226,49 @@ function findAndShowIntermediatePoint(searchValue) {
 }
 
 function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero) {
-  const resultsDiv = document.getElementById('results');
-  getCityFromCoordinates(latLng.lat, latLng.lng, (city) => {
-    const resultItem = document.createElement('div');
-    resultItem.className = 'resultItem';
-    resultItem.innerHTML = `
-      <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
-	  <strong>Ratakm:</strong> ${searchValue}<br>
-      <strong>Ratanumero:</strong> ${ratanumero}
-    `;
-    resultsDiv.appendChild(resultItem);
-  });
-  document.getElementById('results').style.display = 'block';
+    const resultsDiv = document.getElementById('results');
+    getCityFromCoordinates(latLng.lat, latLng.lng, (city) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'resultItem';
+        resultItem.innerHTML = `
+            <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
+            <strong>Ratakm:</strong> ${searchValue}<br>
+            <strong>Ratanumero:</strong> ${ratanumero}
+        `;
+
+        // Lisää data-attribuutit
+        resultItem.setAttribute('data-lat', latLng.lat);
+        resultItem.setAttribute('data-lng', latLng.lng);
+
+        // Kuuntelija klikkaustapahtumalle
+        resultItem.addEventListener('click', function() {
+            const lat = parseFloat(this.getAttribute('data-lat'));
+            const lng = parseFloat(this.getAttribute('data-lng'));
+
+            // Luo uusi marker tai hae olemassa oleva
+            const popupMarker = L.marker([lat, lng]).addTo(map);
+            popupMarker.bindPopup(`
+                <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
+                <strong>Ratakm:</strong> ${searchValue}<br>
+                <strong>Ratanumero:</strong> ${ratanumero}
+            `).openPopup();
+
+            map.setView([lat, lng], 11); // Voit säätää zoomaustasoa tarpeen mukaan
+        });
+
+        resultsDiv.appendChild(resultItem);
+    });
+    if (!document.getElementById('clearMarkersButton')) {
+        const clearButton = document.createElement('button');
+        clearButton.id = 'clearMarkersButton';
+        clearButton.innerText = 'Poista Markkerit Kartalta';
+        clearButton.addEventListener('click', clearMarkers);
+        resultsDiv.appendChild(clearButton);
+    }
+
+    document.getElementById('results').style.display = 'block';
 }
+
 
 function interpolateLatLng(latlng1, latlng2, fraction) {
     const lat = latlng1.lat + (latlng2.lat - latlng1.lat) * fraction;
