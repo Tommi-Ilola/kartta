@@ -19,11 +19,11 @@ function verifyPassword() {
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
 // Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
-let defaultCoords = [62.070149, 26.232580];
-let defaultZoom = 7;
+let defaultCoords = [64.515565, 26.484516];
+let defaultZoom = 6;
 
 // Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
-let mobileCoords = [64.915565, 26.484516]; // Esimerkiksi toiset koordinaatit
+let mobileCoords = [65.915565, 26.484516]; // Esimerkiksi toiset koordinaatit
 let mobileZoom = 6; // Esimerkiksi pienempi zoomaustaso
 
 // Funktio laitetunnistukseen
