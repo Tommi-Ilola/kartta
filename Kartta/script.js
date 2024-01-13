@@ -1,20 +1,3 @@
-function verifyPassword() {
-	var password = prompt("Anna salasana päästäksesi sivulle:");
-	if (password == "ratakilometri") {
-		// Salasana oikein, näytä sisältö
-		document.getElementById("map").style.display = "block";
-			map.invalidateSize();		
-		document.getElementById("protected-content").style.display = "block";
-		// Pyydä Leafletiä päivittämään kartan koko
-		setTimeout(function() {
-			map.invalidateSize();
-		}, 400);
-	} else {
-		// Salasana väärin, ilmoita käyttäjälle
-		alert("Väärä salasana!");
-	}
-}
-
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
@@ -93,13 +76,17 @@ function resetMarkerStyles() {
 }
 
 function parseRatakmValue(value) {
-    const parts = value.split("+");
+    const stringValue = value.toString();
+
+    const parts = stringValue.split("+");
     if (parts.length == 2) {
         return parseInt(parts[0]) + parseInt(parts[1]) / 1000;
     } else {
-        return parseFloat(value);
+        return parseFloat(stringValue);
     }
 }
+
+
 
 function highlightMarker(marker) {
 	resetMarkerStyles(); // Palautetaan ensin muiden markerien värit
@@ -118,16 +105,20 @@ function highlightMarker(marker) {
 
 
 function showMarkersByRatakm(ratakmValue) {
-    const resultsDiv = document.getElementById('results');
+    document.getElementById('results').innerHTML = '';
+	const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     resetMarkerStyles();
 
     let found = false;
+    const parsedSearchValue = parseRatakmValue(ratakmValue);
+
     allMarkers.forEach(marker => {
         const featureProps = marker.featureProperties;
-        const parsedRatakm = parseRatakmValue(featureProps.ratakm.toString());
+        const markerRatakm = parseRatakmValue(featureProps.ratakm.toString());
 
-        if (parsedRatakm === ratakmValue) {
+        // Vertaa, ovatko arvot likimain samat (voit säätää tarkkuutta tarvittaessa)
+        if (Math.abs(markerRatakm - parsedSearchValue) < 0.001) {
             found = true;
             // Hae kaupunki tälle markerille
             const lat = marker.getLatLng().lat;
@@ -167,20 +158,82 @@ function showMarkersByRatakm(ratakmValue) {
     });
 
     if (!found) {
-        resultsDiv.innerHTML = '<p>Ei hakutuloksia.</p>';
+        resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
     }
 
     document.getElementById('results').style.display = 'block';
 }
 
+// Oletetaan, että olet jo tuonut ja tallentanut kaikki ratakilometrit allMarkers-muuttujaan
+// ja että jokaisella markerilla on featureProperties, joka sisältää kyseisen ratakilometrin tiedot
+
+function findMarkersByRatanumero(ratanumero) {
+  // Filtteröi kaikki markerit, jotka vastaavat annettua ratanumeroa
+  return allMarkers.filter(marker => marker.featureProperties.ratanumero === ratanumero);
+}
+
+function findAndShowIntermediatePoint(searchValue) {
+  document.getElementById('results').innerHTML = '';
+  const parsedSearchValue = parseRatakmValue(searchValue);
+  const baseKm = Math.floor(parsedSearchValue);
+  const fraction = parsedSearchValue - baseKm;
+  const ratanumerot = allMarkers.map(marker => marker.featureProperties.ratanumero);
+  const uniqueRatanumerot = [...new Set(ratanumerot)]; // Poistaa duplikaatit
+
+  uniqueRatanumerot.forEach(ratanumero => {
+    const markers = findMarkersByRatanumero(ratanumero);
+    markers.sort((a, b) => parseRatakmValue(a.featureProperties.ratakm) - parseRatakmValue(b.featureProperties.ratakm));
+    
+    for (let i = 0; i < markers.length - 1; i++) {
+      const currentKm = parseRatakmValue(markers[i].featureProperties.ratakm);
+      const nextKm = parseRatakmValue(markers[i + 1].featureProperties.ratakm);
+      if (currentKm <= baseKm && nextKm >= baseKm + 1) {
+        const interpolatedLatLng = interpolateLatLng(
+          markers[i].getLatLng(),
+          markers[i + 1].getLatLng(),
+          fraction
+        );
+        
+        // Luo markeri interpoloidulle sijainnille
+        L.marker(interpolatedLatLng).addTo(map).bindPopup(`Ratakm: ${searchValue} Ratanumero: ${ratanumero}`).openPopup();
+        // Päivitä hakutulokset
+        updateResultsDivWithIntermediatePoints(searchValue, interpolatedLatLng, ratanumero);
+        break;
+      }
+    }
+  });
+}
+
+function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero) {
+  const resultsDiv = document.getElementById('results');
+  getCityFromCoordinates(latLng.lat, latLng.lng, (city) => {
+    const resultItem = document.createElement('div');
+    resultItem.className = 'resultItem';
+    resultItem.innerHTML = `
+      <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
+	  <strong>Ratakm:</strong> ${searchValue}<br>
+      <strong>Ratanumero:</strong> ${ratanumero}
+    `;
+    resultsDiv.appendChild(resultItem);
+  });
+  document.getElementById('results').style.display = 'block';
+}
+
+function interpolateLatLng(latlng1, latlng2, fraction) {
+    const lat = latlng1.lat + (latlng2.lat - latlng1.lat) * fraction;
+    const lng = latlng1.lng + (latlng2.lng - latlng1.lng) * fraction;
+    return L.latLng(lat, lng);
+}
+
 function showCloseIcon() {
     const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
+    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>'; // Sulje-ikoni
+
 }
 
 function showMagnifierIcon() {
     const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="magnifier-icon">&#x1F50E;&#xFE0E;</span>';
+    searchButton.innerHTML = '<span class="magnifier-icon">&#x1F50E;&#xFE0E;</span>'; // Suurennuslasi-ikoni
 }
 
 function resetSearch() {
@@ -194,18 +247,23 @@ document.getElementById('searchButton').addEventListener('click', function() {
     if (document.getElementById('results').style.display === 'block') {
         resetSearch();
     } else {
-        const searchValue = parseRatakmValue(document.getElementById('searchInput').value);
-        showMarkersByRatakm(searchValue);
+    const searchValue = document.getElementById('searchInput').value;
+		findAndShowIntermediatePoint(searchValue);
         showCloseIcon();
     }
 });
 
+// Olemassa olevaan kuuntelijaan enterille
 document.getElementById('searchInput').addEventListener('keyup', function(event) {
-    if (event.keyCode === 13) {
-        const searchValue = parseRatakmValue(document.getElementById('searchInput').value);
-        showMarkersByRatakm(searchValue);
-        showCloseIcon();
+  if (event.key === 'Enter' || event.keyCode === 13) {
+    const searchValue = document.getElementById('searchInput').value;
+    if (searchValue.includes("+")) {
+      findAndShowIntermediatePoint(searchValue);
+    } else {
+		findAndShowIntermediatePoint(searchValue);
     }
+showCloseIcon();
+  }
 });
 
 let tunnelitLayerGroup = L.layerGroup();
