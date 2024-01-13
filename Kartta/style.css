@@ -12,6 +12,37 @@ body, html {
     transform-origin: center;
 }
 
+.leaflet-marker-icon {
+    margin-left: -12px !important;
+    margin-top: -31px !important;
+    width: 20px !important;
+    height: 31px !important;
+}
+
+#removeMarkersButton {
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 388px;
+    background-color: white;
+    color: #d7421f;
+    font-weight: normal;
+    font-family: calibri;
+    font-size: medium;
+    height: 2.75em;
+    z-index: 2000;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    background-clip: padding-box;
+    padding: 7pt;
+    cursor: pointer;
+}
+
+#removeMarkersButton:hover{
+    background-color: #df1200;
+	color: white;
+}
+
 #layerControl {
     position: absolute;
     top: 10px;
@@ -55,7 +86,6 @@ p {
     margin-top: 0px;
     margin-bottom: 0px;
     font-weight: bold;
-    font-family: calibri !important;
 }
 
 .searchContainer {
@@ -362,6 +392,29 @@ p {
     cursor: pointer;
     width: 27px;
     height: 24px;
+}
+
+#removeMarkersButton {
+    position: absolute;
+    top: 58px;
+    left: 0;
+    background-color: white;
+    color: #d7421f;
+    font-weight: normal;
+    font-family: calibri;
+    font-size: inherit;
+    height: 25px;
+    z-index: 998;
+    background-clip: padding-box;
+    cursor: pointer;
+    border-width: 1px;
+    border-color: #ccc;
+    border-radius: 13px;
+    overflow: hidden;
+    width: -webkit-fill-available;
+    padding: 0;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 }
