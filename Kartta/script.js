@@ -1,3 +1,20 @@
+function verifyPassword() {
+	var password = prompt("Anna salasana päästäksesi sivulle:");
+	if (password == "ratakilometri") {
+		// Salasana oikein, näytä sisältö
+		document.getElementById("map").style.display = "block";
+			map.invalidateSize();		
+		document.getElementById("protected-content").style.display = "block";
+		// Pyydä Leafletiä päivittämään kartan koko
+		setTimeout(function() {
+			map.invalidateSize();
+		}, 400);
+	} else {
+		// Salasana väärin, ilmoita käyttäjälle
+		alert("Väärä salasana!");
+	}
+}
+
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
