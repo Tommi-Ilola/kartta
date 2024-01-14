@@ -299,7 +299,7 @@ p {
     margin-left: 3em;
     margin-right: 3em;
     border: 1px solid #ccc;
-    overflow: hidden;
+    overflow: auto;
     border-radius: 1em;
     width: -webkit-fill-available;
     border-box: 0px 0px 4px rgba(0, 0, 0, 0.5);
