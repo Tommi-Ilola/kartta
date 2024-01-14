@@ -18,6 +18,7 @@ body, html {
 .marker-icon {
     transform-origin: center !important;
     width: 24px !important;
+    height: 24px !important;
     margin-left: -12px !important;
     margin-top: -12px !important;
 }
