@@ -8,13 +8,6 @@ body, html {
     transform-origin: center;
 }
 
-.leaflet-marker-icon {
-    margin-left: -12px !important;
-    margin-top: -31px !important;
-    width: 20px !important;
-    height: 31px !important;
-}
-
 .marker-icon {
     transform-origin: center !important;
     width: 24px !important;
