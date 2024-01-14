@@ -4,12 +4,6 @@ body, html {
     padding: 0;
 }
 
-img.marker-icon {
-    transform-origin: center !important;
-	width: 24px !important;
-	height: 24px !important;
-}
-
 .heading-icon {
     transform-origin: center;
 }
@@ -19,6 +13,13 @@ img.marker-icon {
     margin-top: -31px !important;
     width: 20px !important;
     height: 31px !important;
+}
+
+.marker-icon {
+    transform-origin: center !important;
+	width: 24px !important;
+	height: 24px !important;
+	margin: 0px !important;
 }
 
 #removeMarkersButton {
