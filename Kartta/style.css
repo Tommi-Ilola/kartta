@@ -8,11 +8,18 @@ body, html {
     transform-origin: center;
 }
 
+.leaflet-marker-icon {
+    margin-left: -12px !important;
+    margin-top: -31px !important;
+    width: 20px !important;
+    height: 31px !important;
+}
+
 .marker-icon {
     transform-origin: center !important;
-    width: 24px !important;
-    height: 24px !important;
-    margin-left: -12px !important;
+	width: 24px !important;
+	height: 24px !important;
+	margin-left: -12px !important;
     margin-top: -12px !important;
 }
 
@@ -288,8 +295,8 @@ p {
     z-index: 1000;
     top: 1em;
     left: 0;
-    margin-left: 1em;
-    margin-right: 1em;
+    margin-left: 3em;
+    margin-right: 3em;
     border: 1px solid #ccc;
     overflow: hidden;
     border-radius: 1em;
@@ -326,11 +333,17 @@ p {
     z-index: 1001;
     width: 100%;
     font-family: calibri;
-	display: none;
-	border-radius: 0 0 1em 1em; 
-	background-color: white;
-	max-height: 80pt;
-	overflow: auto;
+    display: none;
+    border-radius: 0 0 1em 1em;
+    background-color: white;
+    max-height: 168pt;
+    overflow: auto;
+}
+
+.resultItem {
+    padding: 5px 10px 5px 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 #menuContainer {
@@ -410,8 +423,8 @@ p {
     overflow: hidden;
     width: -webkit-fill-available;
     padding: 0;
-    margin-left: 1em;
-    margin-right: 1em;
+    margin-left: 3em;
+    margin-right: 3em;
 }
 
 }
