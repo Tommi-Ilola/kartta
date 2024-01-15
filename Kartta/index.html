@@ -8,12 +8,11 @@
     <link rel="icon" href="Logo.png">
 	<link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-	
 </head>
 
-<body onload="verifyPassword();">
-<div id="map" style="display:none"></div>	
-  <div id="protected-content" style="display:none">
+<body>
+<div id="map"></div>	
+  <div id="protected-content">
 
 	
 
@@ -27,7 +26,8 @@
 			<label><input type="checkbox" id="tasoristeyksetCheckbox"> Näytä tasoristeykset</label><br>
 			<label><input type="checkbox" id="tilirataosatCheckbox"> Näytä tilirataosat</label><br>
 			<label><input type="checkbox" id="kilometrimerkitCheckbox" checked> Näytä kilometrimerkit</label><br>
-			<label><input type="checkbox" id="kayttokeskusalueetCheckbox"> Näytä käyttökeskusalueet</label><br>
+			<label><input type="checkbox" id="LPCheckbox"> Näytä käyttökeskusalueet</label><br>
+			<label><input type="checkbox" id="RadatCheckbox"> Näytä radat</label>
 		</div>
 	</div>
 
@@ -57,19 +57,67 @@
 				<span class="close-icon" style="display: none;">&#x2715;</span>
 			</button>
 		</div>
-		<div id="results">...</div>
+		
+		<div class="resultbox">
+			<button type="button" class="collapsible"></button>
+			<div class="content">
+				<div class="results" id="results">...</div>
+			</div>
+		</div>
+		
 	</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var coll = document.getElementsByClassName("collapsible");
+    var resultsDiv = document.getElementById("results");
+	resultsDiv.style.display = "none";
+
+    function toggleCollapsibleVisibility() {
+        // Tarkistetaan, onko results-div näkyvissä
+        var isResultsVisible = resultsDiv.style.display !== "none";
+
+        // Asetetaan collapsible-elementtien näkyvyys results-divin näkyvyyden mukaan
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].style.display = isResultsVisible ? "block" : "none";
+        }
+    }
+
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "none") {
+                content.style.display = "block";
+            } else {
+                content.style.display = "none";
+            }
+        });
+    }
+
+    // Asetetaan alustava näkyvyys
+    toggleCollapsibleVisibility();
+
+    // Tarkistetaan ja asetetaan näkyvyys aina kun results-divin tila muuttuu
+    var observer = new MutationObserver(toggleCollapsibleVisibility);
+    observer.observe(resultsDiv, { attributes: true, childList: true, subtree: true });
+});
+</script>
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="script.js"></script> 
-<script src="https://github.com/bbecquet/Leaflet.RotatedMarker/blob/master/leaflet.rotatedMarker.js"></script> 
+<script src="mapsetup.js"></script>
+<script src="Script.js"></script>
+<script src="layers.js"></script>
 <script src="Geolocate.js"></script>
-	  
+<script src="https://github.com/mudin/vue2-leaflet-rotatedmarker/blob/master/dist/Vue2LeafletRotatedMarker.js"></script>
 </div>
   
 </body>
 
 </html>
+
 
 
