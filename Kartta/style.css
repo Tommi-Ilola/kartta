@@ -427,7 +427,7 @@ p {
 
 #removeMarkersButton {
     position: absolute;
-    top: 58px;
+    top: 56px;
     left: 0;
     background-color: #df1200;
     color: white;
@@ -452,6 +452,7 @@ p {
   background: white;
   cursor: pointer;
   width: 100%;
+  height: 25px;
   border: none;
   outline: none;
   display: none;
