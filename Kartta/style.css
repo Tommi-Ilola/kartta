@@ -328,7 +328,6 @@ p {
     border: 0;
     width: -webkit-fill-available;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
-	resize: vertical;
 }
 
 .searchBox {
