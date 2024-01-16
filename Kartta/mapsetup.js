@@ -42,7 +42,7 @@ let defaultCoords = [64.615565, 26.484516];
 let defaultZoom = 6;
 
 // Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
-let mobileCoords = [67.532748, 25.579318]; // Esimerkiksi toiset koordinaatit
+let mobileCoords = [64.532748, 25.579318]; // Esimerkiksi toiset koordinaatit
 let mobileZoom = 6;
 
 // Funktio laitetunnistukseen
