@@ -81,14 +81,4 @@ document.getElementById('toggleView').addEventListener('click', function() {
     }
 });
 
-window.addEventListener("resize", function() {
-    if (map) {
-        if (window.innerWidth <= 900) {
-            map.setView(mobileCoords, mobileZoom);
-        } else {
-            map.setView(defaultCoords, defaultZoom);
-        }
-    }
-});
-
 
