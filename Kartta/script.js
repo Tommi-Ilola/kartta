@@ -213,7 +213,8 @@ function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero)
 
         // Kuuntelija klikkaustapahtumalle
         resultItem.addEventListener('click', function() {
-            map.setView([latLng.lat, latLng.lng], 11); // Voit säätää zoomaustasoa tarpeen mukaan
+            map.setView([latLng.lat, latLng.lng], 20);
+	    map.setView([latLng.lat, latLng.lng], 11); // Voit säätää zoomaustasoa tarpeen mukaan
             popupMarker.openPopup();
         });
 
