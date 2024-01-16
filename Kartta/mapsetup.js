@@ -38,7 +38,7 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
 // Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
-let defaultCoords = [67.615565, 26.484516];
+let defaultCoords = [64.615565, 26.484516];
 let defaultZoom = 5;
 
 // Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
