@@ -47,7 +47,7 @@ let mobileZoom = 4;
 
 // Funktio laitetunnistukseen
 function isMobileDevice() {
-    return window.innerWidth <= 1200; // Oletetaan, että mobiililaitteilla on leveys <= 800px
+    return window.innerWidth <= 800; // Oletetaan, että mobiililaitteilla on leveys <= 800px
 }
 
 // Tarkistetaan, onko laite mobiililaite
