@@ -1,7 +1,7 @@
 function verifyPassword() {
     var password = document.getElementById("passwordInput").value;
     if (password === "ratakilometri4") {
-        document.getElementById("map").style.display = "block";
+        document.getElementById("map").style.opacity = "1";
 	map.invalidateSize();
 	document.getElementById("protected-content").style.display = "block";
 	document.getElementById("passwordModal").style.display = "none";
