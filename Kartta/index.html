@@ -11,10 +11,16 @@
 	
 </head>
 
-<body onload="verifyPassword();">
-<div id="map" style="display:none"></div>	
-  <div id="protected-content" style="display:none">
-
+<body>
+<!-- Salasanan syöttömodaali -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h1>Anna salasana päästäksesi sivulle</h1>
+		<input type="password" id="passwordInput">
+        <button id="passwordButton" onclick="verifyPassword()">Tarkista salasana</button>
+    </div>
+</div>
 	
 
 	<div id="menuContainer">
