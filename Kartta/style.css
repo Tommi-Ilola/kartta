@@ -417,6 +417,8 @@ p {
 	float: right;
 	font-size: 28px;
 	font-weight: bold;
+	-webkit-appearance: none;
+	appearance: none;
 	}
 
 .close:hover,
@@ -442,6 +444,8 @@ h1 {
     font-family: calibri;
     font-size: medium;
     margin-bottom: 5px;
+	-webkit-appearance: none;
+	appearance: none;
 }
 
 #passwordButton {
@@ -454,6 +458,8 @@ h1 {
     padding: 6px 10px 5px 10px;
     margin-bottom: 5px;
     margin-top: 5px;
+	-webkit-appearance: none;
+	appearance: none;
 }
 
 .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
@@ -608,6 +614,7 @@ h1 {
 
 .collapsible:hover {
   background-color: white;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);
 }
 
 .collapsible:after {
