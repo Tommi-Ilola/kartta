@@ -212,12 +212,26 @@ function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero)
         resultItem.setAttribute('data-lng', latLng.lng);
 
         // Kuuntelija klikkaustapahtumalle
-        resultItem.addEventListener('click', function() {
-            map.setView([latLng.lat, latLng.lng], 20);
-	    map.setView([latLng.lat, latLng.lng], 11); // Voit säätää zoomaustasoa tarpeen mukaan
-            popupMarker.openPopup();
-        });
+		resultItem.addEventListener('click', function() {
+			if (window.matchMedia("(max-width: 900px)").matches) {
+				const mapHeight = document.getElementById('map').clientHeight; // Kartan korkeus
+				const offsetPixels = mapHeight / 4; // Määritä offset, esimerkiksi 1/4 kartan korkeudesta
 
+				const markerLatLng = popupMarker.getLatLng();
+				const point = map.latLngToContainerPoint(markerLatLng);
+				point.y -= offsetPixels
+				const newLatLng = map.containerPointToLatLng(point);
+				
+				map.setView(newLatLng, 20);
+				map.setView(newLatLng, 11); // Keskity uuteen sijaintiin ja aseta zoomaustaso
+			} else {
+				// Ei-mobiililaitteiden logiikka: keskitetään marker näytön keskelle
+				map.setView(popupMarker.getLatLng(), 20);
+				map.setView(popupMarker.getLatLng(), 11);
+			}
+			popupMarker.openPopup();
+		});
+		
         resultsDiv.appendChild(resultItem);
 
         // Luo poistopainike, jos sitä ei ole vielä olemassa
@@ -314,6 +328,4 @@ document.getElementById('searchInput').addEventListener('keyup', function(event)
 });
 
 createRemoveMarkersButton();
-
-
 
