@@ -47,14 +47,14 @@ body, html {
 
 /* Salasana input */
 input[type=password] {
-	width: -webkit-fill-available;
-	padding: 10px 20px;
-	margin: 10px 0px;
-	display: inline-block;
-	border-width: 0;
-	border-radius: 0.7rem;
-	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
-	font-size: 25px;
+    width: -webkit-fill-available;
+    padding: 7px 20px;
+    margin: 10px 0px;
+    display: inline-block;
+    border-width: 0;
+    border-radius: 0.7rem;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
+    font-size: 20px;
 }
 
 h1 {
@@ -91,8 +91,8 @@ h1 {
     position: absolute;
     top: 10px;
     left: 388px;
-    background-color: white;
-    color: #d7421f;
+    background-color: #df1200;
+    color: white;
     font-weight: normal;
     font-family: calibri;
     font-size: medium;
@@ -106,7 +106,7 @@ h1 {
 }
 
 #removeMarkersButton:hover{
-    background-color: #df1200;
+    background-color: #9b0d00;
 	color: white;
 }
 
@@ -423,19 +423,20 @@ p {
 
 /* Salasana input */
 input[type=password] {
-	width: -webkit-fill-available;
-	padding: 8px 20px;
-	margin: 10px 0px;
-	display: inline-block;
-	border-width: 0;
-	border-radius: 0.7rem;
-	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
-	font-size: 15px;
+    width: -webkit-fill-available;
+    padding: 8px 20px;
+    margin-top: 0;
+    display: inline-block;
+    border-width: 0;
+    border-radius: 0.7rem;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
+    font-size: 15px;
 }
 
 h1 {
     font-size: medium;
     margin-bottom: 5px;
+    margin-left: 2px;
 }
 
 #passwordButton {
