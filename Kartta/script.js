@@ -1,8 +1,7 @@
 function verifyPassword() {
     var password = document.getElementById("passwordInput").value;
     if (password === "ratakilometri4") {
-        document.getElementById
-	("map").style.display = "block";
+        document.getElementById("map").style.display = "block";
 	map.invalidateSize();
 	document.getElementById("protected-content").style.display = "block";
 	document.getElementById("passwordModal").style.display = "none";
@@ -40,11 +39,11 @@ proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
 // Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
 let defaultCoords = [64.515565, 26.484516];
-let defaultZoom = 7;
+let defaultZoom = 6;
 
 // Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
 let mobileCoords = [66.532748, 25.579318]; // Esimerkiksi toiset koordinaatit
-let mobileZoom = 6; // Esimerkiksi pienempi zoomaustaso
+let mobileZoom = 5; // Esimerkiksi pienempi zoomaustaso
 
 // Funktio laitetunnistukseen
 function isMobileDevice() {
