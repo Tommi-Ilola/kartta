@@ -37,17 +37,26 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
-let mobileCoords, mobileZoom;
-let defaultCoords, defaultZoom;
+// Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
+let defaultCoords = [66.415565, 26.484516];
+let defaultZoom = 6;
 
-// Alustetaan koordinaatit ja zoom-tasot
-mobileCoords = [66.032748, 25.579318];
-mobileZoom = 5;
-defaultCoords = [64.515565, 26.484516];
-defaultZoom = 5;
+// Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
+let mobileCoords = [67.532748, 25.579318]; // Esimerkiksi toiset koordinaatit
+let mobileZoom = 5;
 
-// Luodaan kartta ensimmäisen kerran
-let map = L.map('map').setView(window.matchMedia("(max-width: 1200px)").matches ? mobileCoords : defaultCoords, window.matchMedia("(max-width: 1200px)").matches ? mobileZoom : defaultZoom);
+// Funktio laitetunnistukseen
+function isMobileDevice() {
+    return window.innerWidth <= 900;
+}
+
+// Tarkistetaan, onko laite mobiililaite
+let map;  // Alustetaan ensin muuttuja
+if (isMobileDevice()) {
+    map = L.map('map').setView(mobileCoords, mobileZoom);
+} else {
+    map = L.map('map').setView(defaultCoords, defaultZoom);
+}
 
 // Karttanäkymä (OSM)
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -74,12 +83,11 @@ document.getElementById('toggleView').addEventListener('click', function() {
 
 window.addEventListener("resize", function() {
     if (map) {
-        if (window.innerWidth <= 1200) {
+        if (window.innerWidth <= 900) {
             map.setView(mobileCoords, mobileZoom);
         } else {
             map.setView(defaultCoords, defaultZoom);
         }
     }
 });
-
 
