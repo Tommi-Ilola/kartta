@@ -37,27 +37,17 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
+let mobileCoords, mobileZoom;
 let defaultCoords, defaultZoom;
 
-if (window.matchMedia("(max-width: 800px)").matches) {
-    // Mobiiliasetukset
-    defaultCoords = [67.532748, 25.579318];
-    defaultZoom = 5;
-} else {
-    // Työpöytäasetukset
-    defaultCoords = [66.415565, 26.484516];
-    defaultZoom = 6;
-}
+// Alustetaan koordinaatit ja zoom-tasot
+mobileCoords = [66.032748, 25.579318];
+mobileZoom = 5;
+defaultCoords = [64.515565, 26.484516];
+defaultZoom = 6;
 
-let map = L.map('map').setView(defaultCoords, defaultZoom);
-
-window.addEventListener("resize", function() {
-    if (window.innerWidth <= 800) {
-        map.setView(mobileCoords, mobileZoom);
-    } else {
-        map.setView(defaultCoords, defaultZoom);
-    }
-});
+// Luodaan kartta ensimmäisen kerran
+let map = L.map('map').setView(window.matchMedia("(max-width: 800px)").matches ? mobileCoords : defaultCoords, window.matchMedia("(max-width: 800px)").matches ? mobileZoom : defaultZoom);
 
 // Karttanäkymä (OSM)
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -65,7 +55,7 @@ var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Satelliittinäkymä (esim. Esri:n satelliittikuvat, jotka ovat ilmaisia ja julkisia)
+// Satelliittinäkymä (Esri)
 var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 25,
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
@@ -81,4 +71,15 @@ document.getElementById('toggleView').addEventListener('click', function() {
         osmLayer.addTo(map);
     }
 });
+
+window.addEventListener("resize", function() {
+    if (map) {
+        if (window.innerWidth <= 800) {
+            map.setView(mobileCoords, mobileZoom);
+        } else {
+            map.setView(defaultCoords, defaultZoom);
+        }
+    }
+});
+
 
