@@ -2,6 +2,7 @@ body, html {
     height: 100%;
     margin: 0;
     padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Modaalin perustyylit */
@@ -62,8 +63,6 @@ h1 {
     font-size: x-large;
     margin-bottom: 5px;
     margin-top: 0;
-	-webkit-appearance: none;
-	appearance: none;
 }
 
 #passwordButton {
@@ -76,8 +75,6 @@ h1 {
     padding: 5px 10px 5px 10px;
 	margin-bottom: 10px;
     margin-top: 10px;
-	-webkit-appearance: none;
-	appearance: none;
 }
 
 .heading-icon {
@@ -358,7 +355,7 @@ p {
   border: none;
   outline: none;
   display: none;
-  border-top: 1px solid #ccc;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);
 }
 
 .collapsible:hover {
@@ -417,8 +414,6 @@ p {
 	float: right;
 	font-size: 28px;
 	font-weight: bold;
-	-webkit-appearance: none;
-	appearance: none;
 	}
 
 .close:hover,
@@ -441,15 +436,15 @@ input[type=password] {
 }
 
 h1 {
-    font-family: calibri !important;
+    font-family: calibri;
     font-size: medium;
     margin-bottom: 5px;
 }
 
 #passwordButton {
     position: relative;
-    font-family: calibri !important;
-	color: black !important;
+    font-family: calibri;
+	color: black;
     font-size: medium;
     border-radius: 0.6rem;
     border-width: 0;
@@ -457,8 +452,6 @@ h1 {
     padding: 6px 10px 5px 10px;
     margin-bottom: 5px;
     margin-top: 5px;
-	-webkit-appearance: none;
-	appearance: none;
 }
 
 .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
@@ -608,7 +601,7 @@ h1 {
   outline: none;
   display: none;
   margin-top: 0px;
-  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);
 }
 
 .collapsible:hover {
