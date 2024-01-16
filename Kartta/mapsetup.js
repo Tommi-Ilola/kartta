@@ -39,7 +39,7 @@ proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
 // Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
 let defaultCoords = [65.515565, 26.484516];
-let defaultZoom = 6;
+let defaultZoom = 5;
 
 // Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
 let mobileCoords = [66.532748, 25.579318]; // Esimerkiksi toiset koordinaatit
