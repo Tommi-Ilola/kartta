@@ -637,13 +637,15 @@ h1 {
   flex-direction: column-reverse;
 }
 
-h1, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
+h1, collapsible, #passwordInput, #passwordButton, button, textarea, select {
 	-webkit-appearance: none;
 	appearance: none;
 	font-family: calibri !important;
 }
 
 button {
+	-webkit-appearance: none;
+	appearance: none;
 	-webkit-tap-highlight-color: transparent;
 	font-family: calibri;
 }
