@@ -1,6 +1,6 @@
 function verifyPassword() {
     var password = document.getElementById("passwordInput").value;
-    if (password === "ratakilometri") {
+    if (password === "ratakilometri4") {
         document.getElementById
 	("map").style.display = "block";
 	map.invalidateSize();
