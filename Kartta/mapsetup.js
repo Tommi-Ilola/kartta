@@ -51,6 +51,14 @@ if (window.matchMedia("(max-width: 800px)").matches) {
 
 let map = L.map('map').setView(defaultCoords, defaultZoom);
 
+window.addEventListener("resize", function() {
+    if (window.innerWidth <= 800) {
+        map.setView(mobileCoords, mobileZoom);
+    } else {
+        map.setView(defaultCoords, defaultZoom);
+    }
+});
+
 // Karttanäkymä (OSM)
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 25,
