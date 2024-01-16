@@ -47,7 +47,7 @@ defaultCoords = [64.515565, 26.484516];
 defaultZoom = 5;
 
 // Luodaan kartta ensimmäisen kerran
-let map = L.map('map').setView(window.matchMedia("(max-width: 800px)").matches ? mobileCoords : defaultCoords, window.matchMedia("(max-width: 800px)").matches ? mobileZoom : defaultZoom);
+let map = L.map('map').setView(window.matchMedia("(max-width: 1200px)").matches ? mobileCoords : defaultCoords, window.matchMedia("(max-width: 1200px)").matches ? mobileZoom : defaultZoom);
 
 // Karttanäkymä (OSM)
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -74,7 +74,7 @@ document.getElementById('toggleView').addEventListener('click', function() {
 
 window.addEventListener("resize", function() {
     if (map) {
-        if (window.innerWidth <= 800) {
+        if (window.innerWidth <= 1200) {
             map.setView(mobileCoords, mobileZoom);
         } else {
             map.setView(defaultCoords, defaultZoom);
