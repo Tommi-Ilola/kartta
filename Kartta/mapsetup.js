@@ -44,7 +44,7 @@ let defaultCoords, defaultZoom;
 mobileCoords = [66.032748, 25.579318];
 mobileZoom = 5;
 defaultCoords = [64.515565, 26.484516];
-defaultZoom = 6;
+defaultZoom = 5;
 
 // Luodaan kartta ensimmäisen kerran
 let map = L.map('map').setView(window.matchMedia("(max-width: 800px)").matches ? mobileCoords : defaultCoords, window.matchMedia("(max-width: 800px)").matches ? mobileZoom : defaultZoom);
