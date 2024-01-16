@@ -4,8 +4,7 @@ let tilirataosatLayerGroup = L.layerGroup();
 let kilometrimerkitLayerGroup = L.layerGroup();
 let tasoristeyksetLayerGroup = L.layerGroup();
 kilometrimerkitLayerGroup.addTo(map);
-let LPLayerGroup = L.layerGroup();
-let RadatLayerGroup = L.layerGroup();
+let kayttokeskusalueetLayerGroup = L.layerGroup();
 
 document.getElementById('tunnelitCheckbox').addEventListener('change', function() {
     if (this.checked) {
@@ -47,19 +46,11 @@ document.getElementById('kilometrimerkitCheckbox').addEventListener('change', fu
     }
 });
 
-document.getElementById('LPCheckbox').addEventListener('change', function() {
+document.getElementById('kayttokeskusalueetCheckbox').addEventListener('change', function() {
     if (this.checked) {
-        LPLayerGroup.addTo(map);
+        kayttokeskusalueetLayerGroup.addTo(map);
     } else {
-        LPLayerGroup.removeFrom(map);
-    }
-});
-
-document.getElementById('RadatCheckbox').addEventListener('change', function() {
-    if (this.checked) {
-        RadatLayerGroup.addTo(map);
-    } else {
-        RadatLayerGroup.removeFrom(map);
+        kayttokeskusalueetLayerGroup.removeFrom(map);
     }
 });
 
@@ -126,7 +117,7 @@ fetch('tunnelit.geojson')
     });
 
 // Siltojen lisääminen karttaan
-fetch('https://rata.digitraffic.fi/infra-api/0.7/13018/kunnossapitoalueet.geojson?time=2024-01-12T09:10:00Z/2024-01-12T09:10:00Z')
+fetch('sillat.geojson')
     .then(response => response.json())
     .then(data => {
         railGeometryData = data;
@@ -244,7 +235,7 @@ fetch('tilirataosat.geojson')
     });
 
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/13011/kilometrimerkit.geojson?time=2024-01-07T22:00:00Z/2024-01-07T22:00:00Z')
+fetch('ratakm.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
@@ -277,77 +268,19 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/13011/kilometrimerkit.geojson?t
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
-// Lataa ratojen geometria tiedostosta
-fetch('https://rata.digitraffic.fi/infra-api/0.7/12680/radat.geojson?time=2023-10-27T09:58:00Z/2023-10-27T09:58:00Z')
-    .then(response => response.json())
-    .then(data => {
-        railGeometryData = data;
-        
-        const transformedData = {
-            ...railGeometryData,
-            features: railGeometryData.features.map(feature => {
-                if (feature.geometry && feature.geometry.coordinates) {
-                    if (feature.geometry.type === 'MultiLineString') {
-                        return {
-                            ...feature,
-                            geometry: {
-                                ...feature.geometry,
-                                coordinates: feature.geometry.coordinates.map(line => 
-                                    line.map(coord => {
-                                        const latlng = proj4('EPSG:3067', 'WGS84', coord);
-                                        return [latlng[0], latlng[1]];
-                                    })
-                                )
-                            }
-                        };
-                    } else {
-                        return feature;
-                    }
-                } else {
-                    return feature;
-                }
-            })
-        };
+map.on('zoomend', onZoomEnd);
+map.on('moveend', onMoveEnd);
 
-        const geoLayer = L.geoJSON(transformedData, {
-            style: function(feature) {
-                return { color: "blue", weight: 3, zIndex: 1000 };
-            }
-        }).addTo(RadatLayerGroup);
-    })
-    .catch(error => {
-        console.error("Virhe ladattaessa ratojen geometriaa:", error);
-    });
-
-
-
-fetch('https://rata.digitraffic.fi/infra-api/0.7/13008/kayttokeskukset.geojson?time=2024-01-07T22:00:00Z/2024-01-07T22:00:00Z')
+fetch('kayttokeskusalueet.geojson')
     .then(response => response.json())
     .then(data => {
         const transformedData = transformGeoJSONData(data);
 
         L.geoJSON(transformedData, {
             style: function(feature) {
-				let color;
-                switch (feature.properties.name) {
-                    case 'Helsinki':
-                        color = '#FF0000'; // Punainen
-                        break;
-                    case 'Tampere':
-                        color = '#0000FF'; // Sininen
-                        break;
-                    case 'Kouvola':
-                        color = '#00FF00'; // Vihreä
-                        break;
-                    case 'Oulu':
-                        color = '#FFFF00'; // Keltainen
-                        break;
-                    default:
-                        color = '#FF00FF'; // Jokin muu väri
-                }
                 return {
-                    color: 'color',
-                    weight: 1.5,
+                    color: '#ff7800',
+                    weight: 1,
                     fillOpacity: 0.1
                 };
             },
@@ -364,9 +297,9 @@ fetch('https://rata.digitraffic.fi/infra-api/0.7/13008/kayttokeskukset.geojson?t
                     }
                 }
             }
-        }).addTo(LPLayerGroup);
+        }).addTo(kayttokeskusalueetLayerGroup);
     })
-    .catch(error => console.error('Error loading GeoJSON data:', error));
+    .catch(error => console.error('Virhe ladattaessa käyttökeskusalueiden geometriaa', error));
 
 function transformGeoJSONData(geojsonData) {
     return {
@@ -395,10 +328,6 @@ function transformCoordinates(coordinates, type) {
     return coordinates;
 }
 
-
-map.on('zoomend', onZoomEnd);
-map.on('moveend', onMoveEnd);
-
 function onZoomEnd() {
     const zoomLevel = map.getZoom();
     const currentBounds = map.getBounds();
@@ -423,3 +352,4 @@ function onMoveEnd() {
         }
     });
 }
+
