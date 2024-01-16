@@ -1,19 +1,39 @@
 function verifyPassword() {
-	var password = prompt("Anna salasana päästäksesi sivulle:");
-	if (password == "ratakilometri") {
-		// Salasana oikein, näytä sisältö
-		document.getElementById("map").style.display = "block";
-			map.invalidateSize();		
-		document.getElementById("protected-content").style.display = "block";
-		// Pyydä Leafletiä päivittämään kartan koko
-		setTimeout(function() {
-			map.invalidateSize();
-		}, 400);
+    var password = document.getElementById("passwordInput").value;
+    if (password === "ratakilometri") {
+        document.getElementById
+	("map").style.display = "block";
+	map.invalidateSize();
+	document.getElementById("protected-content").style.display = "block";
+	document.getElementById("passwordModal").style.display = "none";
+	// Pyydä Leafletiä päivittämään kartan koko
+	setTimeout(function() {
+	map.invalidateSize();
+	}, 400);
 	} else {
-		// Salasana väärin, ilmoita käyttäjälle
 		alert("Väärä salasana!");
 	}
 }
+
+// Näytä modaali, kun sivu latautuu
+window.onload = function() {
+    document.getElementById("passwordModal").style.display = "block";
+}
+
+// Sulje-napin toiminnallisuus
+var span = document.getElementsByClassName("close")[0];
+span.onclick = function() {
+   
+document.getElementById("passwordModal").style.display = "none";
+}
+
+document.getElementById("passwordInput").addEventListener("keypress", function(event) {
+    // Tarkistetaan, onko painettu näppäin Enter (Enter-näppäimen keyCode on 13)
+    if (event.keyCode === 13) {
+        event.preventDefault(); // Estä oletustoiminta
+        verifyPassword(); // Kutsu salasanan tarkistusfunktiota
+    }
+});
 
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
