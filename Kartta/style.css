@@ -379,7 +379,7 @@ p {
   display: flex;
   flex-direction: column-reverse;
 }
-@media (max-width: 768px) {
+@media (max-width: 900px) {
 /* Modaalin perustyylit */
 .modal {
     display: none;
