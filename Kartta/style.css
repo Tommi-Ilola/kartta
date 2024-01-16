@@ -356,6 +356,16 @@ p {
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);
 }
 
+.collapsible.active {
+  background: white;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  outline: none;
+  display: none;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);
+}
+
 .collapsible:hover {
   background-color: #ccc;
 }
