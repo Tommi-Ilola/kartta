@@ -22,7 +22,7 @@ window.onload = function() {
 // Sulje-napin toiminnallisuus
 var span = document.getElementsByClassName("close")[0];
 span.onclick = function() {
-   
+
 document.getElementById("passwordModal").style.display = "none";
 }
 
@@ -80,3 +80,4 @@ document.getElementById('toggleView').addEventListener('click', function() {
         osmLayer.addTo(map);
     }
 });
+
