@@ -37,37 +37,26 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
 // Määritellään projektiotiedot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
-// Oletetaan, että nämä ovat alkuperäiset koordinaatit ja zoomaus desktop-laitteille
-let defaultCoords = [64.500, 26.000];
-let defaultZoom = 7;
-
-// Määritellään toiset koordinaatit ja zoomaus mobiililaitteille
-let mobileCoords = [67.500, 25.000]; // Esimerkiksi toiset koordinaatit
-let mobileZoom = 6;
-
-// Funktio laitetunnistukseen
-function isMobileDevice() {
-    return window.innerWidth <= 900;
-}
-
-// Tarkistetaan, onko laite mobiililaite
-let map;  // Alustetaan ensin muuttuja
-if (isMobileDevice()) {
-    map = L.map('map').setView(mobileCoords, mobileZoom);
-} else {
-    map = L.map('map').setView(defaultCoords, defaultZoom);
-}
 
 // Karttanäkymä (OSM)
-var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 25,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+var map = L.map('map', {
+    minZoom: 0,
+    maxZoom: 18
+});
+
+var cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
+
+var osmLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
+map.setView([67.500, 26.000], 5);
+
 // Satelliittinäkymä (Esri)
-var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 25,
-	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+var satelliteLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
 });
 
 // Painikkeen toiminnallisuus
@@ -80,5 +69,4 @@ document.getElementById('toggleView').addEventListener('click', function() {
         osmLayer.addTo(map);
     }
 });
-
 
