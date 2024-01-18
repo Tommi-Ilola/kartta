@@ -8,11 +8,26 @@ let userIcon = L.icon({
     iconAnchor: [12, 12]
 });
 
-function updateUserLocation(lat, lon) {
-    if (!userMarker) {
-        userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
+function updateUserLocation(lat, lon, accuracy) {
+    console.log('Tarkkuus: ', accuracy); // Tämä tulostaa tarkkuuden konsoliin
+
+    if (accuracy && !isNaN(accuracy) && accuracy > 0) {
+        // Tarkkuus on kelvollinen, jatka ympyrän luomista tai päivitystä
+        if (!userMarker) {
+            userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
+            userMarker.accuracyCircle = L.circle([lat, lon], {
+                radius: accuracy,
+                fillColor: '#54a8ff',
+                fillOpacity: 0.4,
+                color: '#54a8ff',
+                weight: 2
+            }).addTo(map);
+        } else {
+            userMarker.setLatLng([lat, lon]);
+            userMarker.accuracyCircle.setLatLng([lat, lon]).setRadius(accuracy);
+        }
     } else {
-        userMarker.setLatLng([lat, lon]);
+        console.error('Tarkkuus on NaN tai 0 tai negatiivinen.');
     }
 }
 
@@ -23,6 +38,9 @@ function startTracking() {
         isTracking = false;
         if (userMarker) {
             map.removeLayer(userMarker);
+            if (userMarker.accuracyCircle) {
+                map.removeLayer(userMarker.accuracyCircle);
+            }
             userMarker = null;
         }
         document.querySelector('#locateUser img').src = "locate.png";
@@ -36,8 +54,11 @@ function startTracking() {
         watchID = navigator.geolocation.watchPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            updateUserLocation(lat, lon);
-            map.setView([lat, lon], 16);
+            const accuracy = position.coords.accuracy;
+            updateUserLocation(lat, lon, accuracy);
+            if (isTracking) {
+                map.setView([lat, lon], 16);
+            }
         }, function(error) {
             console.error("Sijainnin seuranta epäonnistui: ", error);
             isTracking = false;
