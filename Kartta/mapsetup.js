@@ -39,23 +39,23 @@ proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 
 
 // Karttanäkymä (OSM)
-var map = L.map('map', {
+let map = L.map('map', {
     minZoom: 0,
     maxZoom: 18
 });
 
-var cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
+let cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
 
-var osmLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
+let osmLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+        maxZoom: 25,
         subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
 map.setView([67.500, 26.000], 5);
 
 // Satelliittinäkymä (Esri)
-var satelliteLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
+let satelliteLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+        maxZoom: 25,
         subdomains:['mt0','mt1','mt2','mt3']
 });
 
@@ -69,4 +69,3 @@ document.getElementById('toggleView').addEventListener('click', function() {
         osmLayer.addTo(map);
     }
 });
-
