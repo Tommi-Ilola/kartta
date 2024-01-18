@@ -150,7 +150,7 @@ function findAndShowIntermediatePoint(searchValue) {
             );
 
             // Luo markeri interpoloidulle sijainnille ja lisää se kartalle
-            const popupMarker = L.marker(interpolatedLatLng).addTo(map);
+            const popupMarker = L.marker(interpolatedLatLng);
             popupMarker.bindPopup(`Ratakm: ${searchValue} Ratanumero: ${ratanumero}`);
             searchMarkers.push(popupMarker); // Lisää marker hakutulosten markerien joukkoon
 
@@ -184,34 +184,53 @@ if (!removeButton) {
     updateRemoveButtonVisibility();
 }
 
+let currentResultNumber = 1;
+
 function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero) {
-    const resultsDiv = document.getElementById('results');
-    
-    getCityFromCoordinates(latLng.lat, latLng.lng, (city) => {
-        const resultItem = document.createElement('div');
-        resultItem.className = 'resultItem';
-        resultItem.innerHTML = `
-            <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
-            <strong>Ratakm:</strong> ${searchValue}<br>
-            <strong>Ratanumero:</strong> ${ratanumero}
-        `;
+  const resultsDiv = document.getElementById('results');
+   
+  getCityFromCoordinates(latLng.lat, latLng.lng, (city) => {
+    const resultItem = document.createElement('table');
+    resultItem.className = 'resultItem';
+    resultItem.innerHTML = `
+	  <tr><th><strong>${currentResultNumber}</strong></th>
+	  <td><strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
+      <strong>Ratakm:</strong> ${searchValue}<br>
+      <strong>Ratanumero:</strong> ${ratanumero}</td></tr>
+	`;
 
-        // Luo marker tai hae olemassa oleva
-        const popupMarker = L.marker([latLng.lat, latLng.lng]).addTo(map);
-        popupMarker.bindPopup(`
-            <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
-            <strong>Ratakm:</strong> ${searchValue}<br>
-            <strong>Ratanumero:</strong> ${ratanumero}
-        `);
 
-        // Lisää marker hakutulosten markerien joukkoon
-        searchMarkers.push(popupMarker);
+function createNumberedIcon(number) {
+  return L.divIcon({
+    className: 'custom-div-icon',
+    html: `<div style='background-image: url(MyMarker.png);' class='marker-pin'></div>
+           <span class='marker-number'>${number}</span>`,
+    iconSize: [30, 42],
+    iconAnchor: [15, 49],
+    popupAnchor: [0, -42]
+  });
+}
 
-        // Lisää data-attribuutit
-        resultItem.setAttribute('data-lat', latLng.lat);
-        resultItem.setAttribute('data-lng', latLng.lng);
+// Kun luot markerin, kutsu tätä funktiota ja anna sille haluamasi numero
+const numberedIcon = createNumberedIcon(currentResultNumber);
+const popupMarker = L.marker([latLng.lat, latLng.lng], { icon: numberedIcon }).addTo(map);
 
-        // Kuuntelija klikkaustapahtumalle
+
+    popupMarker.bindPopup(`
+      <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
+      <strong>Ratakm:</strong> ${searchValue}<br>
+      <strong>Ratanumero:</strong> ${ratanumero}`
+	  );
+
+    // Lisää marker hakutulosten markerien joukkoon
+    currentResultNumber++;
+	searchMarkers.push(popupMarker);
+
+    // Lisää data-attribuutit
+    resultItem.setAttribute('data-lat', latLng.lat);
+    resultItem.setAttribute('data-lng', latLng.lng);
+
+    // Kuuntelija klikkaustapahtumalle
 		resultItem.addEventListener('click', function() {
 			if (window.matchMedia("(max-width: 900px)").matches) {
 				const mapHeight = document.getElementById('map').clientHeight; // Kartan korkeus
@@ -221,7 +240,7 @@ function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero)
 				const point = map.latLngToContainerPoint(markerLatLng);
 				point.y -= offsetPixels
 				const newLatLng = map.containerPointToLatLng(point);
-				
+ 
 				map.setView(newLatLng, 20);
 				map.setView(newLatLng, 11); // Keskity uuteen sijaintiin ja aseta zoomaustaso
 			} else {
@@ -231,22 +250,24 @@ function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero)
 			}
 			popupMarker.openPopup();
 		});
-		
-        resultsDiv.appendChild(resultItem);
 
-        // Luo poistopainike, jos sitä ei ole vielä olemassa
-        let removeButton = document.getElementById('removeMarkersButton');
-        if (!removeButton) {
-            removeButton = document.createElement('button');
-            removeButton.id = 'removeMarkersButton';
-            removeButton.textContent = 'Poista merkit kartalta';
-            removeButton.addEventListener('click', clearSearchMarkers);
-            resultsDiv.appendChild(removeButton);
-        }
+    // Lisää tulosnumero
 
-        // Näytä poistopainike
-        removeButton.style.display = 'block';
-    });
+    resultsDiv.appendChild(resultItem);
+
+    // Luo poistopainike, jos sitä ei ole vielä olemassa
+    let removeButton = document.getElementById('removeMarkersButton');
+    if (!removeButton) {
+      removeButton = document.createElement('button');
+      removeButton.id = 'removeMarkersButton';
+      removeButton.textContent = 'Poista merkit kartalta';
+      removeButton.addEventListener('click', clearSearchMarkers);
+      resultsDiv.appendChild(removeButton);
+    }
+
+	// Näytä poistopainike
+	removeButton.style.display = 'block';
+	});
 }
 
 
@@ -284,7 +305,8 @@ function updateRemoveButtonVisibility() {
 }
 
 function clearSearchMarkers() {
-    searchMarkers.forEach(marker => map.removeLayer(marker));
+    currentResultNumber = 1; // Alustetaan tulosnumero
+	searchMarkers.forEach(marker => map.removeLayer(marker));
     searchMarkers = [];
     updateRemoveButtonVisibility(); // Päivitä painikkeen näkyvyys
 }
@@ -301,7 +323,7 @@ function showMagnifierIcon() {
 }
 
 function resetSearch() {
-    document.getElementById('searchInput').value = '';
+	document.getElementById('searchInput').value = '';
     resetMarkerStyles();
     document.getElementById('results').style.display = 'none';
     showMagnifierIcon();
