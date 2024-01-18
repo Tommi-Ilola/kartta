@@ -11,26 +11,13 @@ let userIcon = L.icon({
 	className: 'marker-icon'
 });
 
-function updateUserLocation(lat, lon, accuracy) {
+function updateUserLocation(lat, lon) {
     if (!userMarker) {
         userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
-
-        // Lisää kehä näyttämään käyttäjän sijaintitarkkuuden
-        userMarker.accuracyCircle = L.circle([lat, lon], {
-            radius: accuracy,
-            fillColor: '#3377FF',
-            color: '#3377FF',
-            weight: 1,
-            opacity: 0.5,
-            fillOpacity: 0.15
-        }).addTo(map);
     } else {
         userMarker.setLatLng([lat, lon]);
-        userMarker.accuracyCircle.setLatLng([lat, lon]);
-        userMarker.accuracyCircle.setRadius(accuracy);
     }
 }
-
 
 function updateHeading(lat, lon, heading) {
     if (!headingMarker) {
