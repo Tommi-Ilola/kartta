@@ -135,7 +135,7 @@ h1 {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
     border-radius: 5px;
-    z-index: 1000;
+    z-index: 1000;  /* Asetetaan korkea z-indeksi varmistaaksemme, että se näkyy muiden elementtien päällä */
 }
 
 #map {
@@ -585,9 +585,9 @@ th {
 
 #toggleView {
     position: absolute;
-    left: 10px;
-    top: 62px;
-    right: unset;
+    right: 10px;
+    top: 1rem;
+    left: unset;
     z-index: 1000;
     background-color: white;
     padding: 4pt;
@@ -603,7 +603,8 @@ th {
     z-index: 1000;
     position: absolute;
     left: 10px;
-    top: 108px;
+    bottom: 10px;
+    top: unset;
     right: unset;
     z-index: 1000;
     background-color: white;
