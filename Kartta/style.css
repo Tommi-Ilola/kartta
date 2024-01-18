@@ -4,11 +4,23 @@ body, html {
     padding: 0;
 }
 
-@font-face {
-  font-family: "San Francisco";
-  font-weight: 400;
-  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff");
+.custom-div-icon .marker-pin {
+  width: 30px;
+  height: 50px;
+  background-size: cover;
 }
+
+.custom-div-icon .marker-number {
+	position: absolute;
+	top: 5px;
+	left: 0;
+	right: 0;
+	text-align: center;
+	font-size: 15px;
+	font-weight: bold;
+	color: white;
+}
+
 
 /* Modaalin perustyylit */
 .modal {
@@ -123,7 +135,7 @@ h1 {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
     border-radius: 5px;
-    z-index: 1000;  /* Asetetaan korkea z-indeksi varmistaaksemme, että se näkyy muiden elementtien päällä */
+    z-index: 1000;
 }
 
 #map {
@@ -146,12 +158,19 @@ h1 {
 
 .resultItem {
     padding: 10px;
-    border-bottom: 1px solid #eee;
-	cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    column-width: 10px;
+    width: 100%;
+    text-align: left;
 }
 
-.resultItem:last-child {
-    border-bottom: none;
+.result:hover {
+    background-color: rgb(54 142 233 / 22%);
+}
+
+.active-result {
+    background-color: rgb(54 142 233 / 22%);
 }
 
 p {
@@ -160,6 +179,22 @@ p {
     margin-top: 0px;
     margin-bottom: 0px;
     font-weight: bold;
+}
+
+th {
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: unset;
+    text-align: center;
+    background-color: #00000017;
+    border-radius: 1rem 1rem 1rem 1rem;
+    width: 10%;
+}
+
+td {
+    display: table-cell;
+    vertical-align: inherit;
+    padding-left: 10px;
 }
 
 .searchContainer {
@@ -262,9 +297,11 @@ p {
     font-family: calibri;
     display: none;
     background-color: white;
+	max-height: 90vh;
+    overflow: auto
 }
 
-#searchInput:focus {
+#searchInput {
     border: 0px solid #0099FF;
     outline: none;               
     box-shadow: 0 0 0px rgba(0, 153, 255, 0.5);
@@ -364,6 +401,7 @@ p {
 
 .collapsible:hover {
   background-color: #ccc;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);
 }
 
 .collapsible:after {
@@ -445,6 +483,17 @@ h1 {
     margin-left: 2px;
 }
 
+th {
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: unset;
+    text-align: center;
+    background-color: #00000017;
+    border-radius: 1rem 1rem 1rem 1rem;
+    padding: 0px 6px 0 6px;
+    width: 12%;
+}
+
 #passwordButton {
     position: relative;
 	color: black;
@@ -512,9 +561,13 @@ h1 {
 }
 
 .resultItem {
-    padding: 5px 10px 5px 10px;
+    padding: 10px;
+    border: 0;
     border-bottom: 1px solid #eee;
     cursor: pointer;
+    width: 100%;
+    background-color: white;
+    text-align: left;
 }
 
 #menuContainer {
@@ -643,9 +696,20 @@ h1 {
   flex-direction: column-reverse;
 }
 
-h1, #passwordInput, #passwordButton, textarea, select {
+h1, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
 	-webkit-appearance: none;
 	appearance: none;
 	font-family: calibri !important;
+}
+
+button {
+	-webkit-tap-highlight-color: transparent;
+	font-family: calibri;
+}
+
+@font-face {
+  font-family: "San Francisco";
+  font-weight: 400;
+  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff");
 }
 }
