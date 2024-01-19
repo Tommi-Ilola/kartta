@@ -75,7 +75,7 @@ function startTracking() {
 map.on('dragstart', function() {
     if (isTracking) {
         navigator.geolocation.clearWatch(watchID);
-        
+        isTracking = true;
         document.querySelector('#locateUser img').src = "locate-unfollow.png";
     }
 });
