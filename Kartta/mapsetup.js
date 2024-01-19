@@ -1,6 +1,6 @@
 function verifyPassword() {
     var password = document.getElementById("passwordInput").value;
-    if (password === "") {
+    if (password === "ratakilometri4") {
         document.getElementById("map").style.opacity = "1";
 	map.invalidateSize();
 	document.getElementById("protected-content").style.display = "block";
