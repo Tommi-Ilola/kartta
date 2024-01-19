@@ -9,7 +9,7 @@ let userIcon = L.icon({
 });
 
 function updateUserLocation(lat, lon, accuracy) {
-    console.log('Tarkkuus: ', accuracy); // Tämä tulostaa tarkkuuden konsoliin
+    console.log('Tarkkuus: ', accuracy);
 
     if (accuracy && !isNaN(accuracy) && accuracy > 0) {
         // Tarkkuus on kelvollinen, jatka ympyrän luomista tai päivitystä
@@ -17,9 +17,9 @@ function updateUserLocation(lat, lon, accuracy) {
             userMarker = L.marker([lat, lon], {icon: userIcon}).addTo(map);
             userMarker.accuracyCircle = L.circle([lat, lon], {
                 radius: accuracy,
-                fillColor: '#54a8ff',
-                fillOpacity: 0.4,
-                color: '#54a8ff',
+                fillColor: '#3388ff',
+                fillOpacity: 0.2,
+                color: '#3388ff',
                 weight: 2
             }).addTo(map);
         } else {
@@ -51,22 +51,24 @@ function startTracking() {
     if ("geolocation" in navigator) {
         isTracking = true;
         document.querySelector('#locateUser img').src = "locate-active.png";
-        watchID = navigator.geolocation.watchPosition(function(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-            updateUserLocation(lat, lon, accuracy);
-            if (isTracking) {
-                map.setView([lat, lon], 16);
-            }
-        }, function(error) {
-            console.error("Sijainnin seuranta epäonnistui: ", error);
-            isTracking = false;
-        }, {
-            enableHighAccuracy: true,
-            maximumAge: 100000,
-            timeout: 50000
-        });
+		watchID = navigator.geolocation.watchPosition(function(position) {
+			const lat = position.coords.latitude;
+			const lon = position.coords.longitude;
+			const accuracy = position.coords.accuracy; // Tämä voi olla undefined joissakin laitteissa
+
+			updateUserLocation(lat, lon, accuracy);
+
+			if (isTracking) {
+				map.setView([lat, lon], 16);
+			}
+		}, function(error) {
+			console.error("Sijainnin seuranta epäonnistui: ", error);
+			isTracking = false;
+		}, {
+			enableHighAccuracy: true,
+			maximumAge: 10000,
+			timeout: 5000
+		});
     } else {
         alert("Selaimesi ei tue sijainnin hakua.");
     }
