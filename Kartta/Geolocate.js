@@ -1,6 +1,7 @@
 let userMarker; // Käyttäjän sijaintia varten
 let watchID;
 let isTracking = false;
+let isCentering = true;
 
 let userIcon = L.icon({
     iconUrl: 'circle-icon.png',
@@ -48,15 +49,16 @@ function startTracking() {
     }
 
     // Aloita käyttäjän sijainnin seuraaminen
-    if ("geolocation" in navigator) {
+if ("geolocation" in navigator) {
         isTracking = true;
+        isCentering = true; // Aseta keskittäminen päälle, kun seuranta alkaa
         document.querySelector('#locateUser img').src = "locate-active.png";
         watchID = navigator.geolocation.watchPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             const accuracy = position.coords.accuracy;
             updateUserLocation(lat, lon, accuracy);
-            if (isTracking) {
+            if (isTracking && isCentering) { // Tarkista, onko keskittäminen aktiivinen
                 map.setView([lat, lon], 14);
             }
         }, function(error) {
@@ -74,10 +76,10 @@ function startTracking() {
 
 map.on('dragstart', function() {
     if (isTracking) {
-        navigator.geolocation.clearWatch(watchID);
-        isTracking = false;
+        isCentering = false; // Aseta keskittäminen pois päältä, kun käyttäjä liikuttaa karttaa
         document.querySelector('#locateUser img').src = "locate-unfollow.png";
     }
 });
 
 document.getElementById('locateUser').addEventListener('click', startTracking);
+
