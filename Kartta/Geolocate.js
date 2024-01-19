@@ -57,7 +57,7 @@ function startTracking() {
             const accuracy = position.coords.accuracy;
             updateUserLocation(lat, lon, accuracy);
             if (isTracking) {
-                map.setView([lat, lon], 16);
+                map.setView([lat, lon], 14);
             }
         }, function(error) {
             console.error("Sijainnin seuranta epäonnistui: ", error);
@@ -75,7 +75,7 @@ function startTracking() {
 map.on('dragstart', function() {
     if (isTracking) {
         navigator.geolocation.clearWatch(watchID);
-        isTracking = true;
+        isTracking = false;
         document.querySelector('#locateUser img').src = "locate-unfollow.png";
     }
 });
