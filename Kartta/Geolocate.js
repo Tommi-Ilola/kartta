@@ -64,8 +64,8 @@ function startTracking() {
             isTracking = false;
         }, {
             enableHighAccuracy: true,
-            maximumAge: 10000,
-            timeout: 5000
+            maximumAge: 100000,
+            timeout: 50000
         });
     } else {
         alert("Selaimesi ei tue sijainnin hakua.");
