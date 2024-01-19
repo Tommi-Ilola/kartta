@@ -46,7 +46,7 @@ let map = L.map('map', {
 
 let cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
 
-let osmLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+let osmLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
         maxZoom: 25,
         subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
@@ -54,7 +54,7 @@ let osmLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
 map.setView([67.500, 26.000], 5);
 
 // Satelliittinäkymä (Esri)
-let satelliteLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+let satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
         maxZoom: 25,
         subdomains:['mt0','mt1','mt2','mt3']
 });
