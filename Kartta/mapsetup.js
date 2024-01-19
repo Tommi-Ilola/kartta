@@ -41,7 +41,7 @@ proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 // Karttanäkymä (OSM)
 let map = L.map('map', {
     minZoom: 0,
-    maxZoom: 18
+    maxZoom: 25
 });
 
 let cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
