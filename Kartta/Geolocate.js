@@ -59,7 +59,7 @@ if ("geolocation" in navigator) {
             const accuracy = position.coords.accuracy;
             updateUserLocation(lat, lon, accuracy);
             if (isTracking && isCentering) { // Tarkista, onko keskittäminen aktiivinen
-                map.setView([lat, lon], 14);
+                map.setView([lat, lon], 15);
             }
         }, function(error) {
             console.error("Sijainnin seuranta epäonnistui: ", error);
