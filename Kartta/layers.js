@@ -224,18 +224,24 @@ fetch('tilirataosat.geojson')
                 });
                 // Yhdistä tiedot ja luo yksi tooltip
                 let tooltipContent = `Numero: ${feature.properties.numero}<br>Nimi: ${feature.properties.nimi}`;
+				var myHammer = new Hammer(map._container);
 				L.polygon(allPolygons)
 				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
-				  .on('mouseover touchstart', function() {
+				  .on('mouseover', function() {
 					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
 				  })
-				  .on('mouseout touchend', function() {
+				  .on('mouseout', function() {
 					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
 				  })
 				  .addTo(tilirataosatLayerGroup);
             }
-        });
-    })
+        // Tapahtumankäsittelijä kosketulle tapahtumalle Hammer.js-käsittelijässä
+		myHammer.on("tap", function(event) {
+		  var target = event.target;
+		  target.setStyle({ fillOpacity: 0.5, fillColor: '#5eff00' }); // Muuta täytön läpinäkyvyyttä ja väriä koskettamisen tilassa
+		});
+      });
+	})
     .catch(error => {
         console.error('Virhe ladattaessa tilirataosien geometriaa', error);
     });
