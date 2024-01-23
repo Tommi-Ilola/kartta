@@ -226,18 +226,7 @@ fetch('tilirataosat.geojson')
                 let tooltipContent = `Numero: ${feature.properties.numero}<br>Nimi: ${feature.properties.nimi}`;
 				L.polygon(allPolygons)
 				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
-				  .on('mouseover', function() {
-					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
-				  })		 
-				  .on('touchstart', function() {
-					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
-				  })				  
-				  .on('mouseout', function() {
-					this.setStyle({ fillOpacity: 0.1, color: '#3388ff' });
-				  })	
-				  .on('touchend', function() {
-					this.setStyle({ fillOpacity: 0.1, color: '#3388ff' });
-				  })				  
+				  .setStyle({ className: 'rataosat'})
 				  .addTo(tilirataosatLayerGroup);
             }
         });
