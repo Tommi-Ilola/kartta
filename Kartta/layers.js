@@ -226,11 +226,11 @@ fetch('tilirataosat.geojson')
                 let tooltipContent = `Numero: ${feature.properties.numero}<br>Nimi: ${feature.properties.nimi}`;
 				L.polygon(allPolygons)
 				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
-				  .on('mouseover', function() {
-					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' }); // Lisää korostus-tyylimuotoilu hover-tilaan
+				  .on('mouseover touchstart', function() {
+					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
 				  })
-				  .on('mouseout', function() {
-					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' }); // Palauttaa alkuperäisen tyylimuotoilun hover-tilasta
+				  .on('mouseout touchend', function() {
+					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
 				  })
 				  .addTo(tilirataosatLayerGroup);
             }
