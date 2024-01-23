@@ -228,15 +228,15 @@ fetch('tilirataosat.geojson')
 				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
 				  .on('mouseover', function() {
 					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
-				  })
-				  .on('mousedown', function() {
+				  })		 
+				  .on('touchstart', function() {
 					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
 				  })				  
 				  .on('mouseout', function() {
-					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
-				  })
-				  .on('mousedown', function() {
-					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
+					this.setStyle({ fillOpacity: 0.1, color: '#3388ff' });
+				  })	
+				  .on('touchend', function() {
+					this.setStyle({ fillOpacity: 0.1, color: '#3388ff' });
 				  })				  
 				  .addTo(tilirataosatLayerGroup);
             }
