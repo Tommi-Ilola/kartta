@@ -235,7 +235,7 @@ fetch('tilirataosat.geojson')
 				  .on('mouseout', function() {
 					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
 				  })
-				  .on('mouseup', function() {
+				  .on('mousedown', function() {
 					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
 				  })				  
 				  .addTo(tilirataosatLayerGroup);
