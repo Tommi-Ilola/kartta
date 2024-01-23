@@ -224,24 +224,21 @@ fetch('tilirataosat.geojson')
                 });
                 // Yhdistä tiedot ja luo yksi tooltip
                 let tooltipContent = `Numero: ${feature.properties.numero}<br>Nimi: ${feature.properties.nimi}`;
-				var myHammer = new Hammer(map._container);
 				L.polygon(allPolygons)
 				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
 				  .on('mouseover', function() {
 					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
 				  })
+				  .on('click', function() {
+					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
+				  })				  
 				  .on('mouseout', function() {
 					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
 				  })
 				  .addTo(tilirataosatLayerGroup);
             }
-        // Tapahtumankäsittelijä kosketulle tapahtumalle Hammer.js-käsittelijässä
-		myHammer.on("tap", function(event) {
-		  var target = event.target;
-		  target.setStyle({ fillOpacity: 0.5, fillColor: '#5eff00' }); // Muuta täytön läpinäkyvyyttä ja väriä koskettamisen tilassa
-		});
-      });
-	})
+        });
+    })
     .catch(error => {
         console.error('Virhe ladattaessa tilirataosien geometriaa', error);
     });
@@ -289,23 +286,36 @@ fetch('kayttokeskusalueet.geojson')
 
         L.geoJSON(transformedData, {
             style: function(feature) {
+                let color;
+                switch (feature.properties.nimi) {
+                    case 'Helsinki':
+                        color = '#ff6a00'; // Punainen
+                        break;
+                    case 'Tampere':
+                        color = '#0080ff'; // Sininen
+                        break;
+                    case 'Kouvola':
+                        color = '#98ff98'; // Vihreä
+                        break;
+                    case 'Oulu':
+                        color = '#ffff98'; // Keltainen
+                        break;
+                    default:
+                        color = '#FF00FF'; // Jokin muu väri
+                }
                 return {
-                    color: '#ff7800',
-                    weight: 1,
-                    fillOpacity: 0.1
+                    color: color, // Käytä 'color' muuttujaa
+                    weight: 2,
+                    fillOpacity: 0.2
                 };
             },
             onEachFeature: function(feature, layer) {
-                // Tarkistetaan, onko ominaisuustietoja
-                if (feature.properties) {
-                    if (feature.properties.nimi) {
-                        // Luodaan tooltip jokaiselle polygonille
-                        layer.bindTooltip(feature.properties.nimi, {
-                            className: 'kayttokeskusalueet',
-							sticky: true,
-                            direction: 'top'
-                        });
-                    }
+                if (feature.properties && feature.properties.nimi) {
+                    layer.bindTooltip(feature.properties.nimi, {
+                        className: 'kayttokeskusalueet',
+                        sticky: true,
+                        direction: 'top'
+                    });
                 }
             }
         }).addTo(kayttokeskusalueetLayerGroup);
