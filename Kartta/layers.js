@@ -229,12 +229,15 @@ fetch('tilirataosat.geojson')
 				  .on('mouseover', function() {
 					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
 				  })
-				  .on('click', function() {
+				  .on('mousedown', function() {
 					this.setStyle({ fillOpacity: 0.5, color: '#5eff00' });
 				  })				  
 				  .on('mouseout', function() {
 					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
 				  })
+				  .on('mouseup', function() {
+					this.setStyle({  fillOpacity: 0.1, color: '#3388ff' });
+				  })				  
 				  .addTo(tilirataosatLayerGroup);
             }
         });
