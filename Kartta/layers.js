@@ -5,6 +5,7 @@ let kilometrimerkitLayerGroup = L.layerGroup();
 let tasoristeyksetLayerGroup = L.layerGroup();
 kilometrimerkitLayerGroup.addTo(map);
 let kayttokeskusalueetLayerGroup = L.layerGroup();
+let ToimialueetLayerGroup = L.layerGroup();
 
 document.getElementById('tunnelitCheckbox').addEventListener('change', function() {
     if (this.checked) {
@@ -51,6 +52,14 @@ document.getElementById('kayttokeskusalueetCheckbox').addEventListener('change',
         kayttokeskusalueetLayerGroup.addTo(map);
     } else {
         kayttokeskusalueetLayerGroup.removeFrom(map);
+    }
+});
+
+document.getElementById('ToimialueetCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        ToimialueetLayerGroup.addTo(map);
+    } else {
+        ToimialueetLayerGroup.removeFrom(map);
     }
 });
 
@@ -271,6 +280,31 @@ fetch('ratakm.geojson')
 map.on('zoomend', onZoomEnd);
 map.on('moveend', onMoveEnd);
 
+function onZoomEnd() {
+    const zoomLevel = map.getZoom();
+    const currentBounds = map.getBounds();
+
+    allMarkers.forEach(marker => {
+        if (zoomLevel > 10 && currentBounds.contains(marker.getLatLng())) {
+            marker.openTooltip();
+        } else {
+            marker.closeTooltip();
+        }
+    });
+}
+
+function onMoveEnd() {
+    const currentBounds = map.getBounds();
+
+    allMarkers.forEach(marker => {
+        if (map.getZoom() > 10 && currentBounds.contains(marker.getLatLng())) {
+            marker.openTooltip();
+        } else {
+            marker.closeTooltip();
+        }
+    });
+}
+
 fetch('kayttokeskusalueet.geojson')
     .then(response => response.json())
     .then(data => {
@@ -332,6 +366,82 @@ function transformGeoJSONData(geojsonData) {
     };
 }
 
+// Muutettu GeoJSON-data lisätään kartalle
+fetch('https://rata.digitraffic.fi/infra-api/0.7/13042/toimialueet.geojson?time=2024-01-18T22:00:00Z/2024-01-18T22:00:00Z')
+    .then(response => response.json())
+    .then(geojsonData => {
+        const transformedData = transformGeoJSONData(geojsonData);
+        L.geoJSON(transformedData, {
+            style: function(feature) {
+                // Oletetaan, että jokaisella featurella on 'properties' joka sisältää 'vari'-avaimen
+                return {
+                    color: feature.properties.vari,
+                    weight: 6,
+                    strokeOpacity: 0.5
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                if (feature.properties && feature.properties.nimi) {
+                    layer.bindTooltip(feature.properties.nimi, {
+                        className: 'rataosat',
+                        sticky: true,
+                        direction: 'top'
+                    });
+                }
+            }
+        }).addTo(ToimialueetLayerGroup);
+    })
+    .catch(error => console.error('Error loading GeoJSON data:', error));
+
+
+function transformGeoJSONData(geojsonData) {
+    return {
+        ...geojsonData,
+        features: geojsonData.features.map(feature => {
+            switch (feature.geometry.type) {
+                case 'Polygon':
+                case 'MultiPolygon':
+                    // Muutettu logiikka
+                    return {
+                        ...feature,
+                        geometry: {
+                            ...feature.geometry,
+                            coordinates: transformCoordinates(feature.geometry.coordinates, feature.geometry.type)
+                        }
+                    };
+                case 'GeometryCollection':
+                    // Käsittele jokainen geometria GeometryCollectionissa
+                    return {
+                        ...feature,
+                        geometry: {
+                            ...feature.geometry,
+                            geometries: feature.geometry.geometries.map(geometry => {
+                                switch (geometry.type) {
+                                    case 'MultiLineString':
+                                    case 'LineString': // Jos LineString-geometrioita on, käsittele ne samalla tavalla
+                                        return {
+                                            ...geometry,
+                                            coordinates: geometry.coordinates.map(line => 
+                                                line.map(coord => {
+                                                    const [x, y] = proj4('EPSG:3067', 'EPSG:4326', coord);
+                                                    return [x, y]; // Oikea järjestys: [latitude, longitude]
+                                                })
+                                            )
+                                        };
+                                    // Lisää tapauksia tarvittaessa
+                                    default:
+                                        return geometry;
+                                }
+                            })
+                        }
+                    };
+                default:
+                    return feature;
+            }
+        })
+    };
+}
+
 function transformCoordinates(coordinates, type) {
     if (type === 'Polygon') {
         return coordinates.map(ring => ring.map(coord => proj4('EPSG:3067', 'EPSG:4326', coord)));
@@ -339,30 +449,5 @@ function transformCoordinates(coordinates, type) {
         return coordinates.map(polygon => polygon.map(ring => ring.map(coord => proj4('EPSG:3067', 'EPSG:4326', coord))));
     }
     return coordinates;
-}
-
-function onZoomEnd() {
-    const zoomLevel = map.getZoom();
-    const currentBounds = map.getBounds();
-
-    allMarkers.forEach(marker => {
-        if (zoomLevel > 10 && currentBounds.contains(marker.getLatLng())) {
-            marker.openTooltip();
-        } else {
-            marker.closeTooltip();
-        }
-    });
-}
-
-function onMoveEnd() {
-    const currentBounds = map.getBounds();
-
-    allMarkers.forEach(marker => {
-        if (map.getZoom() > 10 && currentBounds.contains(marker.getLatLng())) {
-            marker.openTooltip();
-        } else {
-            marker.closeTooltip();
-        }
-    });
 }
 
