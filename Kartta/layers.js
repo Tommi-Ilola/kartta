@@ -367,7 +367,7 @@ function transformGeoJSONData(geojsonData) {
 }
 
 // Muutettu GeoJSON-data lisätään kartalle
-fetch('https://rata.digitraffic.fi/infra-api/0.7/toimialueet.geojson')
+fetch('toimialueet.geojson')
     .then(response => response.json())
     .then(geojsonData => {
         const transformedData = transformGeoJSONData(geojsonData);
