@@ -2,6 +2,19 @@ let allMarkers = [];
 let searchMarkers = [];
 let currentCity = ""; // Määritetään ulkoinen muuttuja kaupungin nimelle
 let removeButton = createRemoveMarkersButton();
+let ratanumerot = [];
+
+function haeKaikkiRatanumerot() {
+    fetch('https://rata.digitraffic.fi/infra-api/0.7/radat.geojson')
+        .then(response => response.json())
+        .then(data => {
+            ratanumerot = data.features.map(feature => feature.properties.ratanumero);
+            console.log(ratanumerot);
+        })
+        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
+}
+
+haeKaikkiRatanumerot();
 
 function getCityFromCoordinates(lat, lon, callback) {
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
