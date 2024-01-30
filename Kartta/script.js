@@ -4,14 +4,15 @@ let currentCity = ""; // Määritetään ulkoinen muuttuja kaupungin nimelle
 let removeButton = createRemoveMarkersButton();
 let ratanumerot = [];
 
-function haeKaikkiRatanumerot() {
-    fetch('https://rata.digitraffic.fi/infra-api/0.7/radat.geojson')
-        .then(response => response.json())
-        .then(data => {
-            ratanumerot = data.features.map(feature => feature.properties.ratanumero);
-            console.log(ratanumerot);
-        })
-        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
+async function haeKaikkiRatanumerot() {
+    try {
+        const response = await fetch('https://rata.digitraffic.fi/infra-api/0.7/radat.geojson');
+        const data = await response.json();
+        ratanumerot = data.features.map(feature => feature.properties.ratanumero);
+        console.log(ratanumerot);
+    } catch (error) {
+        console.error('Virhe ladattaessa radat.geojson-dataa:', error);
+    }
 }
 
 haeKaikkiRatanumerot();
