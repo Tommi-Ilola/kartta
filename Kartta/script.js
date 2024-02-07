@@ -1,228 +1,209 @@
 let allMarkers = [];
 let searchMarkers = [];
-let currentCity = ""; // Määritetään ulkoinen muuttuja kaupungin nimelle
-let removeButton = createRemoveMarkersButton();
 let ratanumerot = [];
+let resultIndex = 0;
+let currentResultNumber = 1;
 
 function haeKaikkiRatanumerot() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson');
-    
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
+    naytaDatanLatausIndikaattori()
+	fetch('/api/0.7/radat.geojson')
+        .then(response => response.json())
+        .then(data => {
             ratanumerot = data.features.map(feature => feature.properties.ratanumero);
             console.log(ratanumerot);
-        } else {
-            console.error('Virhe ladattaessa radat.geojson-dataa:', xhr.status);
-        }
-    };
-
-    xhr.onerror = function() {
-        console.error('Virhe ladattaessa radat.geojson-dataa');
-    };
-    
-    xhr.send();
+			piilotaDatanLatausIndikaattori()
+        })
+        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
 }
 
 haeKaikkiRatanumerot();
 
-function getCityFromCoordinates(lat, lon, callback) {
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-        .then(response => response.json())
-        .then(data => {
-            let foundCity = null;
-            if (data && data.address) {
-                foundCity = data.address.city || data.address.town;
+function haeRatakilometrinSijainnit(ratakilometri) {
+    let [ratakm, etaisyys] = ratakilometri.split('+').map(osa => osa.trim());
+    etaisyys = etaisyys || '0';
+    naytaLatausIndikaattori();
+
+    const promises = ratanumerot.map(ratanumero => {
+        const muokattuRatanumero = encodeURIComponent(ratanumero.trim());
+        const url = `/api/0.7/radat/${muokattuRatanumero}/${ratakm}+${etaisyys}.geojson`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP-virhe! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error(`Virhe ladattaessa dataa ratanumerolle ${ratanumero}:`, error);
+                return { status: 'rejected', reason: error };
+            });
+    });
+
+  Promise.allSettled(promises).then(results => {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = ''; // Tyhjennä ennen uusien tulosten lisäämistä
+    let foundResults = false;
+
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled' && result.value.features && result.value.features.length > 0) {
+        result.value.features.forEach(feature => {
+          if (feature.geometry && feature.geometry.coordinates) {
+            const coordinates = feature.geometry.coordinates[0];
+            if (Array.isArray(coordinates) && coordinates.length >= 2) {
+              // Odotetaan, että kaupungin nimi haetaan ennen kuin jatketaan
+              lisaaMarkerKartalle(coordinates, feature.properties.ratakmsijainti, (marker, markerId, cityName) => {
+
+              });
             }
-            callback(foundCity);
-        })
-        .catch(error => {
-            console.error("Error fetching city:", error);
-            callback(null);
+          }
         });
+		foundResults = true;
+	}
+    });
+
+  if (foundResults) {
+    // Tuloksia löytyi, varmistetaan että resultsDiv on näkyvissä
+    resultsDiv.style.display = 'block';
+  } else {
+    // Ei löytynyt tuloksia, näytetään viesti
+    resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+    resultsDiv.style.display = 'block'; // Tämä varmistaa, että viesti tulee näkyviin
+  }
+  piilotaLatausIndikaattori();
+}).catch(error => {
+  console.error('Virhe ladattaessa kaikkia ratakilometrin sijainteja:', error);
+  piilotaLatausIndikaattori();
+});
 }
 
-function resetMarkerStyles() {
-    allMarkers.forEach(marker => {
-        marker.setStyle({
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5,
-			radius: 3
-        });
+function getCityFromCoordinates(lat, lon, callback) {
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+    .then(response => response.json())
+    .then(data => {
+      let cityName = data.address.city || data.address.town || 'Ei tiedossa';
+      callback(cityName);
+    })
+    .catch(error => {
+      console.error("Error fetching city:", error);
+      callback('Ei tiedossa');
     });
 }
 
-function parseRatakmValue(value) {
-    const stringValue = value.toString();
+function luoTuloksenHTML(feature, cityName) {
+  if (feature.properties && feature.properties.ratakmsijainti) {
+    return `
+      <table class="resultItem">
+        <tr>
+          <th><strong>${currentResultNumber++}.</strong></th>
+          <td>
+            <strong>Kaupunki:</strong> ${cityName}<br>
+            <strong>Ratakm:</strong> ${feature.properties.ratakmsijainti.ratakm}+${feature.properties.ratakmsijainti.etaisyys}<br>
+            <strong>Ratanumero:</strong> ${feature.properties.ratakmsijainti.ratanumero}
+          </td>
+        </tr>
+      </table>`;
+  } else {
+    return '';
+  }
+}
 
-    const parts = stringValue.split("+");
-    if (parts.length == 2) {
-        return parseInt(parts[0]) + parseInt(parts[1]) / 1000;
-    } else {
-        return parseFloat(stringValue);
+function muunnaKoordinaatit(koordinaatit) {
+    // Tarkista, että proj4 on ladattu
+    if (typeof proj4 === 'undefined') {
+        console.error('proj4-kirjastoa ei ole ladattu.');
+        return null;
     }
+
+    // Muunna koordinaatit EPSG:3067 (EUREF-FIN) -koordinaatistosta EPSG:4326 (WGS84) -koordinaatistoon
+    return proj4(proj4.defs('EPSG:3067'), proj4.defs('EPSG:4326'), koordinaatit);
 }
 
 
-
-function highlightMarker(marker) {
-	resetMarkerStyles(); // Palautetaan ensin muiden markerien värit
-
-    // Korostetaan valittu marker
-    marker.setStyle({
-        color: '#333',
-        fillColor: 'blue',
-        fillOpacity: 0.8,
-		radius: 5
-    });
-	
-    marker.bringToFront();
-    map.setView(marker.getLatLng(), 11); // Keskitytään markeriin ja zoomataan lähemmäs
-}
-
-function showMarkersByRatakm(ratakmValue) {
+// Funktion, joka lisää tulokset sekä markerit
+function lisaaTuloksetJaMarkerit(data) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
-    resetMarkerStyles();
+    let foundResults = false;
 
-    let found = false;
-    const parsedSearchValue = parseRatakmValue(ratakmValue);
+    if (data.features && data.features.length > 0) {
+        data.features.forEach(feature => {
+            if (feature.geometry && feature.geometry.coordinates) {
+                const coordinates = feature.geometry.coordinates[0];
+                if (Array.isArray(coordinates) && coordinates.length >= 2) {
+                    const markerId = lisaaMarkerKartalle(coordinates, feature.properties.ratakmsijainti);
+                    lisaaTulosDiviin(feature, marker);
+                    foundResults = true;
+                }
+            }
+        });
+    }
 
-    allMarkers.forEach(marker => {
-        const featureProps = marker.featureProperties;
-        const markerRatakm = parseRatakmValue(featureProps.ratakm.toString());
-
-        if (Math.abs(markerRatakm - parsedSearchValue) < 0.001) {
-            found = true;
-            const lat = marker.getLatLng().lat;
-            const lon = marker.getLatLng().lng;
-
-            // Hae kaupunki ja päivitä tulokset riippumatta haun tuloksesta
-            getCityFromCoordinates(lat, lon, (city) => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'resultItem';
-                resultItem.innerHTML = `
-                    <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
-                    <strong>Ratakm:</strong> ${featureProps.ratakm}<br>
-                    <strong>Ratanumero:</strong> ${featureProps.ratanumero || 'Ei määritelty'}
-                `;
-
-                // Lisää data-attribuutti markerin indeksillä
-                resultItem.setAttribute('data-marker-index', allMarkers.indexOf(marker));
-
-                // Lisää kuuntelija, joka korostaa markerin kun tulosta klikataan
-                resultItem.addEventListener('click', function() {
-                    highlightMarker(marker);
-                });
-
-                resultsDiv.appendChild(resultItem);
-            });
-        }
-	});
-	// Näytä viesti, jos tuloksia ei löydy
-	if (!found) {
-		resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
-	}
-
-	// Näytä results-div
-	resultsDiv.style.display = 'block';
-
-	// Varmista, että poistopainike on olemassa ja näkyvissä
-	let removeButton = document.getElementById('removeMarkersButton');
-	if (!removeButton) {
-		removeButton = document.createElement('button');
-		removeButton.id = 'removeMarkersButton';
-		removeButton.textContent = 'Poista merkit kartalta';
-		removeButton.addEventListener('click', clearSearchMarkers);
-		resultsDiv.appendChild(removeButton);
-	}
-	removeButton.style.display = 'block';
+    if (foundResults) {
+        resultsDiv.style.display = 'block';
+    } else {
+        resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+        resultsDiv.style.display = 'block';
+    }
 }
 
-// Oletetaan, että olet jo tuonut ja tallentanut kaikki ratakilometrit allMarkers-muuttujaan
-// ja että jokaisella markerilla on featureProperties, joka sisältää kyseisen ratakilometrin tiedot
-
-function findMarkersByRatanumero(ratanumero) {
-  // Filtteröi kaikki markerit, jotka vastaavat annettua ratanumeroa
-  return allMarkers.filter(marker => marker.featureProperties.ratanumero === ratanumero);
-}
-
-function findAndShowIntermediatePoint(searchValue) {
-    document.getElementById('results').innerHTML = '';
-    const resultsDiv = document.getElementById('results');
-    const parsedSearchValue = parseRatakmValue(searchValue);
-    const baseKm = Math.floor(parsedSearchValue);
-    const fraction = parsedSearchValue - baseKm;
-    const ratanumerot = allMarkers.map(marker => marker.featureProperties.ratanumero);
-    const uniqueRatanumerot = [...new Set(ratanumerot)];
-    let found = false;
-
-    uniqueRatanumerot.forEach(ratanumero => {
-        const markers = findMarkersByRatanumero(ratanumero);
-        markers.sort((a, b) => parseRatakmValue(a.featureProperties.ratakm) - parseRatakmValue(b.featureProperties.ratakm));
+function lisaaMarkerKartalle(coordinates, ratakmsijainti, callback) {
+  const muunnetutKoordinaatit = muunnaKoordinaatit(coordinates);
+  if (muunnetutKoordinaatit) {
+    const [lon, lat] = muunnetutKoordinaatit;
     
-    for (let i = 0; i < markers.length - 1; i++) {
-        const currentKm = parseRatakmValue(markers[i].featureProperties.ratakm);
-        const nextKm = parseRatakmValue(markers[i + 1].featureProperties.ratakm);
-        if (currentKm <= baseKm && nextKm >= baseKm + 1) {
-            const interpolatedLatLng = interpolateLatLng(
-                markers[i].getLatLng(),
-                markers[i + 1].getLatLng(),
-                fraction
-            );
+    // Haetaan kaupungin nimi ennen markerin luontia
+    getCityFromCoordinates(lat, lon, (cityName) => {
+      const customIcon = createNumberedIcon(currentResultNumber);
+      const marker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
 
-            // Luo markeri interpoloidulle sijainnille ja lisää se kartalle
-            const popupMarker = L.marker(interpolatedLatLng);
-            popupMarker.bindPopup(`Ratakm: ${searchValue} Ratanumero: ${ratanumero}`);
-            searchMarkers.push(popupMarker); // Lisää marker hakutulosten markerien joukkoon
+      marker.bindPopup(`Kaupunki: ${cityName}<br>Ratakm: ${ratakmsijainti.ratakm}+${ratakmsijainti.etaisyys}<br>Ratanumero: ${ratakmsijainti.ratanumero}`);
+      
+      searchMarkers.push(marker);
+      const markerId = searchMarkers.indexOf(marker);
+      RemoveMarkersButton();
+	  
+      // Luodaan nyt resultItem markerin luonnin jälkeen, jotta se sisältää oikean markerId:n
+      lisaaTulosDiviin(ratakmsijainti, cityName, markerId);
+      if (callback) callback(marker, markerId, cityName);
 
-            // Luo ja lisää tulostietue
-            updateResultsDivWithIntermediatePoints(searchValue, interpolatedLatLng, ratanumero);
-            found = true;
-            break;
-        }
-    }
-});
 
-if (!found) {
-    resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+    });
+  } else {
+    console.error('Koordinaattimuunnos epäonnistui:', coordinates);
+  }
 }
 
-// Näytä results-div
-resultsDiv.style.display = 'block';
-
-// Luo tai päivitä poistopainiketta
-let removeButton = document.getElementById('removeMarkersButton');
-if (!removeButton) {
-    removeButton = document.createElement('button');
-    removeButton.id = 'removeMarkersButton';
-    removeButton.textContent = 'Poista merkit kartalta';
-    removeButton.addEventListener('click', clearSearchMarkers);
-    resultsDiv.appendChild(removeButton);
-}
-    if (searchMarkers.length > 0) {
-        document.getElementById('removeMarkersButton').style.display = 'block'; // Näytä painike
-    }
-    updateRemoveButtonVisibility();
-}
-
-let currentResultNumber = 1;
-
-function updateResultsDivWithIntermediatePoints(searchValue, latLng, ratanumero) {
+function lisaaTulosDiviin(ratakmsijainti, cityName, markerId) {
   const resultsDiv = document.getElementById('results');
-   
-  getCityFromCoordinates(latLng.lat, latLng.lng, (city) => {
-    const resultItem = document.createElement('table');
-    resultItem.className = 'resultItem';
-    resultItem.innerHTML = `
-	  <tr><th><strong>${currentResultNumber}</strong></th>
-	  <td><strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
-      <strong>Ratakm:</strong> ${searchValue}<br>
-      <strong>Ratanumero:</strong> ${ratanumero}</td></tr>
-	`;
+  
+  const resultItem = document.createElement('table');
+  resultItem.className = 'resultItem';
+  resultItem.innerHTML = `
+    <tr>
+      <th><strong>${currentResultNumber}.</strong></th>
+      <td>
+        <strong>Kaupunki:</strong> ${cityName}<br>
+        <strong>Ratakm:</strong> ${ratakmsijainti.ratakm}+${ratakmsijainti.etaisyys}<br>
+        <strong>Ratanumero:</strong> ${ratakmsijainti.ratanumero}
+      </td>
+    </tr>
+  `;
 
+  resultItem.dataset.markerId = markerId;
+  
+  resultItem.addEventListener('click', function() {
+    const markerIndex = this.dataset.markerId;
+    const selectedMarker = searchMarkers[markerIndex];
+    if (selectedMarker) {
+      map.setView(selectedMarker.getLatLng(), 13);
+      selectedMarker.openPopup();
+    }
+  });
+
+  resultsDiv.appendChild(resultItem);
+  currentResultNumber++;
+}
 
 function createNumberedIcon(number) {
   return L.divIcon({
@@ -230,148 +211,97 @@ function createNumberedIcon(number) {
     html: `<div style='background-image: url(MyMarker.png);' class='marker-pin'></div>
            <span class='marker-number'>${number}</span>`,
     iconSize: [30, 42],
-    iconAnchor: [15, 49],
+    iconAnchor: [14, 49],
     popupAnchor: [0, -42]
   });
 }
 
-// Kun luot markerin, kutsu tätä funktiota ja anna sille haluamasi numero
-const numberedIcon = createNumberedIcon(currentResultNumber);
-const popupMarker = L.marker([latLng.lat, latLng.lng], { icon: numberedIcon }).addTo(map);
-
-
-    popupMarker.bindPopup(`
-      <strong>Kaupunki:</strong> ${city || 'Ei tiedossa'}<br>
-      <strong>Ratakm:</strong> ${searchValue}<br>
-      <strong>Ratanumero:</strong> ${ratanumero}`
-	  );
-
-    // Lisää marker hakutulosten markerien joukkoon
-    currentResultNumber++;
-	searchMarkers.push(popupMarker);
-
-    // Lisää data-attribuutit
-    resultItem.setAttribute('data-lat', latLng.lat);
-    resultItem.setAttribute('data-lng', latLng.lng);
-
-    // Kuuntelija klikkaustapahtumalle
-		resultItem.addEventListener('click', function() {
-			if (window.matchMedia("(max-width: 900px)").matches) {
-				const mapHeight = document.getElementById('map').clientHeight; // Kartan korkeus
-				const offsetPixels = mapHeight / 4; // Määritä offset, esimerkiksi 1/4 kartan korkeudesta
-
-				const markerLatLng = popupMarker.getLatLng();
-				const point = map.latLngToContainerPoint(markerLatLng);
-				point.y -= offsetPixels
-				const newLatLng = map.containerPointToLatLng(point);
- 
-				map.setView(newLatLng, 20);
-				map.setView(newLatLng, 11); // Keskity uuteen sijaintiin ja aseta zoomaustaso
-			} else {
-				// Ei-mobiililaitteiden logiikka: keskitetään marker näytön keskelle
-				map.setView(popupMarker.getLatLng(), 20);
-				map.setView(popupMarker.getLatLng(), 11);
-			}
-			popupMarker.openPopup();
-		});
-
-    // Lisää tulosnumero
-
-    resultsDiv.appendChild(resultItem);
-
-    // Luo poistopainike, jos sitä ei ole vielä olemassa
-    let removeButton = document.getElementById('removeMarkersButton');
-    if (!removeButton) {
-      removeButton = document.createElement('button');
-      removeButton.id = 'removeMarkersButton';
-      removeButton.textContent = 'Poista merkit kartalta';
-      removeButton.addEventListener('click', clearSearchMarkers);
-      resultsDiv.appendChild(removeButton);
-    }
-
-	// Näytä poistopainike
-	removeButton.style.display = 'block';
-	});
+function naytaDatanLatausIndikaattori() {
+    document.getElementById('loadData').style.display = 'block';
 }
 
-
-function interpolateLatLng(latlng1, latlng2, fraction) {
-    const lat = latlng1.lat + (latlng2.lat - latlng1.lat) * fraction;
-    const lng = latlng1.lng + (latlng2.lng - latlng1.lng) * fraction;
-    return L.latLng(lat, lng);
+function piilotaDatanLatausIndikaattori() {
+    document.getElementById('loadData').style.display = 'none';
 }
 
-// Luo "Poista markerit" -painike kartan yhteyteen tai muuhun sopivaan paikkaan
-function createRemoveMarkersButton() {
-    let removeButton = document.getElementById('removeMarkersButton');
-    if (!removeButton) {
-        removeButton = document.createElement('button');
-        removeButton.id = 'removeMarkersButton';
-        removeButton.textContent = 'Poista merkit kartalta';
-        removeButton.style.display = 'none'; // Piilota aluksi
-        removeButton.addEventListener('click', clearSearchMarkers);
-
-        // Lisää painike karttaelementin yhteyteen tai muuhun sopivaan paikkaan
-        document.body.appendChild(removeButton); // Vaihda tämä sopivaan paikkaan
-    }
-    return removeButton;
+function naytaLatausIndikaattori() {
+    document.getElementById('loading').style.display = 'block';
 }
 
-// Kutsu tätä funktiota, kun sovellus käynnistyy
-
-
-function updateRemoveButtonVisibility() {
-    if (searchMarkers.length > 0) {
-        removeButton.style.display = 'block';
-    } else {
-        removeButton.style.display = 'none';
-    }
+function piilotaLatausIndikaattori() {
+    document.getElementById('loading').style.display = 'none';
 }
 
-function clearSearchMarkers() {
-    currentResultNumber = 1; // Alustetaan tulosnumero
-	searchMarkers.forEach(marker => map.removeLayer(marker));
-    searchMarkers = [];
-    updateRemoveButtonVisibility(); // Päivitä painikkeen näkyvyys
+function naytaVirheilmoitus(viesti) {
+    const virheDiv = document.getElementById('virhe');
+    virheDiv.innerHTML = viesti;
+    virheDiv.style.display = 'block';
+}
+
+function piilotaVirheilmoitus() {
+    document.getElementById('virhe').style.display = 'none';
 }
 
 function showCloseIcon() {
     const searchButton = document.getElementById('searchButton');
     searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>'; // Sulje-ikoni
-
 }
 
 function showMagnifierIcon() {
     const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="magnifier-icon">&#x1F50E;&#xFE0E;</span>'; // Suurennuslasi-ikoni
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>'; // Suurennuslasi-ikoni
 }
 
 function resetSearch() {
-	document.getElementById('searchInput').value = '';
-    resetMarkerStyles();
-    document.getElementById('results').style.display = 'none';
+    document.getElementById('searchInput').value = '';
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = ''; // Tyhjennä tulokset
+    resultsDiv.style.display = 'none'; // Piilota tulokset
     showMagnifierIcon();
 }
 
-// Kun käyttäjä suorittaa haun
+function RemoveMarkersButton() {
+    const button = document.getElementById('removeMarkersButton');
+    if (searchMarkers.length > 0) {
+        button.style.display = 'block'; // Markkereita on, näytä painike
+    } else {
+        button.style.display = 'none'; // Ei markkereita, piilota painike
+    }
+}
+
+function poistaKaikkiMarkerit() {
+    searchMarkers.forEach(marker => map.removeLayer(marker));
+    searchMarkers = [];
+	currentResultNumber = 1;
+    RemoveMarkersButton(); // Päivitä painikkeen tila
+}
+
 document.getElementById('searchButton').addEventListener('click', function() {
 	if (document.getElementById('results').style.display === 'block') {
 		resetSearch();
 	} else {
-	const searchValue = document.getElementById('searchInput').value;
-		findAndShowIntermediatePoint(searchValue);
+	const hakuInput = document.getElementById('searchInput').value;
+		haeRatakilometrinSijainnit(hakuInput);
 		showCloseIcon();
 	}
 });
 
-// Olemassa olevaan kuuntelijaan enterille
 document.getElementById('searchInput').addEventListener('keyup', function(event) {
 	if (event.key === 'Enter' || event.keyCode === 13) {
-	const searchValue = document.getElementById('searchInput').value;
-	findAndShowIntermediatePoint(searchValue);
+	const hakuInput = document.getElementById('searchInput').value;
+	haeRatakilometrinSijainnit(hakuInput);
 	showCloseIcon();
 	}
 });
 
-createRemoveMarkersButton();
+document.addEventListener('DOMContentLoaded', function() {
+    RemoveMarkersButton(); // Päivitä painikkeen tila kun sivu on ladattu
 
+    // Aseta tapahtumankuuntelija poistopainikkeelle
+    const removeButton = document.getElementById('removeMarkersButton');
+    if (removeButton) {
+        removeButton.addEventListener('click', poistaKaikkiMarkerit);
+    } else {
+        console.error('RemoveMarkersButton-painiketta ei löydy');
+    }
+});
