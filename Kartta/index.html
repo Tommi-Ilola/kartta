@@ -24,6 +24,8 @@
 </div>
 
 <div id="map"></div>
+
+<button id="removeMarkersButton" style="display:none">Poista merkit kartalta</button>
 	
 <div id="protected-content" style="display:none">
 	<div id="menuContainer">
@@ -59,24 +61,27 @@
 		</button>
 		</span>
 		
-	<div class="searchContainer">
+<div class="searchContainer">
+	<div id="loadData" style="position: absolute; background-color: white; font-family: calibri; height: -webkit-fill-available;width: -webkit-fill-available; text-align: center;padding: 10px;color: #ccc;">Ladataan dataa</div>
 		<div class="searchBox">
 			<input type="text" id="searchInput" placeholder="Syötä ratakm...">
 			<button id="searchButton" type="button">
-				<span class="magnifier">&#x1F50E;&#xFE0E;</span>
+				<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>
 				<span class="close-icon" style="display: none;">&#x2715;</span>
 			</button>
 		</div>
-		
+	<div id="loading" style="display: none; background-color: white; padding: 0px 0px 5px 15px; font-family: calibri; font-weight: bold;">Ladataan...</div>
+	<div id="virhe" style="display: none; color: red; background-color: white; padding: 0px 0px 5px 15px; font-family: calibri; font-weight: bold;"></div>
 		<div class="resultbox">
-			<button type="button" class="collapsible" style="box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.5);"></button>
+			<button type="button" class="collapsible"></button>
 			<div class="content">
-				<div class="results" id="results">...</div>
+				<div class="results" id="results"></div>
 			</div>
 		</div>
 		
 	</div>
 </div>
+	
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     var coll = document.getElementsByClassName("collapsible");
