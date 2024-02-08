@@ -6,7 +6,7 @@ let currentResultNumber = 1;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    const url = '/infra-api/0.7/radat.geojson';
+    const url = '/api/0.7/radat.geojson';
     console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
     fetch(url)
         .then(response => response.json())
@@ -28,7 +28,7 @@ function haeRatakilometrinSijainnit(ratakilometri) {
 
     const promises = ratanumerot.map(ratanumero => {
         const muokattuRatanumero = encodeURIComponent(ratanumero.trim());
-        const url = `/infra-api/0.7/radat/${muokattuRatanumero}/${ratakm}+${etaisyys}.geojson`;
+        const url = `/api/0.7/radat/${muokattuRatanumero}/${ratakm}+${etaisyys}.geojson`;
         console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
         return fetch(url)
             .then(response => {
