@@ -80,7 +80,6 @@ function haeRatakilometrinSijainnit(ratakilometri) {
                         processNextBatch(); // Käsittele seuraava erä pyyntöjä
                     }
                 });
-        }
     };
 
     processNextBatch(); // Aloita pyyntöjen käsittely
