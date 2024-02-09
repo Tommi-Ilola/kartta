@@ -25,58 +25,51 @@ function haeRatakilometrinSijainnit(ratakilometri) {
     etaisyys = etaisyys || '0';
     naytaLatausIndikaattori();
 
-    const promises = ratanumerot.map(ratanumero => {
+    // Määritä, kuinka monta pyyntöä haluat suorittaa samanaikaisesti
+    const MAX_CONCURRENT_REQUESTS = 5;
+    let activeRequests = 0;
+    let currentIndex = 0;
+
+    const processNext = () => {
+        if (currentIndex >= ratanumerot.length) {
+            if (activeRequests === 0) {
+                // Kun kaikki pyynnöt on käsitelty, suorita loppusiivous
+                piilotaLatausIndikaattori();
+            }
+            return; // Kaikki pyynnöt on aloitettu
+        }
+
+        activeRequests++;
+        const ratanumero = ratanumerot[currentIndex];
         const muokattuRatanumero = encodeURIComponent(ratanumero.trim());
         const url = `https://rata.digitraffic.fi/infra-api/0.7/radat/${muokattuRatanumero}/${ratakm}+${etaisyys}.geojson`;
-        console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
-        return fetch(url)
+        console.log("Tehdään API-kutsu osoitteeseen:", url);
+
+        fetch(url)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP-virhe! status: ${response.status}`);
                 }
                 return response.json();
             })
+            .then(data => {
+                // Käsittele dataa tässä
+            })
             .catch(error => {
                 console.error(`Virhe ladattaessa dataa ratanumerolle ${ratanumero}:`, error);
-                return { status: 'rejected', reason: error };
+            })
+            .finally(() => {
+                activeRequests--;
+                processNext(); // Käynnistä seuraava pyyntö, kun tämä on valmis
             });
-    });
 
-  Promise.allSettled(promises).then(results => {
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = ''; // Tyhjennä ennen uusien tulosten lisäämistä
-    let foundResults = false;
+        currentIndex++;
+        if (activeRequests < MAX_CONCURRENT_REQUESTS) {
+            processNext(); // Käynnistä seuraava pyyntö, jos olemme alle raja-arvon
+        }
+    };
 
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled' && result.value.features && result.value.features.length > 0) {
-        result.value.features.forEach(feature => {
-          if (feature.geometry && feature.geometry.coordinates) {
-            const coordinates = feature.geometry.coordinates[0];
-            if (Array.isArray(coordinates) && coordinates.length >= 2) {
-              // Odotetaan, että kaupungin nimi haetaan ennen kuin jatketaan
-              lisaaMarkerKartalle(coordinates, feature.properties.ratakmsijainti, (marker, markerId, cityName) => {
-
-              });
-            }
-          }
-        });
-		foundResults = true;
-	}
-    });
-
-  if (foundResults) {
-    // Tuloksia löytyi, varmistetaan että resultsDiv on näkyvissä
-    resultsDiv.style.display = 'block';
-  } else {
-    // Ei löytynyt tuloksia, näytetään viesti
-    resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
-    resultsDiv.style.display = 'block'; // Tämä varmistaa, että viesti tulee näkyviin
-  }
-  piilotaLatausIndikaattori();
-}).catch(error => {
-  console.error('Virhe ladattaessa kaikkia ratakilometrin sijainteja:', error);
-  piilotaLatausIndikaattori();
-});
+    processNext(); // Aloita ensimmäinen pyyntöjen sarja
 }
 
 function getCityFromCoordinates(lat, lon, callback) {
