@@ -6,18 +6,21 @@ let currentResultNumber = 1;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    fetch('/api/0.7/radat.geojson', {
-	    headers: {
-	        'Accept': 'application/json'
-	    }
+fetch('/api/0.7/radat.geojson', {
+    headers: { 'Accept': 'application/json' }
 	})
-        .then(response => response.json())
-        .then(data => {
-            ratanumerot = data.features.map(feature => feature.properties.ratanumero);
-            console.log(ratanumerot);
-            piilotaDatanLatausIndikaattori();
-        })
-        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
+	.then(response => {
+	    if (!response.ok) {
+	        throw new Error('Verkkopyyntö epäonnistui: Status ' + response.status);
+	    }
+	    return response.json();
+	})
+	.then(data => {
+	    ratanumerot = data.features.map(feature => feature.properties.ratanumero);
+	    console.log(ratanumerot);
+	    piilotaDatanLatausIndikaattori();
+	})
+	.catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
 }
 
 haeKaikkiRatanumerot();
