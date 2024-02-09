@@ -6,7 +6,7 @@ let currentResultNumber = 1;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    fetch('/netlify/functions/fetch-ratanumerot') // Käytä nyt taustafunktiota
+    fetch('/.netlify/functions/fetch-ratanumerot') // Käytä nyt taustafunktiota
         .then(response => response.json())
         .then(data => {
             ratanumerot = data.features.map(feature => feature.properties.ratanumero);
