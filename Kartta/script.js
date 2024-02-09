@@ -26,7 +26,7 @@ function haeRatakilometrinSijainnit(ratakilometri) {
     naytaLatausIndikaattori();
 
     // Rajoita samanaikaisten pyyntöjen määrää
-    const MAX_CONCURRENT_REQUESTS = 5;
+    const MAX_CONCURRENT_REQUESTS = 174;
     let activeRequests = 0;
     let currentIndex = 0;
     let foundResults = false;
