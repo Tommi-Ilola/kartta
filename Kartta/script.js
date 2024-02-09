@@ -78,7 +78,6 @@ function haeRatakilometrinSijainnit(ratakilometri) {
 			    resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
 			    resultsDiv.style.display = 'block'; // Varmista, että tämä rivi on oikein
 			}
-                });
         }
     };
 
