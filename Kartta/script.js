@@ -71,13 +71,13 @@ function haeRatakilometrinSijainnit(ratakilometri) {
                     activeRequests--;
                     if (currentIndex >= ratanumerot.length && activeRequests === 0) {
                         piilotaLatausIndikaattori();
-                        if (!foundResults) {
-                            resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
-                            resultsDiv.style.display = 'block';
-                        }
-                    } else {
-                        processNextBatch(); // Käsittele seuraava erä pyyntöjä
-                    }
+                        if (foundResults) {
+			    resultsDiv.style.display = 'block';
+			}
+			else {
+			    resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+			    resultsDiv.style.display = 'block'; // Varmista, että tämä rivi on oikein
+			}
                 });
         }
     };
