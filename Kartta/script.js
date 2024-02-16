@@ -164,7 +164,15 @@ function lisaaMarkerKartalle(coordinates, ratakmsijainti, callback) {
       const customIcon = createNumberedIcon(currentResultNumber);
       const marker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
 
-      marker.bindPopup(`Kaupunki: ${cityName}<br>Ratakm: ${ratakmsijainti.ratakm}+${ratakmsijainti.etaisyys}<br>Ratanumero: ${ratakmsijainti.ratanumero}`);
+      // Lisää Google Maps linkki
+      const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+
+      marker.bindPopup(`
+        Kaupunki: ${cityName}<br>
+        Ratakm: ${ratakmsijainti.ratakm}+${ratakmsijainti.etaisyys}<br>
+        Ratanumero: ${ratakmsijainti.ratanumero}<br>
+        <a href="${googleMapsLink}" target="_blank">Avaa Google Mapsissa</a>
+      `);
       
       searchMarkers.push(marker);
       const markerId = searchMarkers.indexOf(marker);
@@ -173,8 +181,6 @@ function lisaaMarkerKartalle(coordinates, ratakmsijainti, callback) {
       // Luodaan nyt resultItem markerin luonnin jälkeen, jotta se sisältää oikean markerId:n
       lisaaTulosDiviin(ratakmsijainti, cityName, markerId);
       if (callback) callback(marker, markerId, cityName);
-
-
     });
   } else {
     console.error('Koordinaattimuunnos epäonnistui:', coordinates);
