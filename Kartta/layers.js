@@ -451,3 +451,53 @@ function transformCoordinates(coordinates, type) {
     return coordinates;
 }
 
+function haeJunienSijainnit() {
+    const url = 'https://rata.digitraffic.fi/api/v1/train-locations/latest/';
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            paivitaJunienSijainnitKartalla(data);
+        })
+        .catch(error => console.error('Virhe ladattaessa junien sijainteja:', error));
+}
+
+let junienMarkerit = {};
+
+function paivitaJunienSijainnitKartalla(data) {
+	data.forEach(juna => {
+		if (juna.location && Array.isArray(juna.location.coordinates) && juna.location.coordinates.length === 2) {
+			const [lon, lat] = juna.location.coordinates;
+			const trainNumber = juna.trainNumber;
+			const speed = juna.speed;
+
+			// Muodosta HTML sisältö pop-uppiin
+			const popupContent = `
+				<div>
+					<h4>Juna ${trainNumber}</h4>
+					<p>Nopeus: ${speed} km/h</p>
+				</div>
+			`;
+
+			const customIcon = L.icon({
+				iconUrl: 'train.png', // Kuvakkeen polku
+				iconSize: [20, 20], // Kuvakkeen koko pikseleinä
+				iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
+				popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
+			});
+
+			if (junienMarkerit[trainNumber]) {
+				// Päivitä olemassa olevan markerin sijainti
+				junienMarkerit[trainNumber].setLatLng([lat, lon]);
+			} else {
+				// Luo uusi marker kartalle ja aseta pop-up sisältö
+				junienMarkerit[trainNumber] = L.marker([lat, lon], {icon: customIcon})
+					.addTo(map)
+					.bindPopup(popupContent);
+			}
+		} else {
+			console.error('Puuttuvat tai virheelliset sijaintitiedot junalle', juna);
+		}
+	});
+}
+
+setInterval(haeJunienSijainnit, 1000);
