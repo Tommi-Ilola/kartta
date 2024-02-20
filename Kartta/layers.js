@@ -64,11 +64,11 @@ document.getElementById('ToimialueetCheckbox').addEventListener('change', functi
     }
 });
 
-document.getElementById('JunattCheckbox').addEventListener('change', function() {
+document.getElementById('JunatCheckbox').addEventListener('change', function() {
     if (this.checked) {
         JunatLayerGroup.addTo(map);
     } else {
-        JumatLayerGroup.removeFrom(map);
+        JunatLayerGroup.removeFrom(map);
     }
 });
 
