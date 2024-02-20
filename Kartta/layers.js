@@ -500,7 +500,7 @@ function paivitaJunienSijainnitKartalla(data) {
 			} else {
 				// Luo uusi marker kartalle ja aseta pop-up sisältö
 				junienMarkerit[trainNumber] = L.marker([lat, lon], {icon: customIcon})
-					).addTo(JunatLayerGroup);
+					).addTo(JunatLayerGroup)
 					.bindPopup(popupContent);
 			}
 		} else {
