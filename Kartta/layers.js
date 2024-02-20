@@ -6,6 +6,7 @@ let tasoristeyksetLayerGroup = L.layerGroup();
 kilometrimerkitLayerGroup.addTo(map);
 let kayttokeskusalueetLayerGroup = L.layerGroup();
 let ToimialueetLayerGroup = L.layerGroup();
+let JunatLayerGroup = L.layerGroup();
 
 document.getElementById('tunnelitCheckbox').addEventListener('change', function() {
     if (this.checked) {
@@ -60,6 +61,14 @@ document.getElementById('ToimialueetCheckbox').addEventListener('change', functi
         ToimialueetLayerGroup.addTo(map);
     } else {
         ToimialueetLayerGroup.removeFrom(map);
+    }
+});
+
+document.getElementById('JunattCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        JunatLayerGroup.addTo(map);
+    } else {
+        JumatLayerGroup.removeFrom(map);
     }
 });
 
@@ -491,7 +500,7 @@ function paivitaJunienSijainnitKartalla(data) {
 			} else {
 				// Luo uusi marker kartalle ja aseta pop-up sisältö
 				junienMarkerit[trainNumber] = L.marker([lat, lon], {icon: customIcon})
-					.addTo(map)
+					).addTo(JunatLayerGroup);
 					.bindPopup(popupContent);
 			}
 		} else {
