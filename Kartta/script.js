@@ -4,6 +4,7 @@ let geoJsonLayers = [];
 let ratanumerot = [];
 let resultIndex = 0;
 let currentResultNumber = 1;
+let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
@@ -510,15 +511,6 @@ function naytaVirheilmoitus(viesti) {
     virheDiv.style.display = 'block';
 }
 
-function resetSearch() {
-    document.getElementById('searchInput').value = '';
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = ''; // Tyhjennä tulokset
-    resultsDiv.style.display = 'none'; // Piilota tulokset
-    piilotaVirheilmoitus(); // Piilota mahdollinen virheilmoitus
-    showMagnifierIcon(); // Näytä suurennuslasikuvake
-}
-
 function piilotaVirheilmoitus() {
     const virheDiv = document.getElementById('virhe');
     if (virheDiv) {
@@ -561,34 +553,55 @@ function poistaKaikkiMarkerit() {
     currentResultNumber = 1; // Nollaa tulosten laskuri
 }
 
-document.getElementById('searchButton').addEventListener('click', function() {
-    // Piilota mahdollinen aiempi virheilmoitus
-    piilotaVirheilmoitus();
-
-    const hakuInput = document.getElementById('searchInput').value.trim();
-    if (this.innerHTML.includes('close-icon')) {
+document.getElementById('searchButton').addEventListener('click', function(event) {
+    event.preventDefault(); // Estä lomakkeen oletustoiminta
+    if (isSearchActive && this.innerHTML.includes('close-icon')) {
+        // Jos haku on aktiivinen ja käyttäjä klikkaa "x" ikonia, resetoi haku
         resetSearch();
-    } else if (hakuInput.includes('-')) {
-        // Käyttäjä on syöttänyt ratakilometrivälin
-        haeRatakilometriValinSijainnit(hakuInput);
-		showCloseIcon();
-    } else if (/^\d+$/.test(hakuInput) || /^\d+\+\d*$/.test(hakuInput)) {
-        // Käyttäjä on syöttänyt yksittäisen ratakilometrin muodossa "km" tai "km+etaisyys"
-        // Jos syöte on vain "km", lisätään siihen "+0" hakuun sopivaksi
-        const muokattuHakuInput = hakuInput.includes('+') ? hakuInput : `${hakuInput}+0`;
-        haeRatakilometrinSijainnit(muokattuHakuInput);
-		showCloseIcon();
     } else {
-        // Näytetään virheilmoitus, jos syöte ei vastaa yllä olevia ehtoja
-        naytaVirheilmoitus("Syötetty arvo ei ole kelvollinen. Syötä ratakilometrin numero muodossa 'km+etaisyys' tai 'km', tai ratakilometriväli muodossa 'km+etaisyys - km+etaisyys'.");
+        // Muussa tapauksessa suorita haku
+        performSearch();
     }
 });
+
+function performSearch() {
+    const hakuInput = document.getElementById('searchInput').value.trim();
+
+    if (isSearchActive) {
+        // Tyhjennä aiemmat tulokset ja valmistele uutta hakua varten
+        clearResults();
+    }
+
+    if (hakuInput.includes('-')) {
+        haeRatakilometriValinSijainnit(hakuInput);
+    } else if (/^\d+$/.test(hakuInput) || /^\d+\+\d*$/.test(hakuInput)) {
+        const muokattuHakuInput = hakuInput.includes('+') ? hakuInput : `${hakuInput}+0`;
+        haeRatakilometrinSijainnit(muokattuHakuInput);
+    }
+
+    isSearchActive = true; // Aseta haku aktiiviseksi
+    showCloseIcon(); // Vaihda painikkeen ikoni sulkevaksi
+}
+
+// Lisätään funktio aiempien hakutulosten tyhjentämiseksi
+function clearResults() {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+    resultsDiv.style.display = 'none';
+}
 
 document.getElementById('searchInput').addEventListener('keyup', function(event) {
     if (event.key === 'Enter' || event.keyCode === 13) {
-        document.getElementById('searchButton').click();
+        performSearch();
     }
 });
+
+function resetSearch() {
+    clearResults(); // Tyhjennä hakutulokset
+    document.getElementById('searchInput').value = ''; // Tyhjennä hakukenttä
+    isSearchActive = false; // Aseta haku ei-aktiiviseksi
+    showMagnifierIcon(); // Näytä suurennuslasi-ikoni
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     RemoveMarkersButton(); // Päivitä painikkeen tila kun sivu on ladattu
@@ -601,4 +614,3 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('RemoveMarkersButton-painiketta ei löydy');
     }
 });
-
