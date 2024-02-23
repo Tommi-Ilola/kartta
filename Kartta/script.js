@@ -1,5 +1,6 @@
 let allMarkers = [];
 let searchMarkers = [];
+let geoJsonLayers = [];
 let ratanumerot = [];
 let resultIndex = 0;
 let currentResultNumber = 1;
@@ -83,7 +84,6 @@ function haeRatakilometrinSijainnit(ratakilometri) {
     processNextBatch(); // Aloita pyyntöjen käsittely
 }
 
-
 function getCityFromCoordinates(lat, lon, callback) {
   fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
     .then(response => response.json())
@@ -94,6 +94,245 @@ function getCityFromCoordinates(lat, lon, callback) {
     .catch(error => {
       console.error("Error fetching city:", error);
       callback('Ei tiedossa');
+    });
+}
+
+function haeRatakilometriValinSijainnit(ratakilometriVali) {
+    naytaLatausIndikaattori();
+	currentMarkerNumber = 1;
+
+    // Erota syöte ratakm ja etäisyys osiin ja muodosta niistä URL
+    const valiOsat = ratakilometriVali.split('-');
+    if (valiOsat.length === 2) {
+        const alkuOsa = valiOsat[0].split('+');
+        const loppuOsa = valiOsat[1].split('+');
+        const ratakm1 = alkuOsa[0].trim();
+        const etaisyys1 = alkuOsa[1] ? alkuOsa[1].trim() : '0';
+        const ratakm2 = loppuOsa[0].trim();
+        const etaisyys2 = loppuOsa[1] ? loppuOsa[1].trim() : '0';
+
+        // Tulosta debuggausviestit varmistaaksesi, että osat on eroteltu oikein
+        console.log(`Alku: ratakm1 = ${ratakm1}, etaisyys1 = ${etaisyys1}`);
+        console.log(`Loppu: ratakm2 = ${ratakm2}, etaisyys2 = ${etaisyys2}`);
+
+        ratanumerot.forEach(ratanumero => {
+            const muokattuRatanumero = encodeURIComponent(ratanumero);
+            const url = `https://rata.digitraffic.fi/infra-api/0.7/radat/${muokattuRatanumero}/${ratakm1}+${etaisyys1}-${ratakm2}+${etaisyys2}.geojson`;
+            console.log("Tehdään API-kutsu osoitteeseen:", url);
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+					piilotaLatausIndikaattori();
+					naytaDatanTiedotResultsDivissa(data); // Näytä data results-divissä
+					visualisoiGeojsonDataKartalla(data); // Visualisoi data kartalla
+				})
+                .catch(error => {
+                    console.error(`Virhe ladattaessa dataa ratanumerolle ${ratanumero}:`, error);
+                    piilotaLatausIndikaattori();
+                });
+        });
+    } else {
+        console.error('Syötteen muoto on virheellinen. Odotetaan muotoa "ratakm+etaisyys-ratakm+etaisyys".');
+        piilotaLatausIndikaattori();
+    }
+}
+
+function haeRatakilometrinSijainnitJaLisaaMarkerit(ratakm, etaisyys, ratanumero) {
+    // Muodosta URL käyttäen ratakm, etaisyys ja ratanumero arvoja
+    const url = `https://rata.digitraffic.fi/infra-api/0.7/radat/${encodeURIComponent(ratanumero)}/${ratakm}+${etaisyys}.geojson`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP-virhe! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Tarkista, löytyykö koordinaatteja vastaava data
+            if (data.features.length > 0) {
+                const coordinates = data.features[0].geometry.coordinates[0];
+                lisaaValiMarkerKartalle(coordinates, {
+                    ratakm: ratakm,
+                    etaisyys: etaisyys,
+                    ratanumero: ratanumero
+                });
+            }
+        })
+        .catch(error => {
+            console.error(`Virhe ladattaessa dataa ratanumerolle ${ratanumero}:`, error);
+        });
+}
+
+function naytaDatanTiedotResultsDivissa(data) {
+    const resultsDiv = document.getElementById('results');
+	resultsDiv.style.display = 'block';
+
+    if (data.features && data.features.length > 0) {
+
+    } else {
+        resultsDiv.innerHTML = '<p>Ei tuloksia</p>';
+    }
+}
+
+function visualisoiGeojsonDataKartalla(data) {
+    const resultsDiv = document.getElementById('results');
+
+    let index = 0; // Indeksi jokaiselle featurelle
+
+    const layer = L.geoJSON(data, {
+        style: function (feature) {
+            return {
+                color: "#3388ff",
+                weight: 15,
+                opacity: 0.5
+            };
+        },
+
+        onEachFeature: function (feature, layer) {
+            // Luodaan tulokset vastaamaan kartalla olevia kohteita
+            const item = document.createElement('table');
+            item.className = 'resultItem';
+            item.dataset.index = index++; // Tallenna indeksi
+            const properties = feature.properties;
+            item.innerHTML =  `
+            <table class="resultItem" data-index="${index}">
+                    <tr>
+                        <th><strong>${currentResultNumber++}.</strong></th>
+                        <td>
+   
+							<strong>Ratanumero:</strong> ${properties.ratanumero}<br>
+                            <strong>Alku:</strong> km ${properties.alku.ratakm}+${properties.alku.etaisyys}<br>
+                            <strong>Loppu:</strong> km ${properties.loppu.ratakm}+${properties.loppu.etaisyys}<br>
+                            <strong>Pituus:</strong> ${properties.pituus} metriä
+                        </td>
+                    </tr>
+            </table>
+        `;
+		
+		item.addEventListener('click', function() {
+                map.fitBounds(layer.getBounds());
+            });
+
+            resultsDiv.appendChild(item);
+		
+            if (feature.properties && feature.properties.alku && feature.properties.loppu && feature.properties.pituus) {
+                const alku = feature.properties.alku;
+                const loppu = feature.properties.loppu;
+                const pituus = feature.properties.pituus;
+
+                // Oletetaan, että koordinaatit ovat jo EPSG:4326-muodossa (latitude, longitude)
+                const alkuLat = alku.lat; // Oleta, että tämä on saatavilla
+                const alkuLon = alku.lon; // Oleta, että tämä on saatavilla
+                const loppuLat = loppu.lat; // Oleta, että tämä on saatavilla
+                const loppuLon = loppu.lon; // Oleta, että tämä on saatavilla
+
+                // Luo Google Maps URL reitille alkupisteestä loppupisteeseen
+                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${alkuLat},${alkuLon}&destination=${loppuLat},${loppuLon}&travelmode=driving`;
+
+                // Muodostetaan popupin sisältö
+                const popupContent = `
+                    <strong>Ratakilometriväli:</strong><br>
+                    km ${alku.ratakm}+${alku.etaisyys}
+                    - ${loppu.ratakm}+${loppu.etaisyys}<br>
+                    <strong>Pituus:</strong> ${pituus} metriä<br>
+					<a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
+                `;
+
+                // Asetetaan popupin sisältö
+                layer.bindPopup(popupContent);
+            }
+		
+        },
+        coordsToLatLng: function(coords) {
+            // Muunna koordinaatit EPSG:3067 -> EPSG:4326
+            const [lon, lat] = proj4("EPSG:3067", "EPSG:4326", [coords[0], coords[1]]);
+            return [lat, lon];
+        }
+    }).addTo(map);
+	geoJsonLayers.push(layer); // Lisää layeri listaan
+    RemoveMarkersButton(); // Päivitä painikkeen tila
+
+    // Aseta kartan näkymäalue (bounds) vastaamaan GeoJSON-datan aluetta
+	let featureGroup = L.featureGroup(geoJsonLayers);
+	if (featureGroup.getLayers().length > 0) {
+		map.fitBounds(featureGroup.getBounds());
+	}
+}
+
+function lisaaAlkuJaLoppuPisteetGeoJsonista(data) {
+    data.features.forEach(feature => {
+        // Oletetaan, että koordinaatit ovat ensimmäisen ja viimeisen pisteen koordinaatit
+        const alkuKoordinaatit = feature.geometry.coordinates[0][0];
+        const loppuKoordinaatit = feature.geometry.coordinates[0][feature.geometry.coordinates[0].length - 1];
+
+        // Muunna koordinaatit EPSG:3067 -> EPSG:4326
+        const alkuLatLng = proj4(proj4.defs('EPSG:3067'), proj4.defs('EPSG:4326'), alkuKoordinaatit);
+        const loppuLatLng = proj4(proj4.defs('EPSG:3067'), proj4.defs('EPSG:4326'), loppuKoordinaatit);
+
+        // Lisää markkerit kartalle
+        const alkuMarker = L.marker([alkuLatLng[1], alkuLatLng[0]]).addTo(map);
+        const loppuMarker = L.marker([loppuLatLng[1], loppuLatLng[0]]).addTo(map);
+
+        // Aseta popupit markkereille
+        alkuMarker.bindPopup(`Alkupiste: km ${feature.properties.alku.ratakm}+${feature.properties.alku.etaisyys}`);
+        loppuMarker.bindPopup(`Loppupiste: km ${feature.properties.loppu.ratakm}+${feature.properties.loppu.etaisyys}`);
+
+        // Tallenna markerit niiden poistamiseksi tarvittaessa
+        searchMarkers.push(alkuMarker, loppuMarker);
+    });
+}
+
+function naytaTuloksetResultsDivissa(data) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = ''; // Tyhjennä aiemmat tulokset
+
+    data.features.forEach((feature, index) => {
+        const properties = feature.properties;
+        const item = document.createElement('div');
+        item.className = 'resultItem';
+        item.dataset.index = index; // Tallenna geometrian indeksi data-attribuuttiin
+        item.innerHTML = `
+            <h4>Feature ${index + 1}</h4>
+            <p>Ratanumero: ${properties.ratanumero}</p>
+            <p>Alku: ${properties.alku.ratakm}+${properties.alku.etaisyys}</p>
+            <p>Loppu: ${properties.loppu.ratakm}+${properties.loppu.etaisyys}</p>
+            <p>Pituus: ${properties.pituus} metriä</p>
+        `;
+
+        item.addEventListener('click', function() {
+            // Hae klikatun elementin indeksi
+            const featureIndex = this.dataset.index;
+            const selectedFeature = data.features[featureIndex];
+            if (selectedFeature) {
+                // Käytä valitun geometrian koordinaatteja keskittääksesi kartan
+                const bounds = L.geoJSON(selectedFeature.geometry).getBounds();
+                map.fitBounds(bounds);
+            }
+        });
+
+        resultsDiv.appendChild(item);
+    });
+
+    if (data.features.length === 0) {
+        resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+    }
+}
+
+function naytaGeometriatKartalla(data) {
+    data.features.forEach(feature => {
+        const geometry = feature.geometry;
+        if (geometry.type === 'MultiLineString') {
+            geometry.coordinates.forEach(lineString => {
+                const latLngs = lineString.map(coord => {
+                    // Muunna koordinaatit EPSG:3067:stä EPSG:4326:een
+                    const [lon, lat] = proj4(proj4.defs('EPSG:3067'), proj4.defs('EPSG:4326'), coord);
+                    return [lat, lon];
+                });
+                // Lisää polyline kartalle Leafletin avulla
+                L.polyline(latLngs, {color: 'red'}).addTo(map);
+            });
+        }
     });
 }
 
@@ -265,46 +504,90 @@ function showMagnifierIcon() {
     searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>'; // Suurennuslasi-ikoni
 }
 
+function naytaVirheilmoitus(viesti) {
+    const virheDiv = document.getElementById('virhe');
+    virheDiv.innerText = viesti;
+    virheDiv.style.display = 'block';
+}
+
 function resetSearch() {
     document.getElementById('searchInput').value = '';
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = ''; // Tyhjennä tulokset
     resultsDiv.style.display = 'none'; // Piilota tulokset
-    showMagnifierIcon();
+    piilotaVirheilmoitus(); // Piilota mahdollinen virheilmoitus
+    showMagnifierIcon(); // Näytä suurennuslasikuvake
 }
 
+function piilotaVirheilmoitus() {
+    const virheDiv = document.getElementById('virhe');
+    if (virheDiv) {
+        virheDiv.style.display = 'none';
+    }
+}
+
+// Muutettu poistaKaikkiMarkerit-funktio poistamaan kaikki karttaelementit
+function poistaKaikkiMarkerit() {
+    // Poista markerit
+    searchMarkers.forEach(marker => map.removeLayer(marker));
+    searchMarkers = [];
+
+    // Poista kaikki L.geoJSON layerit kartalta
+    map.eachLayer(layer => {
+        if (layer instanceof L.GeoJSON) {
+            map.removeLayer(layer);
+        }
+    });
+
+    // Piilota RemoveMarkersButton, koska kartalla ei ole enää elementtejä
+    RemoveMarkersButton();
+    currentResultNumber = 1; // Nollaa tulosten laskuri
+}
+
+// Päivitetty funktio, joka päivittää RemoveMarkersButton-painikkeen tilan
 function RemoveMarkersButton() {
     const button = document.getElementById('removeMarkersButton');
-    if (searchMarkers.length > 0) {
-        button.style.display = 'block'; // Markkereita on, näytä painike
-    } else {
-        button.style.display = 'none'; // Ei markkereita, piilota painike
-    }
+    // Tarkistetaan, onko kartalla markereita tai GeoJSON-layereita
+    let isElementsPresent = searchMarkers.length > 0 || geoJsonLayers.length > 0;
+    button.style.display = isElementsPresent ? 'block' : 'none';
 }
 
 function poistaKaikkiMarkerit() {
     searchMarkers.forEach(marker => map.removeLayer(marker));
-    searchMarkers = [];
-	currentResultNumber = 1;
+    searchMarkers = []; // Tyhjennä markerit lista
+    geoJsonLayers.forEach(layer => map.removeLayer(layer));
+    geoJsonLayers = []; // Tyhjennä GeoJSON-layereiden lista
     RemoveMarkersButton(); // Päivitä painikkeen tila
+    currentResultNumber = 1; // Nollaa tulosten laskuri
 }
 
 document.getElementById('searchButton').addEventListener('click', function() {
-	if (document.getElementById('results').style.display === 'block') {
-		resetSearch();
-	} else {
-	const hakuInput = document.getElementById('searchInput').value;
-		haeRatakilometrinSijainnit(hakuInput);
+    // Piilota mahdollinen aiempi virheilmoitus
+    piilotaVirheilmoitus();
+
+    const hakuInput = document.getElementById('searchInput').value.trim();
+    if (this.innerHTML.includes('close-icon')) {
+        resetSearch();
+    } else if (hakuInput.includes('-')) {
+        // Käyttäjä on syöttänyt ratakilometrivälin
+        haeRatakilometriValinSijainnit(hakuInput);
 		showCloseIcon();
-	}
+    } else if (/^\d+$/.test(hakuInput) || /^\d+\+\d*$/.test(hakuInput)) {
+        // Käyttäjä on syöttänyt yksittäisen ratakilometrin muodossa "km" tai "km+etaisyys"
+        // Jos syöte on vain "km", lisätään siihen "+0" hakuun sopivaksi
+        const muokattuHakuInput = hakuInput.includes('+') ? hakuInput : `${hakuInput}+0`;
+        haeRatakilometrinSijainnit(muokattuHakuInput);
+		showCloseIcon();
+    } else {
+        // Näytetään virheilmoitus, jos syöte ei vastaa yllä olevia ehtoja
+        naytaVirheilmoitus("Syötetty arvo ei ole kelvollinen. Syötä ratakilometrin numero muodossa 'km+etaisyys' tai 'km', tai ratakilometriväli muodossa 'km+etaisyys - km+etaisyys'.");
+    }
 });
 
 document.getElementById('searchInput').addEventListener('keyup', function(event) {
-	if (event.key === 'Enter' || event.keyCode === 13) {
-	const hakuInput = document.getElementById('searchInput').value;
-	haeRatakilometrinSijainnit(hakuInput);
-	showCloseIcon();
-	}
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        document.getElementById('searchButton').click();
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
