@@ -1,4 +1,6 @@
 [[redirects]]
-  from = "/api/*"
-  to = "https://rata.digitraffic.fi/infra-api/:splat"
+  from = "/radat"
+  to = "https://rata.digitraffic.fi/infra-api/radat.geojson"
   status = 200
+  force = true
+  headers = {X-From = "Netlify"}
