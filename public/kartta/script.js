@@ -11,7 +11,11 @@ function haeKaikkiRatanumerot() {
     const url = '/api/radat.geojson';
 	
     console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
-    fetch(url)
+    fetch(url, {
+	    headers: {
+	        'Accept': 'application/json'
+	    }
+	})
         .then(response => response.json())
         .then(data => {
             ratanumerot = data.features.map(feature => feature.properties.ratanumero);
