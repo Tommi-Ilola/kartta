@@ -2,4 +2,3 @@
   from = "/api/*"
   to = "https://rata.digitraffic.fi/infra-api/:splat"
   status = 200
-  force = true
