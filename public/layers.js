@@ -510,3 +510,14 @@ function paivitaJunienSijainnitKartalla(data) {
 }
 
 setInterval(haeJunienSijainnit, 1000);
+
+fetch('SA.geojson')
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(json) {
+        L.geoJSON(json).addTo(map);
+    })
+    .catch(function(err) {
+        console.error('Virhe ladattaessa GeoJSON-dataa:', err);
+    });
