@@ -514,28 +514,24 @@ setInterval(haeJunienSijainnit, 1000);
 fetch('SA.csv')
   .then(response => response.text())
   .then(csv => Papa.parse(csv, {header: true}))
-	.then(data => {
-	    const features = data.data.map(row => {
-	      const lat = parseFloat(row.latitude);
-	      const lng = parseFloat(row.longitude);
-	      if (!isNaN(lat) && !isNaN(lng)) { // Vain validit koordinaatit
-	        return {
-	          type: 'Feature',
-	          properties: {
-	            name: row.name
-	          },
-	          geometry: {
-	            type: 'Point',
-	            coordinates: [lng, lat]
-	          }
-	        };
-	      }
-	    }).filter(Boolean); // Poistaa undefined arvot, jotka syntyvät, jos koordinaatit ovat NaN
-	    
-	    const geoJson = {
-	      type: 'FeatureCollection',
-	      features: features
-	    };
-	    
-	    L.geoJSON(geoJson).addTo(map);
-	  });
+  .then(data => {
+    const features = data.data.map(row => {
+      return {
+        type: 'Feature',
+        properties: {
+          name: row.name
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)]
+        }
+      };
+    });
+    
+    const geoJson = {
+      type: 'FeatureCollection',
+      features: features
+    };
+    
+    L.geoJSON(geoJson).addTo(map);
+  });
