@@ -8,7 +8,6 @@ let kayttokeskusalueetLayerGroup = L.layerGroup();
 let ToimialueetLayerGroup = L.layerGroup();
 let JunatLayerGroup = L.layerGroup();
 let SyottoAsematLayerGroup = L.layerGroup();
-SyottoAsematLayerGroup.addTo(map);
 
 fetch('SA.geojson')
     .then(response => {
@@ -28,9 +27,10 @@ fetch('SA.geojson')
                     fillOpacity: 0.5,
                     radius: 5
                 })
-                // Tarkista, että name on olemassa ennen sen käyttämistä
-                .bindTooltip(feature.properties.name ? feature.properties.name.toString() : "Nimetön", {
-                    direction: 'right',
+                .bindTooltip(feature.properties.type ? feature.properties.type.toString() : "Nimetön", {
+		  permanent: false,
+		  direction: 'top',
+		  className: 'custom-tooltip'
                 });
 
                 marker.featureProperties = feature.properties;
