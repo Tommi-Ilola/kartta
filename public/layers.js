@@ -7,6 +7,54 @@ kilometrimerkitLayerGroup.addTo(map);
 let kayttokeskusalueetLayerGroup = L.layerGroup();
 let ToimialueetLayerGroup = L.layerGroup();
 let JunatLayerGroup = L.layerGroup();
+let SyottoAsematLayerGroup = L.layerGroup();
+SyottoAsematLayerGroup.addTo(map);
+
+fetch('SA.geojson')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+		SyottoAsematData = data;
+        data.features.forEach(function(feature) {
+            if (feature.geometry && feature.properties) {
+                const coords = feature.geometry.coordinates;
+                const latlng = proj4('EPSG:3067', 'WGS84', coords);
+                const marker = L.circleMarker([latlng[1], latlng[0]], {
+                    color: 'blue',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: 5,
+					zIndex: 5
+                }).bindTooltip(feature.properties.name.toString(), {
+                    direction: 'right',
+					zIndex: 1000
+                });
+
+                marker.featureProperties = feature.properties;
+                allMarkers.push(marker);
+                marker.addTo(SyottoAsematLayerGroup);
+				marker.bringToFront();
+            }
+        });
+
+        onZoomEnd();  // Tarkista zoom-taso heti, kun markerit on lisätty.
+    })
+    .catch(error => {
+        console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
+    });
+	
+document.getElementById('SyottoAsematCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        SyottoAsematLayerGroup.addTo(map);
+    } else {
+        SyottoAsematLayerGroup.removeFrom(map);
+    }
+});
+
 
 document.getElementById('tunnelitCheckbox').addEventListener('change', function() {
     if (this.checked) {
