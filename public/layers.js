@@ -18,7 +18,6 @@ fetch('SA.geojson')
         return response.json();
     })
     .then(data => {
-		SyottoAsematData = data;
         data.features.forEach(function(feature) {
             if (feature.geometry && feature.properties) {
                 const coords = feature.geometry.coordinates;
@@ -27,21 +26,16 @@ fetch('SA.geojson')
                     color: 'blue',
                     fillColor: '#f03',
                     fillOpacity: 0.5,
-                    radius: 5,
-					zIndex: 5
+                    radius: 5
                 }).bindTooltip(feature.properties.name.toString(), {
                     direction: 'right',
-					zIndex: 1000
                 });
 
                 marker.featureProperties = feature.properties;
                 allMarkers.push(marker);
                 marker.addTo(SyottoAsematLayerGroup);
-				marker.bringToFront();
             }
         });
-
-        onZoomEnd();  // Tarkista zoom-taso heti, kun markerit on lisätty.
     })
     .catch(error => {
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
