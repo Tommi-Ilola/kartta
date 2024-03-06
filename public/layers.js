@@ -31,7 +31,9 @@ fetch('SA.geojson')
 	        const coords = feature.geometry.coordinates;
 	        const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
 	        .bindTooltip(feature.properties.type ? feature.properties.type.toString() : "Nimetön", {
-	            direction: 'right',
+		  permanent: false,
+		  direction: 'top',
+		  className: 'custom-tooltip'
 	        });
 	
 	        marker.featureProperties = feature.properties;
