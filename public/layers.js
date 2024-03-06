@@ -18,9 +18,6 @@ fetch('SA.geojson')
     })
     .then(data => {
 	var saIcon = L.divIcon({
-	    className: 'custom-div-icon',
-	    html: "<div style='background-color: white; color: black; font-size: 24px; text-align: center; line-height: 24px; width: 24px; height: 24px;'></div>",
-
 	iconUrl: 'SA.png', // Kuvakkeen polku
 	iconSize: [20, 20], // Kuvakkeen koko pikseleinä
 	iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
