@@ -27,7 +27,8 @@ fetch('SA.geojson')
                     fillColor: '#f03',
                     fillOpacity: 0.5,
                     radius: 5
-                }).bindTooltip(feature.properties.name.toString(), {
+                })
+                .bindTooltip(feature.properties.name ? feature.properties.name.toString() : "Nimetön", {
                     direction: 'right',
                 });
 
@@ -40,6 +41,7 @@ fetch('SA.geojson')
     .catch(error => {
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
     });
+
 	
 document.getElementById('SyottoAsematCheckbox').addEventListener('change', function() {
     if (this.checked) {
