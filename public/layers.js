@@ -17,27 +17,30 @@ fetch('SA.geojson')
         return response.json();
     })
     .then(data => {
-        data.features.forEach(function(feature) {
-            if (feature.geometry && feature.properties) {
-                // Oletetaan, että koordinaatit ovat jo lat, lng muodossa
-                const coords = feature.geometry.coordinates;
-                const marker = L.circleMarker([coords[1], coords[0]], {
-                    color: 'blue',
-                    fillColor: '#f03',
-                    fillOpacity: 0.5,
-                    radius: 5
-                })
-                .bindTooltip(feature.properties.type ? feature.properties.type.toString() : "Nimetön", {
-		  permanent: false,
-		  direction: 'top',
-		  className: 'custom-tooltip'
-                });
+	var saIcon = L.divIcon({
+	    className: 'custom-div-icon',
+	    html: "<div style='background-color: white; color: black; font-size: 24px; text-align: center; line-height: 24px; width: 24px; height: 24px;'></div>",
 
-                marker.featureProperties = feature.properties;
-                allMarkers.push(marker);
-                marker.addTo(SyottoAsematLayerGroup);
-            }
-        });
+	iconUrl: 'SA.png', // Kuvakkeen polku
+	iconSize: [20, 20], // Kuvakkeen koko pikseleinä
+	iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
+	popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
+	});
+	
+	// Käytä plusIconia markerin luomisessa
+	data.features.forEach(function(feature) {
+	    if (feature.geometry && feature.properties) {
+	        const coords = feature.geometry.coordinates;
+	        const marker = L.marker([coords[1], coords[0]], {icon: plusIcon})
+	        .bindTooltip(feature.properties.name ? feature.properties.name.toString() : "Nimetön", {
+	            direction: 'right',
+	        });
+	
+	        marker.featureProperties = feature.properties;
+	        allMarkers.push(marker);
+	        marker.addTo(SyottoAsematLayerGroup);
+	    }
+	});
     })
     .catch(error => {
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
