@@ -66,7 +66,7 @@ fetch('VK.geojson')
 	    if (feature.geometry && feature.properties) {
 	        const coords = feature.geometry.coordinates;
 	        const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-	        .bindTooltip(feature.properties.name ? feature.properties.name.toString() : "Nimetön", {
+	        .bindTooltip(feature.properties.type ? feature.properties.type.toString() : "Nimetön", {
 		  permanent: false,
 		  direction: 'top',
 		  className: 'custom-tooltip'
