@@ -8,7 +8,7 @@ let kayttokeskusalueetLayerGroup = L.layerGroup();
 let ToimialueetLayerGroup = L.layerGroup();
 let JunatLayerGroup = L.layerGroup();
 let SyottoAsematLayerGroup = L.layerGroup();
-let VKayerGroup = L.layerGroup();
+let VKLayerGroup = L.layerGroup();
 
 fetch('SA.geojson')
     .then(response => {
