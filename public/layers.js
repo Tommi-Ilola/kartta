@@ -8,6 +8,7 @@ let kayttokeskusalueetLayerGroup = L.layerGroup();
 let ToimialueetLayerGroup = L.layerGroup();
 let JunatLayerGroup = L.layerGroup();
 let SyottoAsematLayerGroup = L.layerGroup();
+let VKayerGroup = L.layerGroup();
 
 fetch('SA.geojson')
     .then(response => {
@@ -25,7 +26,6 @@ fetch('SA.geojson')
 	popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
 	});
 	
-	// Käytä plusIconia markerin luomisessa
 	data.features.forEach(function(feature) {
 	    if (feature.geometry && feature.properties) {
 	        const coords = feature.geometry.coordinates;
@@ -46,12 +46,56 @@ fetch('SA.geojson')
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
     });
 
+fetch('VK.geojson')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+	var vkIcon = L.divIcon({
+        className: 'custom-icon-container',
+        html: "<img src='VK.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
+	iconSize: [20, 20], // Kuvakkeen koko pikseleinä
+	iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
+	popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
+	});
+	
+	data.features.forEach(function(feature) {
+	    if (feature.geometry && feature.properties) {
+	        const coords = feature.geometry.coordinates;
+	        const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
+	        .bindTooltip(feature.properties.name ? feature.properties.name.toString() : "Nimetön", {
+		  permanent: false,
+		  direction: 'top',
+		  className: 'custom-tooltip'
+	        });
+	
+	        marker.featureProperties = feature.properties;
+	        allMarkers.push(marker);
+	        marker.addTo(VKLayerGroup);
+	    }
+	});
+    })
+    .catch(error => {
+        console.error('Virhe ladattaessa välikytkinasemien geometriaa', error);
+    });
+
 	
 document.getElementById('SyottoAsematCheckbox').addEventListener('change', function() {
     if (this.checked) {
         SyottoAsematLayerGroup.addTo(map);
     } else {
         SyottoAsematLayerGroup.removeFrom(map);
+    }
+});
+
+document.getElementById('VKCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        VKLayerGroup.addTo(map);
+    } else {
+        VKLayerGroup.removeFrom(map);
     }
 });
 
