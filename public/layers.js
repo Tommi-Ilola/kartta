@@ -20,14 +20,15 @@ fetch('SA.geojson')
     .then(data => {
         data.features.forEach(function(feature) {
             if (feature.geometry && feature.properties) {
+                // Oletetaan, että koordinaatit ovat jo lat, lng muodossa
                 const coords = feature.geometry.coordinates;
-                const latlng = proj4('EPSG:3067', 'WGS84', coords);
-                const marker = L.circleMarker([latlng[1], latlng[0]], {
+                const marker = L.circleMarker([coords[1], coords[0]], {
                     color: 'blue',
                     fillColor: '#f03',
                     fillOpacity: 0.5,
                     radius: 5
                 })
+                // Tarkista, että name on olemassa ennen sen käyttämistä
                 .bindTooltip(feature.properties.name ? feature.properties.name.toString() : "Nimetön", {
                     direction: 'right',
                 });
