@@ -798,7 +798,7 @@ h1, .tooltip-gm, .tooltip-satellite, .collapsible, #passwordInput, #passwordButt
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    color: none;
+    color: unset;
 }
 
 a {
