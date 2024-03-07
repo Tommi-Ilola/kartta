@@ -793,7 +793,7 @@ table {
     border-spacing: 0;
 }
 
-h1, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
+h1, .tooltip-gm, .tooltip-satellite, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
     font-family: 'Calibri', sans-serif !important;
     -webkit-appearance: none;
     -moz-appearance: none;
