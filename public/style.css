@@ -784,10 +784,6 @@ th {
     box-sizing: border-box;
 }
 
-html, body {
-    line-height: 1;
-}
-
 ol, ul {
     list-style: none;
 }
@@ -797,16 +793,17 @@ table {
     border-spacing: 0;
 }
 
-input, button, textarea, select {
+button, textarea, select {
     font-family: 'Calibri', sans-serif !important;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+	color: none;
 }
 
 a {
     text-decoration: none;
-    color: inherit;
+    color: none;
 }
 
 button {
