@@ -1,1 +1,1 @@
-/api/* https://rata.digitraffic.fi/infra-api/:splat 200
+/api/* https://rata.digitraffic.fi/infra-api/0.7/:splat  200
