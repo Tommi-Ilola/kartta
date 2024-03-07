@@ -773,10 +773,40 @@ th {
   flex-direction: column-reverse;
 }
 
-h1, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
-	-webkit-appearance: none;
-	appearance: none;
-	font-family: calibri !important;
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    font-family: 'Calibri', sans-serif !important;
+    box-sizing: border-box;
+}
+
+html, body {
+    line-height: 1;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+input, button, textarea, select {
+    font-family: 'Calibri', sans-serif !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 button {
