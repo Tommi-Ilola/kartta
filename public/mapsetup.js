@@ -34,20 +34,22 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
     }
 });
 
-// Määritellään projektiotiedot
-proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
+proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
+proj4.defs("EPSG:4326","+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs");
 
+let currentBaseLayer = "gm"
+var isRetina = L.Browser.retina;
 
 // Karttanäkymä (OSM)
 let map = L.map('map', {
     minZoom: 0,
-    maxZoom: 25
+    maxZoom: 22
 });
 
-let cartodbAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>';
 
-let osmLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-        maxZoom: 25,
+
+let gmLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+        maxZoom: 22,
         subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
@@ -55,17 +57,20 @@ map.setView([67.500, 26.000], 5);
 
 // Satelliittinäkymä (Esri)
 let satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
-        maxZoom: 25,
+        maxZoom: 22,
         subdomains:['mt0','mt1','mt2','mt3']
 });
 
-// Painikkeen toiminnallisuus
 document.getElementById('toggleView').addEventListener('click', function() {
-    if (map.hasLayer(osmLayer)) {
-        map.removeLayer(osmLayer);
+    if (map.hasLayer(gmLayer)) {
+        map.removeLayer(gmLayer);
         satelliteLayer.addTo(map);
+        currentBaseLayer = "satellite"; // Päivitä nykyinen karttataso satelliitiksi
     } else {
         map.removeLayer(satelliteLayer);
-        osmLayer.addTo(map);
+        gmLayer.addTo(map);
+        currentBaseLayer = "gm"; // Päivitä nykyinen karttataso OSM:ksi
     }
+    updateMarkerStyles();
+	updateTooltipStyles();
 });
