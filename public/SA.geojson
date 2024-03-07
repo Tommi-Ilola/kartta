@@ -1,5 +1,4 @@
 {"type":"FeatureCollection", "features":[
-{"type":"Feature","geometry":{"type":"Point","coordinates":[0,0,0]},"properties":{"name":"Syöttöaseman tunnus","type":"Name"}},
 {"type":"Feature","geometry":{"type":"Point","coordinates":[24.587324,60.185515,0]},"properties":{"name":"MANKKI SA","type":"MANKKI SA"}},
 {"type":"Feature","geometry":{"type":"Point","coordinates":[24.155023,60.131012,0]},"properties":{"name":"KÄK SA","type":"KÄKELÄ SA"}},
 {"type":"Feature","geometry":{"type":"Point","coordinates":[23.613558,60.067586,0]},"properties":{"name":"KÖS SA","type":"KÖPSKOG SA"}},

@@ -1,5 +1,4 @@
 {"type":"FeatureCollection", "features":[
-{"type":"Feature","geometry":{"type":"Point","coordinates":[0,0,0]},"properties":{"name":"Tyyppi","type":"Name"}},
 {"type":"Feature","geometry":{"type":"Point","coordinates":[23.503532,61.656348,0]},"properties":{"name":"1x25kV","type":"Ahvenus VK"}},
 {"type":"Feature","geometry":{"type":"Point","coordinates":[23.20232,61.938898,0]},"properties":{"name":"1x25kV","type":"Vahojärvi VK"}},
 {"type":"Feature","geometry":{"type":"Point","coordinates":[23.010928,62.245925,0]},"properties":{"name":"1x25kV","type":"Ratikylä VK"}},
