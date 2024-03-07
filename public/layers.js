@@ -345,6 +345,38 @@ fetch('tilirataosat.geojson')
         console.error('Virhe ladattaessa tilirataosien geometriaa', error);
     });
 
+const gmStyle = {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 3
+};
+
+const satelliteStyle = {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 3
+};
+
+function updateMarkerStyles() {
+    const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
+    allMarkers.forEach(marker => {
+        marker.setStyle(style);
+    });
+}
+
+function updateTooltipStyles() {
+    const tooltipClass = currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite';
+    allMarkers.forEach(marker => {
+        const tooltip = marker.getTooltip();
+        if (tooltip) {
+            tooltip.options.className = tooltipClass;
+            marker.unbindTooltip().bindTooltip(tooltip.getContent(), tooltip.options);
+        }
+    });
+}
+
 fetch('ratakm.geojson')
     .then(response => {
         if (!response.ok) {
@@ -357,22 +389,17 @@ fetch('ratakm.geojson')
             if (feature.geometry && feature.properties) {
                 const coords = feature.geometry.coordinates;
                 const latlng = proj4('EPSG:3067', 'WGS84', coords);
-                const marker = L.circleMarker([latlng[1], latlng[0]], {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.5,
-                    radius: 3
-                }).bindTooltip(feature.properties.ratakm.toString(), {
-                    direction: 'right',
-                });
-
+                const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
+                const marker = L.circleMarker([latlng[1], latlng[0]], style)
+                    .bindTooltip(feature.properties.ratakm.toString(), {
+                        direction: 'right',
+                        className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'
+                    });
                 marker.featureProperties = feature.properties;
                 allMarkers.push(marker);
-                marker.addTo(kilometrimerkitLayerGroup);
+                marker.addTo(map);
             }
         });
-
-        onZoomEnd();  // Tarkista zoom-taso heti, kun markerit on lisätty.
     })
     .catch(error => {
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
