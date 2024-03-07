@@ -260,7 +260,7 @@ fetch('sillat.geojson')
 
         const geoLayer = L.geoJSON(transformedData, {
 			style: function(feature) {
-				return { color: "#56ff00", weight: 7, zIndex: 1000 };
+				return { color: "#4caf50", weight: 7, zIndex: 1000 };
 			},
 			onEachFeature: function(feature, layer) {
 				if (feature.properties && feature.properties.nimi) {
