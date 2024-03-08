@@ -8,8 +8,9 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    const url = 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson';
-    console.log("Tehdään API-kutsu osoitteeseen:", url);
+    const url = '/api/radat.geojson';
+	
+    console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
     fetch(url)
         .then(response => response.json())
         .then(data => {
