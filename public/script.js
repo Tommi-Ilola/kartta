@@ -8,7 +8,7 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    const url = '/.netlify/functions/hakuProxy';
+    const url = '/hakuProxy.js';
 	
     console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
     fetch(url)
