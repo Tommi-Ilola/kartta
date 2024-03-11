@@ -34,7 +34,7 @@ fetch('SA.geojson')
                 // Valitse tästä, mitkä tiedot haluat näyttää popupissa
                 let popupContent = `<b>Nimi:</b> ${properties.name}<br>
 									<b>Tunnus:</b> ${properties.SyöttöasemanTunnus}<br>
-									<b>Tyyppi:</b> ${properties.type}<br>
+									<b>Tyyppi:</b> ${properties.Tyyppi}<br>
 									<b>Ratanumero:</b> ${properties.Ratanumero}<br>
 									<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
 									<b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
@@ -49,7 +49,7 @@ fetch('SA.geojson')
                 const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
                 .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
                     permanent: false,
-                    direction: 'right',
+                    direction: 'top',
                     className: 'custom-tooltip'
                 })
                 .bindPopup(popupContent)
