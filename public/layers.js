@@ -18,33 +18,45 @@ fetch('SA.geojson')
         return response.json();
     })
     .then(data => {
-	var saIcon = L.divIcon({
-        className: 'custom-icon-container',
-        html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
-	iconSize: [20, 20], // Kuvakkeen koko pikseleinä
-	iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
-	popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
-	});
-	
-	data.features.forEach(function(feature) {
-	    if (feature.geometry && feature.properties) {
-	        const coords = feature.geometry.coordinates;
-	        const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-	        .bindTooltip(feature.properties.type ? feature.properties.type.toString() : "Nimetön", {
-		  permanent: false,
-		  direction: 'top',
-		  className: 'custom-tooltip'
-	        });
-	
-	        marker.featureProperties = feature.properties;
-	        allMarkers.push(marker);
-	        marker.addTo(SyottoAsematLayerGroup);
-	    }
-	});
+        var saIcon = L.divIcon({
+            className: 'custom-icon-container',
+            html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
+            iconSize: [20, 20], // Kuvakkeen koko pikseleinä
+            iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
+            popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
+        });
+
+        data.features.forEach(function(feature) {
+            if (feature.geometry && feature.properties) {
+                const coords = feature.geometry.coordinates;
+                const properties = feature.properties;
+                const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindTooltip(properties.type ? properties.type.toString() : "Nimetön", {
+                    permanent: false,
+                    direction: 'top',
+                    className: 'custom-tooltip'
+                });
+
+                // Luodaan popup-sisältö
+                let popupContent = "<b>Elementin tiedot:</b><br>";
+                Object.keys(properties).forEach(key => {
+                    popupContent += `<b>${key}:</b> ${properties[key]}<br>`;
+                });
+                const googleMapsLink = `https://www.google.com/maps/?q=${coords[1]},${coords[0]}`;
+                popupContent += `<a href="${googleMapsLink}" target="_blank">Näytä Google Mapsissa</a>`;
+
+                marker.bindPopup(popupContent);
+
+                marker.featureProperties = properties;
+                allMarkers.push(marker);
+                marker.addTo(SyottoAsematLayerGroup);
+            }
+        });
     })
     .catch(error => {
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
     });
+
 
 fetch('VK.geojson')
     .then(response => {
