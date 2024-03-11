@@ -85,7 +85,7 @@ fetch('VK.geojson')
                 const properties = feature.properties;
 
                 // Valitse tästä, mitkä tiedot haluat näyttää popupissa
-                let popupContent = `<b>Nimi:</b> ${properties.name}<br>
+                let popupContent = `<b>Nimi:</b> ${properties.Name}<br>
 									<b>Tyyppi:</b> ${properties.Tyyppi}<br>
 									<b>Ratanumero:</b> ${properties.Ratanumero}<br>
 									<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
@@ -99,7 +99,7 @@ fetch('VK.geojson')
                 popupContent += `<a href="${googleMapsLink}" target="_blank">Näytä Google Mapsissa</a>`;
 
                 const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
+                .bindTooltip(properties.Name ? properties.Name.toString() : "Nimetön", {
                     permanent: false,
                     direction: 'top',
                     className: 'custom-tooltip'
