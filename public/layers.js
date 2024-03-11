@@ -21,42 +21,42 @@ fetch('SA.geojson')
         var saIcon = L.divIcon({
             className: 'custom-icon-container',
             html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
-            iconSize: [20, 20], // Kuvakkeen koko pikseleinä
-            iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
-            popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
+            iconSize: [20, 20],
+            iconAnchor: [9, 12],
+            popupAnchor: [0, -12]
         });
 
         data.features.forEach(function(feature) {
             if (feature.geometry && feature.properties) {
                 const coords = feature.geometry.coordinates;
                 const properties = feature.properties;
-                const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
-                    permanent: false,
-                    direction: 'top',
-                    className: 'custom-tooltip'
-                });
 
-                // Luodaan popup-sisältö
-                let popupContent = "<b>Elementin tiedot:</b><br>";
-                Object.keys(properties).forEach(key => {
-                    popupContent += `<b>${key}:</b> ${properties[key]}<br>`;
-                });
+                // Valitse tästä, mitkä tiedot haluat näyttää popupissa
+                let popupContent = `<b>Nimi:</b> ${properties.name}<br>
+									<b>Tunnus:</b> ${properties.ogr:Syöttöaseman_tunnus}<br>
+									<b>Tyyppi:</b> ${properties.org:type}<br>
+									<b>Ratanumero:</b> ${properties.ogr:Ratanumero}<br>
+									<b>Ratakilometrisijainti:</b> ${properties.ogr:Ratakilometrisijainti}<br>
+									<b>Tilirataosa:</b> ${properties.ogr:Tilirataosa}<br>
+									<b>Kunnossapitoalue:</b> ${properties.ogr:Kunnossapitoalue}<br>
+									<b>Isännöintialue:</b> ${properties.ogr:Isännöintialue}<br>
+									`;
+                
+                // Lisää Google Maps -linkki
                 const googleMapsLink = `https://www.google.com/maps/?q=${coords[1]},${coords[0]}`;
                 popupContent += `<a href="${googleMapsLink}" target="_blank">Näytä Google Mapsissa</a>`;
 
-                marker.bindPopup(popupContent);
+                const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindPopup(popupContent)
+                .addTo(SyottoAsematLayerGroup);
 
-                marker.featureProperties = properties;
                 allMarkers.push(marker);
-                marker.addTo(SyottoAsematLayerGroup);
             }
         });
     })
     .catch(error => {
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
     });
-
 
 fetch('VK.geojson')
     .then(response => {
