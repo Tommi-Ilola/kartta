@@ -79,19 +79,34 @@ fetch('VK.geojson')
 	popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
 	});
 	
-	data.features.forEach(function(feature) {
-	    if (feature.geometry && feature.properties) {
-	        const coords = feature.geometry.coordinates;
-	        const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-	        .bindTooltip(feature.properties.type ? feature.properties.type.toString() : "Nimetön", {
-		  permanent: false,
-		  direction: 'top',
-		  className: 'custom-tooltip'
-	        });
-	
-	        marker.featureProperties = feature.properties;
-	        allMarkers.push(marker);
+        data.features.forEach(function(feature) {
+            if (feature.geometry && feature.properties) {
+                const coords = feature.geometry.coordinates;
+                const properties = feature.properties;
+
+                // Valitse tästä, mitkä tiedot haluat näyttää popupissa
+                let popupContent = `<b>Nimi:</b> ${properties.name}<br>
+									<b>Tyyppi:</b> ${properties.Tyyppi}<br>
+									<b>Ratanumero:</b> ${properties.Ratanumero}<br>
+									<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
+									<b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
+									<b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
+									<b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
+									`;
+                
+                // Lisää Google Maps -linkki
+                const googleMapsLink = `https://www.google.com/maps/?q=${coords[1]},${coords[0]}`;
+                popupContent += `<a href="${googleMapsLink}" target="_blank">Näytä Google Mapsissa</a>`;
+
+                const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
+                    permanent: false,
+                    direction: 'top',
+                    className: 'custom-tooltip'
+                })
+                .bindPopup(popupContent)
 	        marker.addTo(VKLayerGroup);
+                allMarkers.push(marker);
 	    }
 	});
     })
