@@ -33,7 +33,7 @@ fetch('SA.geojson')
 
                 // Valitse tästä, mitkä tiedot haluat näyttää popupissa
                 let popupContent = `<b>Nimi:</b> ${properties.name}<br>
-									<b>Tunnus:</b> ${properties.ogr:Syöttöaseman_tunnus}<br>
+									<b>Tunnus:</b> ${properties.ogr:SyöttöasemanTunnus}<br>
 									<b>Tyyppi:</b> ${properties.ogr:type}<br>
 									<b>Ratanumero:</b> ${properties.ogr:Ratanumero}<br>
 									<b>Ratakilometrisijainti:</b> ${properties.ogr:Ratakilometrisijainti}<br>
