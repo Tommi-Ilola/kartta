@@ -30,6 +30,12 @@ fetch('SA.geojson')
             if (feature.geometry && feature.properties) {
                 const coords = feature.geometry.coordinates;
                 const properties = feature.properties;
+                const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
+                    permanent: false,
+                    direction: 'top',
+                    className: 'custom-tooltip'
+                });
 
                 // Valitse tästä, mitkä tiedot haluat näyttää popupissa
                 let popupContent = `<b>Nimi:</b> ${properties.name}<br>
