@@ -49,7 +49,7 @@ fetch('SA.geojson')
                 const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
                 .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
                     permanent: false,
-                    direction: 'top',
+                    direction: 'right',
                     className: 'custom-tooltip'
                 })
                 .bindPopup(popupContent)
