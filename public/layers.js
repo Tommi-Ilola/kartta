@@ -437,42 +437,50 @@ fetch('ratakm.geojson')
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
-map.on('zoomend', onZoomEnd);
-map.on('moveend', onMoveEnd);
-
 const saVkZoomThreshold = 12;
 const rataKmZoomThreshold = 10;
 
 function onZoomEnd() {
-	map.on('zoomend', function() {
-	    var currentZoom = map.getZoom();
-	    SyottoAsematLayerGroup.eachLayer(function(layer) {
-	        if (currentZoom >= saVkZoomThreshold) {
-	            layer.openTooltip();
-	        } else {
-	            layer.closeTooltip();
-	        }
-	    });
-	
-	    VKLayerGroup.eachLayer(function(layer) {
-	        if (currentZoom >= saVkZoomThreshold) {
-	            layer.openTooltip();
-	        } else {
-	            layer.closeTooltip();
-	        }
-	    });
-	
-	    // Käsittele ratakm layerGroup
-	    allMarkers.forEach(function(marker) {
-	        // Tarkista, kuuluuko marker erityisesti ratakm layerGroupiin, jos on tarpeen
-	        if (currentZoom >= rataKmZoomThreshold) {
-	            marker.openTooltip();
-	        } else {
-	            marker.closeTooltip();
-	        }
-	    });
-	});
+    var currentZoom = map.getZoom();
+    SyottoAsematLayerGroup.eachLayer(function(layer) {
+        if (currentZoom >= saVkZoomThreshold) {
+            if (!layer.getTooltip().isOpen()) {
+                layer.openTooltip();
+            }
+        } else {
+            if (layer.getTooltip().isOpen()) {
+                layer.closeTooltip();
+            }
+        }
+    });
+
+    VKLayerGroup.eachLayer(function(layer) {
+        if (currentZoom >= saVkZoomThreshold) {
+            if (!layer.getTooltip().isOpen()) {
+                layer.openTooltip();
+            }
+        } else {
+            if (layer.getTooltip().isOpen()) {
+                layer.closeTooltip();
+            }
+        }
+    });
+
+    allMarkers.forEach(function(marker) {
+        if (currentZoom >= rataKmZoomThreshold) {
+            if (!marker.getTooltip().isOpen()) {
+                marker.openTooltip();
+            }
+        } else {
+            if (marker.getTooltip().isOpen()) {
+                marker.closeTooltip();
+            }
+        }
+    });
 }
+
+map.on('zoomend', onZoomEnd);
+map.on('moveend', onMoveEnd);
 
 function onMoveEnd() {
     const currentBounds = map.getBounds();
