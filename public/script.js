@@ -8,21 +8,17 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-const url = 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson';
-const options = {
-  headers: {
-    'Authorization': 'Bearer 12345' // Esimerkki olettaen, että käytät "Bearer" tokenia
-  }
-};
-
-fetch(url, options)
-  .then(response => response.json())
-  .then(data => {
-    ratanumerot = data.features.map(feature => feature.properties.ratanumero);
-    console.log(ratanumerot);
-    piilotaDatanLatausIndikaattori();
-  })
-  .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
+    const url = 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson';
+	
+    console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            ratanumerot = data.features.map(feature => feature.properties.ratanumero);
+            console.log(ratanumerot);
+            piilotaDatanLatausIndikaattori();
+        })
+        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
 }
 
 haeKaikkiRatanumerot();
