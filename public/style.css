@@ -158,6 +158,13 @@ h1 {
     cursor: auto;
 }
 
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
 .resultItem {
     padding: 10px;
     border-bottom: 1px solid #ccc;
