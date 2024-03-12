@@ -437,54 +437,18 @@ fetch('ratakm.geojson')
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
-// Funktio, joka päivittää tooltipien näkyvyyden zoomaustason perusteella
-function updateTooltipsBasedOnZoom() {
+function updateTooltipsVisibility() {
     const zoomLevel = map.getZoom();
-
-    // 'SA.geojson' ja 'VK.geojson' tooltipien näyttäminen/piilottaminen
-    SyottoAsematLayerGroup.eachLayer(layer => {
-        if (zoomLevel >= 10) {
-            if (!layer.getTooltip()) {
-                layer.bindTooltip(layer.featureProperties.name, {permanent: true});
-            }
+    allMarkers.forEach(marker => {
+        // Tarkistetaan, onko markerin tooltipin näyttäminen tarpeellista nykyisellä zoomaustasolla
+        // Esimerkki: Näytä tooltipit vain, jos zoomaustaso on yli 10
+        if (zoomLevel > 10) {
+            marker.getTooltip() && marker.openTooltip();
         } else {
-            if (layer.getTooltip()) {
-                layer.unbindTooltip();
-            }
-        }
-    });
-
-    VKLayerGroup.eachLayer(layer => {
-        if (zoomLevel >= 10) {
-            if (!layer.getTooltip()) {
-                layer.bindTooltip(layer.featureProperties.name, {permanent: true});
-            }
-        } else {
-            if (layer.getTooltip()) {
-                layer.unbindTooltip();
-            }
-        }
-    });
-
-    // 'ratakm.geojson' tooltipien näyttäminen/piilottaminen
-    // Oletetaan, että olet lisännyt ratakm-kohteet johonkin LayerGroupiin tai olet tallentanut ne muuttujaan
-    kilometrimerkitLayerGroup.eachLayer(layer => {
-        if (zoomLevel >= 12) {
-            if (!layer.getTooltip()) {
-                layer.bindTooltip(layer.featureProperties.ratakm.toString(), {permanent: true});
-            }
-        } else {
-            if (layer.getTooltip()) {
-                layer.unbindTooltip();
-            }
+            marker.closeTooltip();
         }
     });
 }
-
-map.on('zoomend', updateTooltipsBasedOnZoom);
-map.on('moveend', updateTooltipsBasedOnZoom);
-
-updateTooltipsBasedOnZoom();
 
 function onZoomEnd() {
     updateTooltipsVisibility();
