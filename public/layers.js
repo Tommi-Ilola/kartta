@@ -101,7 +101,60 @@ fetch('VK.geojson')
         console.error('Virhe ladattaessa välikytkinasemien geometriaa', error);
     });
 	
+fetch('LA.geojson')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const laIcon = L.divIcon({
+            className: 'custom-icon-container',
+            html: "<img src='LA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
+            iconSize: [20, 20],
+            iconAnchor: [9, 12],
+            popupAnchor: [0, -12]
+        });
 
+        data.features.forEach(function(feature) {
+            const coords = feature.geometry.coordinates;
+            const properties = feature.properties;
+
+            let popupContent = `<b>Nimi:</b> ${properties.Nimi}<br>
+                <b>Tunnus:</b> ${properties['Tunnus']}<br>
+                <b>Sijaintiraide:</b> ${properties.Sijaintiraide}<br>
+                <b>Ratanumero:</b> ${properties.Ratanumero}<br>
+                <b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
+                <b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
+                <b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
+		<b>Käyttökeskusalue:</b> ${properties.Käyttökeskusalue}<br>
+                <b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
+		<b>Omistaja:</b> ${properties.Omistaja}<br>
+                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+
+            const marker = L.marker([coords[1], coords[0]], {icon: laIcon})
+                .bindTooltip(properties.Nimi ? properties.Nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindPopup(popupContent)
+                .addTo(LaLayerGroup);
+            marker.type = 'LA';
+            allMarkers.push(marker);
+        });
+
+        // Kutsu tooltipien päivitysfunktiota
+        updateTooltipsVisibility();
+    })
+    .catch(error => {
+        console.error('Virhe ladattaessa lämmitysasemien geometriaa', error);
+    });
+
+document.getElementById('SyottoAsematCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        SyottoAsematLayerGroup.addTo(map);
+    } else {
+        SyottoAsematLayerGroup.removeFrom(map);
+    }
+});
 
 document.getElementById('VKCheckbox').addEventListener('change', function() {
     if (this.checked) {
@@ -410,14 +463,15 @@ fetch('ratakm.geojson')
                 const coords = feature.geometry.coordinates;
                 const latlng = proj4('EPSG:3067', 'WGS84', coords);
                 const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
-                const marker = L.circleMarker([latlng[1], latlng[0]], style)
-                    .bindTooltip(feature.properties.ratakm.toString(), {
-                        direction: 'right',
-                        className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'
-                    });
-                marker.featureProperties = feature.properties;
-                allMarkers.push(marker);
-                marker.addTo(kilometrimerkitLayerGroup);
+		const marker = L.circleMarker([latlng[1], latlng[0]], style)
+		    .bindTooltip(feature.properties.ratakm.toString(), {
+		        direction: 'right',
+		        className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'
+		    });
+		marker.featureProperties = feature.properties;
+		marker.type = 'ratakm'; // Lisää tämä rivi
+		allMarkers.push(marker);
+		marker.addTo(kilometrimerkitLayerGroup);
             }
         });
     })
@@ -430,7 +484,10 @@ function updateTooltipsVisibility() {
     const bounds = map.getBounds();
 
     allMarkers.forEach(marker => {
-        const shouldShowTooltip = (zoomLevel > 12 && marker.type === 'SA') || (zoomLevel > 10 && marker.type === 'VK');
+        // Lisää tarkistus 'ratakm'-tyypille ja määritä, missä zoom-tasolla sen tooltipit tulevat näkyviin
+        const shouldShowTooltip = (zoomLevel > 12 && marker.type === 'SA') || 
+                                  (zoomLevel > 10 && marker.type === 'VK') ||
+                                  (zoomLevel > 14 && marker.type === 'ratakm'); // Esimerkiksi, näytä 'ratakm'-tooltipit yli 14 zoom-tasolla
 
         if (shouldShowTooltip && bounds.contains(marker.getLatLng())) {
             marker.openTooltip();
@@ -439,6 +496,7 @@ function updateTooltipsVisibility() {
         }
     });
 }
+
 
 function onZoomEnd() {
     updateTooltipsVisibility();
