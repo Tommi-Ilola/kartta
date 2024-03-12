@@ -76,7 +76,7 @@ fetch('VK.geojson')
             const coords = feature.geometry.coordinates;
             const properties = feature.properties;
 
-            let popupContent = `<b>Nimi:</b> ${properties.type}<br>
+            let popupContent = `<b>Nimi:</b> ${properties.Name}<br>
 				<b>Tyyppi:</b> ${properties.Tyyppi}<br>
 				<b>Ratanumero:</b> ${properties.Ratanumero}<br>
 				<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
@@ -87,7 +87,7 @@ fetch('VK.geojson')
 				`;
                 
             const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-                .bindTooltip(properties.type ? properties.type.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindTooltip(properties.Name ? properties.Name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(VKLayerGroup);
             marker.type = 'VK';
