@@ -437,27 +437,37 @@ fetch('ratakm.geojson')
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
+data.features.forEach(function(feature) {
+    const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+        .bindPopup(popupContent)
+        .addTo(SyottoAsematLayerGroup);
+    marker.type = 'SA';
+    allMarkers.push(marker);
+});
+
+data.features.forEach(function(feature) {
+    const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
+        .bindPopup(popupContent)
+        .addTo(VKLayerGroup);
+    marker.type = 'VK';
+    allMarkers.push(marker);
+});
+
 function updateTooltipsVisibility() {
     const zoomLevel = map.getZoom();
-    const bounds = map.getBounds(); // Haetaan nykyisen karttanäkymän rajat
+    const bounds = map.getBounds();
 
     allMarkers.forEach(marker => {
-        if (zoomLevel > 10 && bounds.contains(marker.getLatLng())) {
-            // Jos marker on näkyvissä ja zoomaustaso on suurempi kuin 10, näytetään tooltip
-            if (marker.getTooltip()) {
-                marker.openTooltip();
-            }
+        const shouldShowTooltip = (zoomLevel > 12 && marker.type === 'SA') || (zoomLevel > 10 && marker.type === 'VK');
+
+        if (shouldShowTooltip && bounds.contains(marker.getLatLng())) {
+            marker.openTooltip();
         } else {
-            // Muussa tapauksessa tooltip piilotetaan
             marker.closeTooltip();
         }
     });
 }
 
-map.on('zoomend', onZoomEnd);
-map.on('moveend', onMoveEnd);
-
-// Alkuperäiset onZoomEnd ja onMoveEnd funktiot pysyvät samoina
 function onZoomEnd() {
     updateTooltipsVisibility();
 }
@@ -466,7 +476,8 @@ function onMoveEnd() {
     updateTooltipsVisibility();
 }
 
-// Ensimmäinen kutsu varmistamaan, että tooltipit päivittyvät oikein.
+map.on('zoomend', onZoomEnd);
+map.on('moveend', onMoveEnd);
 updateTooltipsVisibility();
 
 fetch('kayttokeskusalueet.geojson')
