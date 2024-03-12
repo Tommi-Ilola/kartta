@@ -440,47 +440,40 @@ fetch('ratakm.geojson')
 const saVkZoomThreshold = 12;
 const rataKmZoomThreshold = 10;
 
-function onZoomEnd() {
-    var currentZoom = map.getZoom();
-    SyottoAsematLayerGroup.eachLayer(function(layer) {
+// Funktion määritelmä zoomauksen ja siirron loppumisen käsittelyyn
+function handleZoomEndAndMoveEnd() {
+    const currentZoom = map.getZoom();
+
+    // Käsittele SA ja VK layerit
+    SyottoAsematLayerGroup.eachLayer(layer => {
         if (currentZoom >= saVkZoomThreshold) {
-            if (!layer.getTooltip().isOpen()) {
-                layer.openTooltip();
-            }
+            layer.openTooltip();
         } else {
-            if (layer.getTooltip().isOpen()) {
-                layer.closeTooltip();
-            }
+            layer.closeTooltip();
         }
     });
 
-    VKLayerGroup.eachLayer(function(layer) {
+    VKLayerGroup.eachLayer(layer => {
         if (currentZoom >= saVkZoomThreshold) {
-            if (!layer.getTooltip().isOpen()) {
-                layer.openTooltip();
-            }
+            layer.openTooltip();
         } else {
-            if (layer.getTooltip().isOpen()) {
-                layer.closeTooltip();
-            }
+            layer.closeTooltip();
         }
     });
 
-    allMarkers.forEach(function(marker) {
+    // Käsittele ratakm layer
+    allMarkers.forEach(marker => {
         if (currentZoom >= rataKmZoomThreshold) {
-            if (!marker.getTooltip().isOpen()) {
-                marker.openTooltip();
-            }
+            marker.openTooltip();
         } else {
-            if (marker.getTooltip().isOpen()) {
-                marker.closeTooltip();
-            }
+            marker.closeTooltip();
         }
     });
 }
 
-map.on('zoomend', onZoomEnd);
-map.on('moveend', onMoveEnd);
+// Rekisteröi tapahtumankäsittelijät kartalle
+map.on('zoomend', handleZoomEndAndMoveEnd);
+map.on('moveend', handleZoomEndAndMoveEnd);
 
 function onMoveEnd() {
     const currentBounds = map.getBounds();
