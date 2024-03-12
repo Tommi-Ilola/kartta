@@ -76,7 +76,7 @@ fetch('VK.geojson')
             const coords = feature.geometry.coordinates;
             const properties = feature.properties;
 
-            let popupContent = `<b>Nimi:</b> ${properties.Nimi}<br>
+            let popupContent = `<b>Nimi:</b> ${properties.type}<br>
 				<b>Tyyppi:</b> ${properties.Tyyppi}<br>
 				<b>Ratanumero:</b> ${properties.Ratanumero}<br>
 				<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
@@ -87,7 +87,7 @@ fetch('VK.geojson')
 				`;
                 
             const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-                .bindTooltip(properties.Nimi ? properties.Nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindTooltip(properties.type ? properties.type.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(VKLayerGroup);
             marker.type = 'VK';
@@ -487,7 +487,7 @@ function updateTooltipsVisibility() {
         // Lisää tarkistus 'ratakm'-tyypille ja määritä, missä zoom-tasolla sen tooltipit tulevat näkyviin
         const shouldShowTooltip = (zoomLevel > 8 && marker.type === 'SA') || 
                                   (zoomLevel > 8 && marker.type === 'VK') ||
-				  (zoomLevel > 10 && marker.type === 'LA') ||
+				  (zoomLevel > 14 && marker.type === 'LA') ||
                                   (zoomLevel > 10 && marker.type === 'ratakm');
 
         if (shouldShowTooltip && bounds.contains(marker.getLatLng())) {
