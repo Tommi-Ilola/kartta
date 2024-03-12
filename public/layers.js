@@ -439,30 +439,34 @@ fetch('ratakm.geojson')
 
 function updateTooltipsVisibility() {
     const zoomLevel = map.getZoom();
+    const bounds = map.getBounds(); // Haetaan nykyisen karttanäkymän rajat
+
     allMarkers.forEach(marker => {
-        // Tarkistetaan, onko markerin tooltipin näyttäminen tarpeellista nykyisellä zoomaustasolla
-        // Esimerkki: Näytä tooltipit vain, jos zoomaustaso on yli 10
-        if (zoomLevel > 10) {
-            marker.getTooltip() && marker.openTooltip();
+        if (zoomLevel > 10 && bounds.contains(marker.getLatLng())) {
+            // Jos marker on näkyvissä ja zoomaustaso on suurempi kuin 10, näytetään tooltip
+            if (marker.getTooltip()) {
+                marker.openTooltip();
+            }
         } else {
+            // Muussa tapauksessa tooltip piilotetaan
             marker.closeTooltip();
         }
     });
 }
 
+map.on('zoomend', onZoomEnd);
+map.on('moveend', onMoveEnd);
+
+// Alkuperäiset onZoomEnd ja onMoveEnd funktiot pysyvät samoina
 function onZoomEnd() {
     updateTooltipsVisibility();
 }
 
-// Funktio, joka suoritetaan kartan liikkumisen päätyttyä
 function onMoveEnd() {
     updateTooltipsVisibility();
 }
 
-// Rekisteröi onZoomEnd- ja onMoveEnd-funktiot vastaaviin tapahtumiin
-map.on('zoomend', onZoomEnd);
-map.on('moveend', onMoveEnd);
-
+// Ensimmäinen kutsu varmistamaan, että tooltipit päivittyvät oikein.
 updateTooltipsVisibility();
 
 fetch('kayttokeskusalueet.geojson')
