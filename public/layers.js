@@ -133,7 +133,7 @@ fetch('LA.geojson')
 		<b>Omistaja:</b> ${properties.Omistaja}<br>
                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
-            const marker = L.marker([coords[1], coords[0]], {icon: LaIcon})
+            const marker = L.marker([coords[1], coords[0]], {icon: laIcon})
                 .bindTooltip(properties.Nimi ? properties.Nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(LaLayerGroup);
