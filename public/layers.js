@@ -437,55 +437,69 @@ fetch('ratakm.geojson')
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
-const saVkZoomThreshold = 12;
-const rataKmZoomThreshold = 10;
+// Funktio, joka päivittää tooltipien näkyvyyden zoomaustason perusteella
+function updateTooltipsBasedOnZoom() {
+    const zoomLevel = map.getZoom();
 
-// Funktion määritelmä zoomauksen ja siirron loppumisen käsittelyyn
-function handleZoomEndAndMoveEnd() {
-    const currentZoom = map.getZoom();
-
-    // Käsittele SA ja VK layerit
+    // 'SA.geojson' ja 'VK.geojson' tooltipien näyttäminen/piilottaminen
     SyottoAsematLayerGroup.eachLayer(layer => {
-        if (currentZoom >= saVkZoomThreshold) {
-            layer.openTooltip();
+        if (zoomLevel >= 10) {
+            if (!layer.getTooltip()) {
+                layer.bindTooltip(layer.featureProperties.name, {permanent: true});
+            }
         } else {
-            layer.closeTooltip();
+            if (layer.getTooltip()) {
+                layer.unbindTooltip();
+            }
         }
     });
 
     VKLayerGroup.eachLayer(layer => {
-        if (currentZoom >= saVkZoomThreshold) {
-            layer.openTooltip();
+        if (zoomLevel >= 10) {
+            if (!layer.getTooltip()) {
+                layer.bindTooltip(layer.featureProperties.name, {permanent: true});
+            }
         } else {
-            layer.closeTooltip();
+            if (layer.getTooltip()) {
+                layer.unbindTooltip();
+            }
         }
     });
 
-    // Käsittele ratakm layer
-    allMarkers.forEach(marker => {
-        if (currentZoom >= rataKmZoomThreshold) {
-            marker.openTooltip();
+    // 'ratakm.geojson' tooltipien näyttäminen/piilottaminen
+    // Oletetaan, että olet lisännyt ratakm-kohteet johonkin LayerGroupiin tai olet tallentanut ne muuttujaan
+    kilometrimerkitLayerGroup.eachLayer(layer => {
+        if (zoomLevel >= 12) {
+            if (!layer.getTooltip()) {
+                layer.bindTooltip(layer.featureProperties.ratakm.toString(), {permanent: true});
+            }
         } else {
-            marker.closeTooltip();
+            if (layer.getTooltip()) {
+                layer.unbindTooltip();
+            }
         }
     });
 }
 
-// Rekisteröi tapahtumankäsittelijät kartalle
-map.on('zoomend', handleZoomEndAndMoveEnd);
-map.on('moveend', handleZoomEndAndMoveEnd);
+map.on('zoomend', updateTooltipsBasedOnZoom);
+map.on('moveend', updateTooltipsBasedOnZoom);
 
+updateTooltipsBasedOnZoom();
+
+function onZoomEnd() {
+    updateTooltipsVisibility();
+}
+
+// Funktio, joka suoritetaan kartan liikkumisen päätyttyä
 function onMoveEnd() {
-    const currentBounds = map.getBounds();
-
-    allMarkers.forEach(marker => {
-        if (map.getZoom() > 10 && currentBounds.contains(marker.getLatLng())) {
-            marker.openTooltip();
-        } else {
-            marker.closeTooltip();
-        }
-    });
+    updateTooltipsVisibility();
 }
+
+// Rekisteröi onZoomEnd- ja onMoveEnd-funktiot vastaaviin tapahtumiin
+map.on('zoomend', onZoomEnd);
+map.on('moveend', onMoveEnd);
+
+updateTooltipsVisibility();
 
 fetch('kayttokeskusalueet.geojson')
     .then(response => response.json())
