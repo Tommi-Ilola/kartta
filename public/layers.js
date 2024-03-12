@@ -42,7 +42,7 @@ fetch('SA.geojson')
                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
             const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {permanent: false, direction: 'top', className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'})
+                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(SyottoAsematLayerGroup);
             marker.type = 'SA';
