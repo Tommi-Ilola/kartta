@@ -444,9 +444,7 @@ const saVkZoomThreshold = 12;
 const rataKmZoomThreshold = 10;
 
 map.on('zoomend', function() {
-    const currentZoom = map.getZoom();
-
-    // Käsittele SA ja VK layerGroupit
+    var currentZoom = map.getZoom();
     SyottoAsematLayerGroup.eachLayer(function(layer) {
         if (currentZoom >= saVkZoomThreshold) {
             layer.openTooltip();
