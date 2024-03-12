@@ -429,7 +429,7 @@ fetch('ratakm.geojson')
                     });
                 marker.featureProperties = feature.properties;
                 allMarkers.push(marker);
-                marker.addTo(map);
+                marker.addTo(kilometrimerkitLayerGroup);
             }
         });
     })
@@ -440,18 +440,39 @@ fetch('ratakm.geojson')
 map.on('zoomend', onZoomEnd);
 map.on('moveend', onMoveEnd);
 
-function onZoomEnd() {
-    const zoomLevel = map.getZoom();
-    const currentBounds = map.getBounds();
+const saVkZoomThreshold = 12;
+const rataKmZoomThreshold = 10;
 
-    allMarkers.forEach(marker => {
-        if (zoomLevel > 10 && currentBounds.contains(marker.getLatLng())) {
+map.on('zoomend', function() {
+    const currentZoom = map.getZoom();
+
+    // Käsittele SA ja VK layerGroupit
+    SyottoAsematLayerGroup.eachLayer(function(layer) {
+        if (currentZoom >= saVkZoomThreshold) {
+            layer.openTooltip();
+        } else {
+            layer.closeTooltip();
+        }
+    });
+
+    VKLayerGroup.eachLayer(function(layer) {
+        if (currentZoom >= saVkZoomThreshold) {
+            layer.openTooltip();
+        } else {
+            layer.closeTooltip();
+        }
+    });
+
+    // Käsittele ratakm layerGroup
+    allMarkers.forEach(function(marker) {
+        // Tarkista, kuuluuko marker erityisesti ratakm layerGroupiin, jos on tarpeen
+        if (currentZoom >= rataKmZoomThreshold) {
             marker.openTooltip();
         } else {
             marker.closeTooltip();
         }
     });
-}
+});
 
 function onMoveEnd() {
     const currentBounds = map.getBounds();
