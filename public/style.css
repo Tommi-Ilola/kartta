@@ -4,6 +4,11 @@ body, html {
     padding: 0;
 }
 
+label {
+    display: block;
+    height: 20px;
+}
+
 .custom-div-icon .marker-pin {
     width: 30px;
     height: 50px;
