@@ -27,9 +27,12 @@ fetch('SA.geojson')
         });
 
         data.features.forEach(function(feature) {
-            if (feature.geometry && feature.properties) {
-                const coords = feature.geometry.coordinates;
-                const properties = feature.properties;
+            const coords = feature.geometry.coordinates;
+            const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindPopup("Popup content") // Vaihda dynaamiseen sisältöön tarpeen mukaan
+                .addTo(SyottoAsematLayerGroup);
+            marker.type = 'SA';
+            allMarkers.push(marker);
 
                 // Valitse tästä, mitkä tiedot haluat näyttää popupissa
                 let popupContent = `<b>Nimi:</b> ${properties.name}<br>
@@ -56,8 +59,8 @@ fetch('SA.geojson')
                 .addTo(SyottoAsematLayerGroup);
 
                 allMarkers.push(marker);
-            }
         });
+        updateTooltipsVisibility();
     })
     .catch(error => {
         console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
@@ -80,9 +83,12 @@ fetch('VK.geojson')
 	});
 	
         data.features.forEach(function(feature) {
-            if (feature.geometry && feature.properties) {
-                const coords = feature.geometry.coordinates;
-                const properties = feature.properties;
+            const coords = feature.geometry.coordinates;
+            const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
+                .bindPopup("Popup content") // Vaihda dynaamiseen sisältöön tarpeen mukaan
+                .addTo(VKLayerGroup);
+            marker.type = 'VK';
+            allMarkers.push(marker);
 
                 // Valitse tästä, mitkä tiedot haluat näyttää popupissa
                 let popupContent = `<b>Nimi:</b> ${properties.Name}<br>
@@ -109,6 +115,7 @@ fetch('VK.geojson')
                 allMarkers.push(marker);
 	    }
 	});
+	updateTooltipsVisibility();   
     })
     .catch(error => {
         console.error('Virhe ladattaessa välikytkinasemien geometriaa', error);
