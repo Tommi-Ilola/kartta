@@ -485,9 +485,9 @@ function updateTooltipsVisibility() {
 
     allMarkers.forEach(marker => {
         // Lisää tarkistus 'ratakm'-tyypille ja määritä, missä zoom-tasolla sen tooltipit tulevat näkyviin
-        const shouldShowTooltip = (zoomLevel > 12 && marker.type === 'SA') || 
-                                  (zoomLevel > 10 && marker.type === 'VK') ||
-                                  (zoomLevel > 14 && marker.type === 'ratakm'); // Esimerkiksi, näytä 'ratakm'-tooltipit yli 14 zoom-tasolla
+        const shouldShowTooltip = (zoomLevel > 8 && marker.type === 'SA') || 
+                                  (zoomLevel > 8 && marker.type === 'VK') ||
+                                  (zoomLevel > 10 && marker.type === 'ratakm'); // Esimerkiksi, näytä 'ratakm'-tooltipit yli 14 zoom-tasolla
 
         if (shouldShowTooltip && bounds.contains(marker.getLatLng())) {
             marker.openTooltip();
