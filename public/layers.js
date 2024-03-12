@@ -443,34 +443,36 @@ map.on('moveend', onMoveEnd);
 const saVkZoomThreshold = 12;
 const rataKmZoomThreshold = 10;
 
-map.on('zoomend', function() {
-    var currentZoom = map.getZoom();
-    SyottoAsematLayerGroup.eachLayer(function(layer) {
-        if (currentZoom >= saVkZoomThreshold) {
-            layer.openTooltip();
-        } else {
-            layer.closeTooltip();
-        }
-    });
-
-    VKLayerGroup.eachLayer(function(layer) {
-        if (currentZoom >= saVkZoomThreshold) {
-            layer.openTooltip();
-        } else {
-            layer.closeTooltip();
-        }
-    });
-
-    // Käsittele ratakm layerGroup
-    allMarkers.forEach(function(marker) {
-        // Tarkista, kuuluuko marker erityisesti ratakm layerGroupiin, jos on tarpeen
-        if (currentZoom >= rataKmZoomThreshold) {
-            marker.openTooltip();
-        } else {
-            marker.closeTooltip();
-        }
-    });
-});
+function onZoomEnd() {
+	map.on('zoomend', function() {
+	    var currentZoom = map.getZoom();
+	    SyottoAsematLayerGroup.eachLayer(function(layer) {
+	        if (currentZoom >= saVkZoomThreshold) {
+	            layer.openTooltip();
+	        } else {
+	            layer.closeTooltip();
+	        }
+	    });
+	
+	    VKLayerGroup.eachLayer(function(layer) {
+	        if (currentZoom >= saVkZoomThreshold) {
+	            layer.openTooltip();
+	        } else {
+	            layer.closeTooltip();
+	        }
+	    });
+	
+	    // Käsittele ratakm layerGroup
+	    allMarkers.forEach(function(marker) {
+	        // Tarkista, kuuluuko marker erityisesti ratakm layerGroupiin, jos on tarpeen
+	        if (currentZoom >= rataKmZoomThreshold) {
+	            marker.openTooltip();
+	        } else {
+	            marker.closeTooltip();
+	        }
+	    });
+	});
+}
 
 function onMoveEnd() {
     const currentBounds = map.getBounds();
