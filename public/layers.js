@@ -18,7 +18,7 @@ fetch('SA.geojson')
         return response.json();
     })
     .then(data => {
-        var saIcon = L.divIcon({
+        const saIcon = L.divIcon({
             className: 'custom-icon-container',
             html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
             iconSize: [20, 20],
@@ -28,38 +28,27 @@ fetch('SA.geojson')
 
         data.features.forEach(function(feature) {
             const coords = feature.geometry.coordinates;
+            const properties = feature.properties;
+
+            let popupContent = `<b>Nimi:</b> ${properties.name}<br>
+                <b>Tunnus:</b> ${properties['SyöttöasemanTunnus']}<br>
+                <b>Tyyppi:</b> ${properties.Tyyppi}<br>
+                <b>Ratanumero:</b> ${properties.Ratanumero}<br>
+                <b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
+                <b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
+                <b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
+                <b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
+                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+
             const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-                .bindPopup("Popup content") // Vaihda dynaamiseen sisältöön tarpeen mukaan
+                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindPopup(popupContent)
                 .addTo(SyottoAsematLayerGroup);
             marker.type = 'SA';
             allMarkers.push(marker);
-
-                // Valitse tästä, mitkä tiedot haluat näyttää popupissa
-                let popupContent = `<b>Nimi:</b> ${properties.name}<br>
-									<b>Tunnus:</b> ${properties.SyöttöasemanTunnus}<br>
-									<b>Tyyppi:</b> ${properties.Tyyppi}<br>
-									<b>Ratanumero:</b> ${properties.Ratanumero}<br>
-									<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
-									<b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
-									<b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
-									<b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
-									`;
-                
-                // Lisää Google Maps -linkki
-                const googleMapsLink = `https://www.google.com/maps/?q=${coords[1]},${coords[0]}`;
-                popupContent += `<a href="${googleMapsLink}" target="_blank">Näytä Google Mapsissa</a>`;
-
-                const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {
-                    permanent: false,
-                    direction: 'top',
-                    className: 'custom-tooltip'
-                })
-                .bindPopup(popupContent)
-                .addTo(SyottoAsematLayerGroup);
-
-                allMarkers.push(marker);
         });
+
+        // Kutsu tooltipien päivitysfunktiota
         updateTooltipsVisibility();
     })
     .catch(error => {
@@ -74,7 +63,7 @@ fetch('VK.geojson')
         return response.json();
     })
     .then(data => {
-	var vkIcon = L.divIcon({
+	const vkIcon = L.divIcon({
         className: 'custom-icon-container',
         html: "<img src='VK.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
 	iconSize: [20, 20], // Kuvakkeen koko pikseleinä
@@ -84,43 +73,32 @@ fetch('VK.geojson')
 	
         data.features.forEach(function(feature) {
             const coords = feature.geometry.coordinates;
-            const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-                .bindPopup("Popup content") // Vaihda dynaamiseen sisältöön tarpeen mukaan
+            const properties = feature.properties;
+
+            let popupContent = `<b>Nimi:</b> ${properties.Name}<br>
+				<b>Tyyppi:</b> ${properties.Tyyppi}<br>
+				<b>Ratanumero:</b> ${properties.Ratanumero}<br>
+				<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
+				<b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
+				<b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
+				<b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
+    				<a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>
+				`;
+                
+            const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindPopup(popupContent)
                 .addTo(VKLayerGroup);
             marker.type = 'VK';
             allMarkers.push(marker);
+        });
 
-                // Valitse tästä, mitkä tiedot haluat näyttää popupissa
-                let popupContent = `<b>Nimi:</b> ${properties.Name}<br>
-									<b>Tyyppi:</b> ${properties.Tyyppi}<br>
-									<b>Ratanumero:</b> ${properties.Ratanumero}<br>
-									<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
-									<b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
-									<b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
-									<b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
-									`;
-                
-                // Lisää Google Maps -linkki
-                const googleMapsLink = `https://www.google.com/maps/?q=${coords[1]},${coords[0]}`;
-                popupContent += `<a href="${googleMapsLink}" target="_blank">Näytä Google Mapsissa</a>`;
-
-                const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-                .bindTooltip(properties.Name ? properties.Name.toString() : "Nimetön", {
-                    permanent: false,
-                    direction: 'top',
-                    className: 'custom-tooltip'
-                })
-                .bindPopup(popupContent)
-	        marker.addTo(VKLayerGroup);
-                allMarkers.push(marker);
-	    }
-	});
-	updateTooltipsVisibility();   
+        // Kutsu tooltipien päivitysfunktiota
+        updateTooltipsVisibility();
     })
     .catch(error => {
         console.error('Virhe ladattaessa välikytkinasemien geometriaa', error);
     });
-
 	
 document.getElementById('SyottoAsematCheckbox').addEventListener('change', function() {
     if (this.checked) {
