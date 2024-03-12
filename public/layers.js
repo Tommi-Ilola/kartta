@@ -444,22 +444,6 @@ fetch('ratakm.geojson')
         console.error('Virhe ladattaessa ratakilometrien geometriaa', error);
     });
 
-data.features.forEach(function(feature) {
-    const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-        .bindPopup(popupContent)
-        .addTo(SyottoAsematLayerGroup);
-    marker.type = 'SA';
-    allMarkers.push(marker);
-});
-
-data.features.forEach(function(feature) {
-    const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-        .bindPopup(popupContent)
-        .addTo(VKLayerGroup);
-    marker.type = 'VK';
-    allMarkers.push(marker);
-});
-
 function updateTooltipsVisibility() {
     const zoomLevel = map.getZoom();
     const bounds = map.getBounds();
