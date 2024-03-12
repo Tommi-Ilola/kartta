@@ -365,27 +365,30 @@ fetch('tasoristeykset.geojson')
         // Popupin määrittely tulee tänne...
       },
       pointToLayer: function (feature, latlng) {
+        // Oletetaan, että sinulla on 'marker-icon.png' kuvatiedosto projektin kansiossa
+        var customIcon = L.icon({
+          iconUrl: 'tasoristeys.png', // Markerin kuvatiedoston polku
+          iconSize: [30, 30], // Kuvan koko pikseleinä
+          iconAnchor: [17, 14], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+          tooltipAnchor: [1, -10], // Popup-ikkunan sijainti suhteessa markerin ankkuriin
+        });
 
+        // Muunnetaan koordinaatit EPSG:3067:stä EPSG:4326:een
         const transformedCoords = proj4('EPSG:3067', 'EPSG:4326', [latlng.lng, latlng.lat]);
-        return L.circleMarker([transformedCoords[1], transformedCoords[0]], {
-           radius: 8,
-          fillColor: "#ff7800",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
-        }).bindTooltip(`Tunnus: ${feature.properties.tunnus}<br>Nimi: ${feature.properties.nimi}`, {
-		  permanent: false,
-		  direction: 'top',
-		  className: 'custom-tooltip'
-		});
+
+        // Käytä customIconia markerin luomisessa
+        return L.marker([transformedCoords[1], transformedCoords[0]], {icon: customIcon})
+          .bindTooltip(`Tunnus: ${feature.properties.tunnus}<br>Nimi: ${feature.properties.nimi}`, {
+            permanent: false,
+            direction: 'top',
+            className: 'custom-tooltip'
+          });
       }
     }).addTo(tasoristeyksetLayerGroup); // Lisää geojsonLayer suoraan tasoristeyksetLayerGroupiin
   })
   .catch(error => {
     console.error('Virhe ladattaessa tasoristeysten geometriaa:', error);
   });
-
 
 fetch('tilirataosat.geojson')
     .then(response => {
