@@ -86,7 +86,7 @@ fetch('VK.geojson')
     				<a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>
 				`;
                 
-            const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+            const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
                 .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(VKLayerGroup);
