@@ -46,40 +46,30 @@ let map = L.map('map', {
     maxZoom: 22
 });
 
-const gmLightUrl = 'https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}';
-const gmDarkUrl = 'https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}&style=feature:all|element:all|invert_lightness:true';
-const satelliteUrl = 'https://www.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}';
-
-// Oletetaan, että gmLayer on alustettu tummalle teemalle jos laite on tummassa tilassa
-let gmLayer = L.tileLayer(window.matchMedia('(prefers-color-scheme: dark)').matches ? gmDarkUrl : gmLightUrl, {
-    maxZoom: 22,
-    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-    attribution: 'GoogleMaps'
+let gmLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',{
+        maxZoom: 22,
+        subdomains:['mt0','mt1','mt2','mt3'],
+		attribution: 'GoogleMaps'
 }).addTo(map);
 
-// Satelliittinäkymä ei muutu tumman tilan mukaan
-let satelliteLayer = L.tileLayer(satelliteUrl, {
-    maxZoom: 22,
-    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-    attribution: 'GoogleMaps'
+map.setView([67.500, 26.000], 5);
+
+// Satelliittinäkymä (Esri)
+let satelliteLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}',{
+        maxZoom: 22,
+        subdomains:['mt0','mt1','mt2','mt3'],
+		attribution: 'GoogleMaps'
 });
 
-// Tarkkaile tumman tilan muutoksia ja päivitä karttatason URL tarvittaessa
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    const newUrl = e.matches ? gmDarkUrl : gmLightUrl;
-    gmLayer.setUrl(newUrl);
-});
-
-// Tässä oleva toggleView-tapahtumankuuntelija pysyy samana
 document.getElementById('toggleView').addEventListener('click', function() {
     if (map.hasLayer(gmLayer)) {
         map.removeLayer(gmLayer);
         satelliteLayer.addTo(map);
-        currentBaseLayer = "satellite";
+        currentBaseLayer = "satellite"; // Päivitä nykyinen karttataso satelliitiksi
     } else {
         map.removeLayer(satelliteLayer);
         gmLayer.addTo(map);
-        currentBaseLayer = "gm";
+        currentBaseLayer = "gm"; // Päivitä nykyinen karttataso OSM:ksi
     }
     updateMarkerStyles();
 	updateTooltipStyles();
