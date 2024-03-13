@@ -46,19 +46,19 @@ let map = L.map('map', {
     maxZoom: 22
 });
 
-
-
-let gmLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+let gmLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',{
         maxZoom: 22,
-        subdomains:['mt0','mt1','mt2','mt3']
+        subdomains:['mt0','mt1','mt2','mt3'],
+		attribution: 'GoogleMaps'
 }).addTo(map);
 
 map.setView([67.500, 26.000], 5);
 
 // Satelliittinäkymä (Esri)
-let satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+let satelliteLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}',{
         maxZoom: 22,
-        subdomains:['mt0','mt1','mt2','mt3']
+        subdomains:['mt0','mt1','mt2','mt3'],
+		attribution: 'GoogleMaps'
 });
 
 document.getElementById('toggleView').addEventListener('click', function() {
