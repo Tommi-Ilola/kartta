@@ -34,19 +34,7 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
     }
 });
 
-proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
-proj4.defs("EPSG:4326","+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs");
-
-let currentBaseLayer = "gm"
-var isRetina = L.Browser.retina;
-
-// Karttanäkymä (OSM)
-let map = L.map('map', {
-    minZoom: 0,
-    maxZoom: 22
-});
-
-let gmLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+let gmLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',{
         maxZoom: 22,
         subdomains:['mt0','mt1','mt2','mt3'],
 		attribution: 'GoogleMaps'
