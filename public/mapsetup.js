@@ -46,7 +46,7 @@ let map = L.map('map', {
     maxZoom: 22
 });
 
-let gmLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',{
+let gmLayer = L.tileLayer('https://mts1.google.com/vt/lyrs=m@186112443&hl=x-local&src=app&x=1325&y=3143&z=13&s=Galile',{
         maxZoom: 22,
         subdomains:['mt0','mt1','mt2','mt3'],
 		attribution: 'GoogleMaps'
