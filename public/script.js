@@ -8,17 +8,28 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
+    // Oletetaan, että sinulla on API-avain (jos tarpeen)
+    const apiKey = "0000"; // Korvaa YOUR_API_KEY_HERE oikealla API-avaimellasi
     const url = 'https://prd-base-pub-111471060.eu-west-1.elb.amazonaws.com/infra-api/0.7/radat.geojson?time=2024-03-13T12%3A01%3A26Z%2F2024-03-13T12%3A01%3A26Z';
-	
-    console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            ratanumerot = data.features.map(feature => feature.properties.ratanumero);
-            console.log(ratanumerot);
-            piilotaDatanLatausIndikaattori();
-        })
-        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
+
+    console.log("Tehdään API-kutsu osoitteeseen:", url);
+    fetch(url, {
+        headers: {
+            "Authorization": `Bearer ${apiKey}` // Lisätään Authorization-header, jos API vaatii autentikoinnin
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Verkkovirhe ladattaessa dataa: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        ratanumerot = data.features.map(feature => feature.properties.ratanumero);
+        console.log(ratanumerot);
+        piilotaDatanLatausIndikaattori();
+    })
+    .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
 }
 
 haeKaikkiRatanumerot();
