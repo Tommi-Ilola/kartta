@@ -8,7 +8,7 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    const url = 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson';
+    const url = 'https://prd-base-pub-111471060.eu-west-1.elb.amazonaws.com/infra-api/0.7/radat.geojson?time=2024-03-13T12%3A01%3A26Z%2F2024-03-13T12%3A01%3A26Z';
 	
     console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
     fetch(url)
