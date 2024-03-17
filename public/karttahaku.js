@@ -1,3 +1,27 @@
+let liikennepaikatData;
+let liikennepaikkavalitData;
+
+// Ladataan GeoJSON-tiedoston sisältö
+async function lataaGeojsonData(url) {
+    try {
+        const vastaus = await fetch(url);
+        const data = await vastaus.json();
+        return data;
+    } catch (error) {
+        console.error('Virhe ladattaessa GeoJSON-tiedostoa:', error);
+        return null;
+    }
+}
+
+// Käytä tätä funktiota ladataksesi liikennepaikat ja liikennepaikkavälit käynnistyksen yhteydessä
+async function alustaGeojsonData() {
+    liikennepaikatData = await lataaGeojsonData('liikennepaikat.geojson');
+    liikennepaikkavalitData = await lataaGeojsonData('liikennepaikkavalit.geojson');
+}
+
+// Kutsu tätä funktiota, kun sovelluksesi latautuu
+alustaGeojsonData();
+
 map.on('click', function(e) {
     const resultsDiv = document.getElementById('results');
     const lat = e.latlng.lat;
@@ -23,13 +47,13 @@ map.on('click', function(e) {
                 const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
                 const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
 
-                Promise.all([
-                    rautatieliikennepaikanTunniste ? haeLiikennepaikanNimi(rautatieliikennepaikanTunniste) : Promise.resolve(null),
-                    liikennepaikkavalinTunniste ? haeLiikennepaikkavalinTiedot(liikennepaikkavalinTunniste) : Promise.resolve({ alkuLiikennepaikanNimi: null, loppuLiikennepaikanNimi: null })
-                ]).then(([rautatieliikennepaikanNimi, liikennepaikkavalinTiedot]) => {
-                    let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
-                    let liikennepaikkavaliHtml = liikennepaikkavalinTiedot.alkuLiikennepaikanNimi && liikennepaikkavalinTiedot.loppuLiikennepaikanNimi
-                        ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinTiedot.alkuLiikennepaikanNimi} - ${liikennepaikkavalinTiedot.loppuLiikennepaikanNimi}<br>` : '';
+			Promise.all([
+				rautatieliikennepaikanTunniste ? haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste) : Promise.resolve(null),
+				liikennepaikkavalinTunniste ? haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste) : Promise.resolve(null)
+			]).then(([rautatieliikennepaikanNimi, liikennepaikkavalinNimi]) => {
+				let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
+				let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
+
 
                     const popupContent = `
                         <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
@@ -60,52 +84,19 @@ map.on('click', function(e) {
         });
 });
 
-function haeLiikennepaikanNimi(tunniste) {
-    if (!tunniste) {
-        console.log('Tunniste on null, joten API-kutsua ei tehdä.');
-        return Promise.resolve(null); // Palautetaan null jos tunniste puuttuu
-    }
-
-    const url = `https://rata.digitraffic.fi/infra-api/0.7/${tunniste}.geojson`;
-    console.log(`Tekee API-kutsun liikennepaikan nimelle: ${url}`);
-    return fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
-                return data.features[0].properties.nimi || null;
-            }
-            return null;
-        })
-        .catch(error => {
-            console.error('Virhe ladattaessa liikennepaikan nimeä:', error);
-            return null;
-        });
+function haeLiikennepaikanNimiGeojsonista(tunniste) {
+    const liikennepaikka = liikennepaikatData.features.find(feature => feature.properties.tunniste === tunniste);
+    return liikennepaikka ? liikennepaikka.properties.nimi : null;
 }
 
-function haeLiikennepaikkavalinTiedot(liikennepaikkavaliTunniste) {
-    if (!liikennepaikkavaliTunniste) {
-        console.log('Liikennepaikkavälin tunniste on null, joten API-kutsua ei tehdä.');
-        return Promise.resolve({ alkuLiikennepaikanNimi: null, loppuLiikennepaikanNimi: null });
-    }
+function haeLiikennepaikkavalinNimiGeojsonista(tunniste) {
+    const liikennepaikkavali = liikennepaikkavalitData.features.find(feature => feature.properties.tunniste === tunniste);
+    if (!liikennepaikkavali) return null;
 
-    return fetch(`https://rata.digitraffic.fi/infra-api/0.7/${liikennepaikkavaliTunniste}.geojson`)
-        .then(response => response.json())
-        .then(data => {
-            const alkuTunniste = data.features[0].properties.alkuliikennepaikka;
-            const loppuTunniste = data.features[0].properties.loppuliikennepaikka;
+    const alkuLiikennepaikanNimi = haeLiikennepaikanNimiGeojsonista(liikennepaikkavali.properties.alkuliikennepaikka);
+    const loppuLiikennepaikanNimi = haeLiikennepaikanNimiGeojsonista(liikennepaikkavali.properties.loppuliikennepaikka);
 
-            return Promise.all([
-                haeLiikennepaikanNimi(alkuTunniste),
-                haeLiikennepaikanNimi(loppuTunniste)
-            ]).then(([alkuLiikennepaikanNimi, loppuLiikennepaikanNimi]) => ({
-                alkuLiikennepaikanNimi: alkuLiikennepaikanNimi || null,
-                loppuLiikennepaikanNimi: loppuLiikennepaikanNimi || null
-            }));
-        })
-        .catch(error => {
-            console.error('Virhe ladattaessa liikennepaikkavälin tietoja:', error);
-            return { alkuLiikennepaikanNimi: null, loppuLiikennepaikanNimi: null };
-        });
+    return alkuLiikennepaikanNimi && loppuLiikennepaikanNimi ? `${alkuLiikennepaikanNimi} - ${loppuLiikennepaikanNimi}` : null;
 }
 
 function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi, googleMapsUrl, marker) {
@@ -124,7 +115,6 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
         <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
         <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
         <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
-        <a href="${googleMapsUrl}" target="_blank" style="color: #0078a8;">Avaa Google Mapsissa</a>
 	   </td>
 	 </tr>
 	</table> 
