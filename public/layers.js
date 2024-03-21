@@ -6,6 +6,7 @@ let tasoristeyksetLayerGroup = L.layerGroup();
 kilometrimerkitLayerGroup.addTo(map);
 let kayttokeskusalueetLayerGroup = L.layerGroup();
 let ToimialueetLayerGroup = L.layerGroup();
+let RadatLayerGroup = L.layerGroup();
 let JunatLayerGroup = L.layerGroup();
 let SyottoAsematLayerGroup = L.layerGroup();
 let VKLayerGroup = L.layerGroup();
@@ -226,6 +227,14 @@ document.getElementById('ToimialueetCheckbox').addEventListener('change', functi
         ToimialueetLayerGroup.addTo(map);
     } else {
         ToimialueetLayerGroup.removeFrom(map);
+    }
+});
+
+document.getElementById('RadatCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        RadatLayerGroup.addTo(map);
+    } else {
+        RadatLayerGroup.removeFrom(map);
     }
 });
 
@@ -513,6 +522,56 @@ function onMoveEnd() {
 map.on('zoomend', onZoomEnd);
 map.on('moveend', onMoveEnd);
 updateTooltipsVisibility();
+
+fetch('radat.geojson')
+    .then(response => response.json())
+    .then(data => {
+        railGeometryData = data;
+        
+        const transformedData = {
+            ...railGeometryData,
+            features: railGeometryData.features.map(feature => {
+                if (feature.geometry && feature.geometry.coordinates) {
+                    if (feature.geometry.type === 'MultiLineString') {
+                        return {
+                            ...feature,
+                            geometry: {
+                                ...feature.geometry,
+                                coordinates: feature.geometry.coordinates.map(line => 
+                                    line.map(coord => {
+                                        const latlng = proj4('EPSG:3067', 'WGS84', coord);
+                                        return [latlng[0], latlng[1]];
+                                    })
+                                )
+                            }
+                        };
+                    } else {
+                        return feature;
+                    }
+                } else {
+                    return feature;
+                }
+            })
+        };
+
+        const geoLayer = L.geoJSON(transformedData, {
+            style: function(feature) {
+                return { className: 'radat', color: "grey", weight: 1, zIndex: 1000 };
+            },
+			onEachFeature: function(feature, layer) {
+                if (feature.properties && feature.properties.ratanumero) {
+                    layer.bindTooltip(feature.properties.ratanumero, {
+                        className: 'kayttokeskusalueet',
+                        sticky: true,
+                        direction: 'top'
+                    });
+                }
+            }
+        }).addTo(RadatLayerGroup);
+    })
+    .catch(error => {
+        console.error("Virhe ladattaessa ratojen geometriaa:", error);
+    });
 
 fetch('kayttokeskusalueet.geojson')
     .then(response => response.json())
