@@ -453,7 +453,7 @@ function updateTooltipStyles() {
     });
 }
 
-fetch('https://rata.digitraffic.fi/infra-api/0.7/13011/kilometrimerkit.geojson?time=2024-01-07T22:00:00Z/2024-01-07T22:00:00Z')
+fetch('ratakm.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
