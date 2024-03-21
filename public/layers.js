@@ -442,33 +442,31 @@ function updateMarkerStyles() {
     });
 }
 
-let tooltipGroup = L.featureGroup().addTo(map); // Luo kerrosryhmä tooltippeja varten
+let tooltipGroup = L.featureGroup().addTo(map);
 
 function updateTooltips() {
-    tooltipGroup.clearLayers(); // Poista kaikki aiemmat tooltipit kerrosryhmästä
+    tooltipGroup.clearLayers();
 
-    if (map.getZoom() > 10) { // Määrittele zoomauksen taso, jolloin tooltipit näytetään
+    if (map.getZoom() > 10) {
         allMarkers.forEach(marker => {
-            if (map.getBounds().contains(marker.getLatLng())) { // Tarkista, onko marker näkymäalueella
-                // Luo tooltip käyttäen markerin tietoja
+            if (map.getBounds().contains(marker.getLatLng())) {
+				
                 const tooltip = L.tooltip({
-                    direction: 'right',
-                    permanent: true, // Tooltip pysyy näkyvissä
+                    direction: 'left',
+                    permanent: true,
                     className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'
                 }).setContent(marker.featureProperties.ratakm.toString())
                   .setLatLng(marker.getLatLng());
 
-                tooltipGroup.addLayer(tooltip); // Lisää tooltip kerrosryhmään
+                tooltipGroup.addLayer(tooltip);
             }
         });
     }
 }
 
-// Kuuntelijat zoomauksen ja kartan liikuttamisen tapahtumille
 map.on('zoomend', updateTooltips);
 map.on('moveend', updateTooltips);
 
-// Kutsu funktiota alussa, jotta tooltipit päivittyvät kartan ensimmäisen latauksen yhteydessä
 updateTooltips();
 
 fetch('ratakm.geojson')
@@ -484,12 +482,12 @@ fetch('ratakm.geojson')
                 const coords = feature.geometry.coordinates;
                 const latlng = proj4('EPSG:3067', 'WGS84', coords);
                 const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
-		const marker = L.circleMarker([latlng[1], latlng[0]], style)
+                const marker = L.circleMarker([latlng[1], latlng[0]], style)
 
-		marker.featureProperties = feature.properties;
-		marker.type = 'ratakm'; // Lisää tämä rivi
-		allMarkers.push(marker);
-		marker.addTo(kilometrimerkitLayerGroup);
+                marker.featureProperties = feature.properties;
+				marker.type = 'ratakm'; // Lisää tämä rivi
+                allMarkers.push(marker);
+                marker.addTo(kilometrimerkitLayerGroup);
             }
         });
     })
@@ -505,7 +503,7 @@ function updateTooltipsVisibility() {
         // Lisää tarkistus 'ratakm'-tyypille ja määritä, missä zoom-tasolla sen tooltipit tulevat näkyviin
         const shouldShowTooltip = (zoomLevel > 8 && marker.type === 'SA') || 
                                   (zoomLevel > 8 && marker.type === 'VK') ||
-				  (zoomLevel > 14 && marker.type === 'LA') ||
+								  (zoomLevel > 14 && marker.type === 'LA') ||
                                   (zoomLevel > 10 && marker.type === 'ratakm');
 
         if (shouldShowTooltip && bounds.contains(marker.getLatLng())) {
@@ -515,7 +513,6 @@ function updateTooltipsVisibility() {
         }
     });
 }
-
 
 function onZoomEnd() {
     updateTooltipsVisibility();
