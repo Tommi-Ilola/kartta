@@ -192,7 +192,7 @@ function visualisoiGeojsonDataKartalla(data) {
         },
 
         onEachFeature: function (feature, layer) {
-            // Luodaan tulokset vastaamaan kartalla olevia kohteita
+            const tooltipText = ` ${currentResultNumber}.`;
             const item = document.createElement('table');
             item.className = 'resultItem';
             item.dataset.index = index++; // Tallenna indeksi
@@ -211,6 +211,8 @@ function visualisoiGeojsonDataKartalla(data) {
                     </tr>
             </table>
         `;
+		
+		layer.bindTooltip(tooltipText, {permanent: true, direction: 'auto', className: 'search-tooltip'});
 		
 		item.addEventListener('click', function() {
                 map.fitBounds(layer.getBounds());
