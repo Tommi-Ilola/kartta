@@ -356,7 +356,7 @@ td {
     border: none !important;
     box-shadow: none !important;
 	font-weight: bold !important;
-	font-size: 15px !important;
+	font-size: 12px !important;
 	color: black !important;
 	text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white !important;
 }
@@ -366,7 +366,7 @@ td {
     border: none !important;
     box-shadow: none !important;
 	font-weight: bold !important;
-	font-size: 15px !important;
+	font-size: 12px !important;
 	color: white !important;
 	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black !important;
 }
