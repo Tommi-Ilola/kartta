@@ -20,7 +20,7 @@ body, html {
 
 label {
     display: block;
-    height: 25px;
+    height: 20px;
 }
 
 .custom-div-icon .marker-pin {
@@ -170,16 +170,6 @@ h1 {
     margin: 0;
     transform: translate3d(0, 0, 0);
     cursor: auto;
-}
-
-:root {
-    --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
-}
-
-@media (prefers-color-scheme: dark) {
-    .map-tiles {
-        filter:var(--map-tiles-filter, none);
-	}
 }
 
 .resultItem {
@@ -441,7 +431,24 @@ td {
   border-radius: 4px !important;
   padding: 6px !important;
   box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
-  margin-top: -12px !important;
+  margin-top: -3px !important;
+}
+
+.search-tooltip {
+	z-index: 1000 !important;
+    background-color: #fff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 1rem !important;
+    padding: 6px !important;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
+    margin-top: -12px !important;
+    font-size: larger;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #menuContainer {
@@ -534,7 +541,7 @@ td {
 	color: white !important;
 	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black !important;
 }
-	
+
 .modal {
     display: none;
     position: fixed;
@@ -575,7 +582,6 @@ td {
 	cursor: pointer;
 }
 
-/* Salasana input */
 input[type=password] {
     width: -webkit-fill-available;
     padding: 8px 20px;
@@ -827,7 +833,6 @@ th {
     padding: 0;
     border: 0;
     font-size: 100%;
-    font: inherit;
     vertical-align: baseline;
     font-family: 'Calibri', sans-serif !important;
     box-sizing: border-box;
@@ -837,17 +842,12 @@ ol, ul {
     list-style: none;
 }
 
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-
 h1, .tooltip-gm, .tooltip-satellite, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
     font-family: 'Calibri', sans-serif !important;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    color: unset;
+	color: unset;
 }
 
 a {
