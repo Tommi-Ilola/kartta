@@ -411,7 +411,7 @@ fetch('tilirataosat.geojson')
                 // Yhdistä tiedot ja luo yksi tooltip
                 let tooltipContent = `Numero: ${feature.properties.numero}<br>Nimi: ${feature.properties.nimi}`;
 				L.polygon(allPolygons)
-				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'top' })
+				  .bindTooltip(tooltipContent, { className: 'rataosat', sticky: true, direction: 'right' })
 				  .setStyle({ className: 'rataosat'})
 				  .addTo(tilirataosatLayerGroup);
             }
@@ -436,23 +436,40 @@ const satelliteStyle = {
 };
 
 function updateMarkerStyles() {
+    const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
     allMarkers.forEach(marker => {
-        const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
-        marker.setStyle({color: style.color, fillColor: style.fillColor, fillOpacity: style.fillOpacity});
-        marker.setRadius(style.radius);
+        marker.setStyle(style);
     });
 }
 
-function updateTooltipStyles() {
-    const tooltipClass = currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite';
-    allMarkers.forEach(marker => {
-        const tooltip = marker.getTooltip();
-        if (tooltip) {
-            tooltip.options.className = tooltipClass;
-            marker.unbindTooltip().bindTooltip(tooltip.getContent(), tooltip.options);
-        }
-    });
+let tooltipGroup = L.featureGroup().addTo(map); // Luo kerrosryhmä tooltippeja varten
+
+function updateTooltips() {
+    tooltipGroup.clearLayers(); // Poista kaikki aiemmat tooltipit kerrosryhmästä
+
+    if (map.getZoom() > 10) { // Määrittele zoomauksen taso, jolloin tooltipit näytetään
+        allMarkers.forEach(marker => {
+            if (map.getBounds().contains(marker.getLatLng())) { // Tarkista, onko marker näkymäalueella
+                // Luo tooltip käyttäen markerin tietoja
+                const tooltip = L.tooltip({
+                    direction: 'right',
+                    permanent: true, // Tooltip pysyy näkyvissä
+                    className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'
+                }).setContent(marker.featureProperties.ratakm.toString())
+                  .setLatLng(marker.getLatLng());
+
+                tooltipGroup.addLayer(tooltip); // Lisää tooltip kerrosryhmään
+            }
+        });
+    }
 }
+
+// Kuuntelijat zoomauksen ja kartan liikuttamisen tapahtumille
+map.on('zoomend', updateTooltips);
+map.on('moveend', updateTooltips);
+
+// Kutsu funktiota alussa, jotta tooltipit päivittyvät kartan ensimmäisen latauksen yhteydessä
+updateTooltips();
 
 fetch('ratakm.geojson')
     .then(response => {
@@ -468,10 +485,7 @@ fetch('ratakm.geojson')
                 const latlng = proj4('EPSG:3067', 'WGS84', coords);
                 const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
 		const marker = L.circleMarker([latlng[1], latlng[0]], style)
-		    .bindTooltip(feature.properties.ratakm.toString(), {
-		        direction: 'right',
-		        className: currentBaseLayer === "gm" ? 'tooltip-gm' : 'tooltip-satellite'
-		    });
+
 		marker.featureProperties = feature.properties;
 		marker.type = 'ratakm'; // Lisää tämä rivi
 		allMarkers.push(marker);
