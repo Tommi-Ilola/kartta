@@ -36,7 +36,7 @@ map.on('click', function(e) {
         popupAnchor: [0, -48]
     });
 
-    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
+    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.8/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
 
     fetch(apiUrl)
         .then(response => response.json())
