@@ -74,26 +74,3 @@ document.getElementById('toggleView').addEventListener('click', function() {
     updateMarkerStyles();
 	updateTooltipStyles();
 });
-
-function changeBaseLayer(newBaseLayer) {
-    currentBaseLayer = newBaseLayer;
-    map.removeLayer(currentLayer);
-    map.addLayer(baseLayers[newBaseLayer]);
-    updateTooltipStyles();
-    updateTooltips();
-}
-
-// Kutsu changeBaseLayer funktiota, kun käyttäjä vaihtaa karttatason
-document.getElementById('changeToGM').addEventListener('click', function() {
-    changeBaseLayer('gm');
-});
-
-document.getElementById('changeToSatellite').addEventListener('click', function() {
-    changeBaseLayer('satellite');
-});
-
-map.on('baselayerchange', function(event) {
-    currentBaseLayer = event.name; // Päivitä currentBaseLayer perustuen valittuun kerrokseen
-    updateTooltipStyles();
-    updateTooltips();
-});
