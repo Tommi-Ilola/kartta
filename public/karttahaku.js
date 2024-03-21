@@ -22,67 +22,61 @@ async function alustaGeojsonData() {
 // Kutsu tätä funktiota, kun sovelluksesi latautuu
 alustaGeojsonData();
 
-map.on('click', function(e) {
-    const resultsDiv = document.getElementById('results');
-    const lat = e.latlng.lat;
-    const lng = e.latlng.lng;
+async function mapOnClick(e) {
+    const { lat, lng } = e.latlng;
     const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
+    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
 
-    const customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin' style='background-color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border: 2px solid black;'><span class='marker-number' style='font-size: 25px;top: -3px;'>+</span></div>`,
-        iconSize: [30, 42],
-        iconAnchor: [14, 49],
-        popupAnchor: [0, -48]
-    });
-
-    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.8/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
-
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.features && data.features.length > 0) {
-                const properties = data.features[0].properties;
-
-                const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
-                const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
-
-			Promise.all([
-				rautatieliikennepaikanTunniste ? haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste) : Promise.resolve(null),
-				liikennepaikkavalinTunniste ? haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste) : Promise.resolve(null)
-			]).then(([rautatieliikennepaikanNimi, liikennepaikkavalinNimi]) => {
-				let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
-				let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
-
-
-                    const popupContent = `
-                        <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
-                        <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                        <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
-                        ${liikennepaikkaHtml}
-                        ${liikennepaikkavaliHtml}
-                        <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
-                    `;
-
-                    // Luodaan marker ja lisätään se kartalle
-                    const marker = L.marker([lat, lng], { icon: customIcon })
-                        .addTo(map)
-                        .bindPopup(popupContent);
-                    marker.openPopup();
-
-                    // Lisätään marker hakutuloksiin ja mahdollistetaan niiden poisto
-                    searchMarkers.push(marker);
-                    lisaaResultItem(properties, rautatieliikennepaikanNimi, liikennepaikkavaliHtml, googleMapsUrl, marker);
-                    RemoveMarkersButton();
-                }).catch(error => {
-                    console.error('Error while fetching station or track section names:', error);
-                });
-            }
+    const tempPopupContent = "Haetaan tietoja...";
+    const marker = L.marker([lat, lng], {
+        icon: L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'>+</span>`,
+            iconSize: [30, 42],
+            iconAnchor: [15, 42],
+            popupAnchor: [0, -42]
         })
-        .catch(error => {
-            console.error('Error while fetching data from API:', error);
-        });
-});
+    }).addTo(map).bindPopup(tempPopupContent).openPopup();
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        if (data.features && data.features.length > 0) {
+            const properties = data.features[0].properties;
+            const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
+            const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
+
+            let rautatieliikennepaikanNimi = await haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste);
+            let liikennepaikkavalinNimi = await haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste);
+
+            let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
+            let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
+
+            let popupContent = `
+				${liikennepaikkaHtml}
+				${liikennepaikkavaliHtml}	   
+				<strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
+				<strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
+				<strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
+            `;
+
+            marker.setPopupContent(popupContent);
+
+            lisaaResultItem(properties, rautatieliikennepaikanNimi, liikennepaikkavalinNimi, googleMapsUrl, marker);
+        } else {
+            marker.setPopupContent("Rata-alueen ulkopuolella.");
+        }
+    } catch (error) {
+        console.error('Error while fetching data from API:', error);
+        marker.setPopupContent("Virhe tietojen haussa.");
+    }
+
+    searchMarkers.push(marker);
+    RemoveMarkersButton();
+}
+
+map.on('click', mapOnClick);
 
 function haeLiikennepaikanNimiGeojsonista(tunniste) {
     const liikennepaikka = liikennepaikatData.features.find(feature => feature.properties.tunniste === tunniste);
