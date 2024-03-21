@@ -128,4 +128,6 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
 
     resultsDiv.appendChild(item);
     resultsDiv.style.display = 'block';
+    isSearchActive = true;
+    showCloseIcon();
 }
