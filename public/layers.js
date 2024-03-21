@@ -436,9 +436,10 @@ const satelliteStyle = {
 };
 
 function updateMarkerStyles() {
-    const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
     allMarkers.forEach(marker => {
-        marker.setStyle(style);
+        const style = currentBaseLayer === "gm" ? gmStyle : satelliteStyle;
+        marker.setStyle({color: style.color, fillColor: style.fillColor, fillOpacity: style.fillOpacity});
+        marker.setRadius(style.radius);
     });
 }
 
