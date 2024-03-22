@@ -568,22 +568,26 @@ document.getElementById('searchButton').addEventListener('click', function(event
 });
 
 function performSearch() {
-    const hakuInput = document.getElementById('searchInput').value.trim();
-
-    if (isSearchActive) {
-        // Tyhjennä aiemmat tulokset ja valmistele uutta hakua varten
-        clearResults();
+    let searchTerm = document.getElementById('searchInput').value.trim();
+    if (!searchTerm) {
+        console.error('Hakukenttä on tyhjä');
+        naytaVirheilmoitus('Syötä hakutermi');
+        return;
     }
 
-    if (hakuInput.includes('-')) {
-        haeRatakilometriValinSijainnit(hakuInput);
-    } else if (/^\d+$/.test(hakuInput) || /^\d+\+\d*$/.test(hakuInput)) {
-        const muokattuHakuInput = hakuInput.includes('+') ? hakuInput : `${hakuInput}+0`;
-        haeRatakilometrinSijainnit(muokattuHakuInput);
-    }
-
-    isSearchActive = true; // Aseta haku aktiiviseksi
-    showCloseIcon(); // Vaihda painikkeen ikoni sulkevaksi
+    // Tarkistetaan, onko syöte koordinaatteja
+    if (searchTerm.match(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/)) {
+        const [lat, lng] = searchTerm.split(',').map(Number);
+        haeTiedotKoordinaateistaJaLisaaMarker(lat, lng);
+    } else if (searchTerm.includes('-')) {
+        // Suorita ratakilometrivälihaku
+        haeRatakilometriValinSijainnit(searchTerm);
+    } else (searchTerm.includes('+') || !isNaN(searchTerm)) {
+        // Suorita ratakilometrihaku
+        haeRatakilometrinSijainnit(searchTerm);
+    } 
+    isSearchActive = true;
+    showCloseIcon();
 }
 
 // Lisätään funktio aiempien hakutulosten tyhjentämiseksi
@@ -617,3 +621,52 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('RemoveMarkersButton-painiketta ei löydy');
     }
 });
+
+async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
+    const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
+    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
+
+    const tempPopupContent = "Haetaan tietoja...";
+    const marker = L.marker([lat, lng], {
+        icon: L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style='background-image: url(MyCcMarker.png);' class='marker-pin'></div><span class='marker-number'></span>`,
+            iconSize: [30, 42],
+            iconAnchor: [15, 48],
+            popupAnchor: [0, -48]
+        })
+    }).addTo(map).bindPopup(tempPopupContent).openPopup();
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        if (data.features && data.features.length > 0) {
+            const properties = data.features[0].properties;
+            const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
+            const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
+
+            let rautatieliikennepaikanNimi = await haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste);
+            let liikennepaikkavalinNimi = await haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste);
+
+            let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
+            let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
+
+            let popupContent = `
+                ${liikennepaikkaHtml}
+                ${liikennepaikkavaliHtml}       
+                <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
+                <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
+                <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
+            `;
+
+            marker.setPopupContent(popupContent);
+			lisaaResultItem(properties, rautatieliikennepaikanNimi, liikennepaikkavalinNimi, googleMapsUrl, marker);
+        } else {
+            marker.setPopupContent("Rata-alueen ulkopuolella.");
+        }
+    } catch (error) {
+        console.error('Error while fetching data from API:', error);
+        marker.setPopupContent("Virhe tietojen haussa.");
+    }
+}
