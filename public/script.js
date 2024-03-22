@@ -582,10 +582,13 @@ function performSearch() {
     } else if (searchTerm.includes('-')) {
         // Suorita ratakilometrivälihaku
         haeRatakilometriValinSijainnit(searchTerm);
-    } else (searchTerm.includes('+') || !isNaN(searchTerm)) {
+    } else if (searchTerm.includes('+') || !isNaN(searchTerm)) {
         // Suorita ratakilometrihaku
         haeRatakilometrinSijainnit(searchTerm);
-    } 
+    } else {
+        // Suorita paikannimihaku
+        searchLocation(searchTerm);
+    }
     isSearchActive = true;
     showCloseIcon();
 }
