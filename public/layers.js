@@ -554,10 +554,8 @@ fetch('radat.geojson')
             })
         };
 
-        const geoLayer = L.geoJSON(transformedData, {
-            style: function(feature) {
-                return { className: 'radat', color: "grey", weight: 1, zIndex: 1000 };
-            },
+        geoLayer = L.geoJSON(transformedData, {
+			style: getRailStyle,
 			onEachFeature: function(feature, layer) {
                 if (feature.properties && feature.properties.ratanumero) {
                     layer.bindTooltip(feature.properties.ratanumero, {
@@ -568,10 +566,30 @@ fetch('radat.geojson')
                 }
             }
         }).addTo(RadatLayerGroup);
-    })
+        document.getElementById('toggleView').addEventListener('click', function() {
+            updateStyles();
+        });    
+	})
     .catch(error => {
         console.error("Virhe ladattaessa ratojen geometriaa:", error);
     });
+	
+function getRailStyle() {
+    return {
+        className: currentBaseLayer === "gm" ? 'radat-normal' : 'radat-satellite'
+    };
+}
+
+function updateStyles() {
+    const className = currentBaseLayer === "gm" ? 'radat-normal' : 'radat-satellite';
+
+    geoLayer.eachLayer(function(layer) {
+        if (layer._path) {
+            // Päivitetään className suoraan
+            layer._path.setAttribute('class', className);
+        }
+    });
+}
 
 fetch('kayttokeskusalueet.geojson')
     .then(response => response.json())
