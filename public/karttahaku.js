@@ -25,7 +25,7 @@ async function mapOnClick(e) {
     klikkausLaskuri++; // Kasvatetaan klikkauslaskuria jokaisella klikkauksella
 
     // Jos on pariton klikkaus, lisätään marker
-    if (klikkausLaskuri % 2 !== 0) {
+    if (klikkausLaskuri % 3 !== 0) {
         const { lat, lng } = e.latlng;
         const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
         const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
