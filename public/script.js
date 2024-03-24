@@ -521,25 +521,22 @@ function piilotaVirheilmoitus() {
     }
 }
 
-// Muutettu poistaKaikkiMarkerit-funktio poistamaan kaikki karttaelementit
 function poistaKaikkiMarkerit() {
-    // Poista markerit
     searchMarkers.forEach(marker => map.removeLayer(marker));
     searchMarkers = [];
 
-    // Poista kaikki L.geoJSON layerit kartalta
-    map.eachLayer(layer => {
-        if (layer instanceof L.GeoJSON) {
-            map.removeLayer(layer);
-        }
-    });
+    geoJsonLayers.forEach(layer => map.removeLayer(layer));
+    geoJsonLayers = [];
 
-    // Piilota RemoveMarkersButton, koska kartalla ei ole enää elementtejä
+    if (window.searchResultsLayer) {
+        map.removeLayer(window.searchResultsLayer);
+        window.searchResultsLayer = null;
+    }
     RemoveMarkersButton();
-    currentResultNumber = 1; // Nollaa tulosten laskuri
+    currentResultNumber = 1;
+	resetSearch()
 }
 
-// Päivitetty funktio, joka päivittää RemoveMarkersButton-painikkeen tilan
 function RemoveMarkersButton() {
     const button = document.getElementById('removeMarkersButton');
     // Tarkistetaan, onko kartalla markereita tai GeoJSON-layereita
