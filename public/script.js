@@ -639,6 +639,7 @@ async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
             popupAnchor: [0, -48]
         })
     }).addTo(map).bindPopup(tempPopupContent).openPopup();
+	searchMarkers.push(marker);
 
     try {
         const response = await fetch(apiUrl);
