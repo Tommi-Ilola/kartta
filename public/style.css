@@ -4,6 +4,10 @@ body, html {
     padding: 0;
 }
 
+input[type="checkbox" i] {
+	vertical-align: middle;
+}
+
 :root {
     --leaflet-tile-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
@@ -20,7 +24,7 @@ body, html {
 
 label {
     display: block;
-    height: 20px;
+    height: 25px;
 }
 
 .custom-div-icon .marker-pin {
