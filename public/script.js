@@ -521,6 +521,21 @@ function piilotaVirheilmoitus() {
     }
 }
 
+function RemoveMarkersButton() {
+    let isMarkersPresent = searchMarkers.length > 0;
+    let isLayersPresent = geoJsonLayers.length > 0;
+    let button = document.getElementById('removeMarkersButton');
+    if (button) {
+        if (isMarkersPresent || isLayersPresent) {
+            button.style.display = 'block';
+        } else {
+            button.style.display = 'none';
+        }
+    } else {
+        console.error('Poista markerit -painiketta ei löydy');
+    }
+}
+
 function poistaKaikkiMarkerit() {
     searchMarkers.forEach(marker => map.removeLayer(marker));
     searchMarkers = [];
@@ -535,22 +550,6 @@ function poistaKaikkiMarkerit() {
     RemoveMarkersButton();
     currentResultNumber = 1;
 	resetSearch()
-}
-
-function RemoveMarkersButton() {
-    const button = document.getElementById('removeMarkersButton');
-    // Tarkistetaan, onko kartalla markereita tai GeoJSON-layereita
-    let isElementsPresent = searchMarkers.length > 0 || geoJsonLayers.length > 0;
-    button.style.display = isElementsPresent ? 'block' : 'none';
-}
-
-function poistaKaikkiMarkerit() {
-    searchMarkers.forEach(marker => map.removeLayer(marker));
-    searchMarkers = []; // Tyhjennä markerit lista
-    geoJsonLayers.forEach(layer => map.removeLayer(layer));
-    geoJsonLayers = []; // Tyhjennä GeoJSON-layereiden lista
-    RemoveMarkersButton(); // Päivitä painikkeen tila
-    currentResultNumber = 1; // Nollaa tulosten laskuri
 }
 
 document.getElementById('searchButton').addEventListener('click', function(event) {
