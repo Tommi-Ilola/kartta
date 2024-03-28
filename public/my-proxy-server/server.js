@@ -1,18 +1,3 @@
-function haeKaikkiRatanumerot() {
-    naytaDatanLatausIndikaattori();
-    const url = '/api/infra-api/0.7/radat.geojson';
-	
-    console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            ratanumerot = data.features.map(feature => feature.properties.ratanumero);
-            console.log(ratanumerot);
-            piilotaDatanLatausIndikaattori();
-        })
-        .catch(error => console.error('Virhe ladattaessa radat.geojson dataa:', error));
-}
-
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
