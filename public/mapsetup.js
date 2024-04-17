@@ -38,39 +38,27 @@ document.getElementById("passwordInput").addEventListener("keypress", function(e
 proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs");
 proj4.defs("EPSG:4326","+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs");
 
-let currentBaseLayer = "gm"
-var isRetina = L.Browser.retina;
+var currentBaseLayer = "gm";
+        var map = L.map("map").setView([67.500, 26.000], 5);
 
-let map = L.map('map', {
-    minZoom: 0,
-    maxZoom: 22
-});
+        var gm = L.gridLayer.googleMutant({
+            maxZoom: 24,
+            type: "roadmap"
+        }).addTo(map);
 
-let gmLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',{
-        maxZoom: 22,
-        subdomains:['mt0','mt1','mt2','mt3'],
-		attribution: 'GoogleMaps'
-}).addTo(map);
+        var satellite = L.gridLayer.googleMutant({
+            maxZoom: 24,
+            type: "satellite"
+        });
 
-map.setView([67.500, 26.000], 5);
-
-// Satelliittinäkymä (Esri)
-let satelliteLayer = L.tileLayer('https://www.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}',{
-        maxZoom: 22,
-        subdomains:['mt0','mt1','mt2','mt3'],
-		attribution: 'GoogleMaps'
-});
-
-document.getElementById('toggleView').addEventListener('click', function() {
-    if (map.hasLayer(gmLayer)) {
-        map.removeLayer(gmLayer);
-        satelliteLayer.addTo(map);
-        currentBaseLayer = "satellite"; // Päivitä nykyinen karttataso satelliitiksi
-    } else {
-        map.removeLayer(satelliteLayer);
-        gmLayer.addTo(map);
-        currentBaseLayer = "gm"; // Päivitä nykyinen karttataso OSM:ksi
-    }
-    updateMarkerStyles();
-	updateTooltipStyles();
-});
+		document.getElementById('toggleView').addEventListener('click', function () {
+				if (map.hasLayer(gm)) {
+					map.removeLayer(gm);
+					satellite.addTo(map);
+				} else {
+					map.removeLayer(satellite);
+					gm.addTo(map);
+				}
+			updateMarkerStyles();
+			updateTooltipStyles();
+		});
