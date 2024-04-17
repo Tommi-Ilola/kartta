@@ -8,8 +8,7 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    // Oletetaan, että EC2-instanssin IP on 16.170.224.21 ja portti on 3000
-    const url = 'https://16.170.224.21:3000/infra-api/0.7/radat.geojson';
+    const url = 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson';
 	
     console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
     fetch(url)
