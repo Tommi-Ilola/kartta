@@ -323,24 +323,10 @@ td {
     background-color: #eeeeee;
 }
 
-#locateUser {
-    position: absolute;
+.leaflet-control-locate{
+	position: absolute !important;
     z-index: 1000;
-    top: 156px;
-    left: 10px;
-    background-color: white;
-    width: 34px;
-    height: 34px;
-    border-radius: 5px;
-    border-width: 0px;
-    border: 2px solid rgba(0,0,0,0.2);
-    background-clip: padding-box;
-    padding: 3pt 3pt 3pt 3pt;
-    cursor: pointer;
-}
-
-#locateUser:hover {
-    background-color: #eeeeee;
+    top: 146px;
 }
 
 .locate-button {
@@ -794,22 +780,19 @@ th {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
 }
 
-#locateUser {
-    z-index: 1000;
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    top: unset;
-    right: unset;
-    z-index: 1000;
+.leaflet-control-locate {
     background-color: white;
-    padding: 3pt 3pt 3pt 3pt;
-    border: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    border-width: 0px;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
+    position: absolute !important;
+    z-index: 1000;
+    top: 92vh;
+    display: block !important;
+    padding: 3pt 3pt 3pt 3pt !important;
+    border: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    border-width: 0px !important;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
 }
 
 #menuButton {
