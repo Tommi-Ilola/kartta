@@ -4,6 +4,48 @@ body, html {
     padding: 0;
 }
 
+#file-input {
+    display: none; /* Piilota alkuperäinen input-elementti */
+}
+
+.custom-file-upload {
+    display: grid;
+    padding: 0px 12px;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-file-upload:hover {
+    display: grid;
+    padding: 0px 12px;
+    cursor: pointer;
+    background-color: #ccc;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+}
+	
+.leaflet-shadow-pane img {
+	display: none;
+}
+
+.file-tooltip {
+    z-index: 1000 !important;
+    background-color: #fff0 !important;
+    border: 1px solid #ddd0 !important;
+    border-radius: 4px !important;
+    padding: 6px !important;
+    box-shadow: 0 3px 14px rgb(0 0 0 / 0%) !important;
+    margin-top: -3px !important;
+    font-weight: 900;
+    text-shadow: -1px 0 #fff, 0 1px white, 1px 0 white, 0 -1px white !important;
+}
+
 input[type="checkbox" i] {
 	vertical-align: middle;
 }
