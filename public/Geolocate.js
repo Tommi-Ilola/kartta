@@ -5,3 +5,8 @@ L.control.locate({
          setView: true // Automaattisesti keskitä näkymä löydettyyn sijaintiin
     }
 }).addTo(map);
+
+document.querySelector('.leaflet-control-locate a').addEventListener('touchend', function(e) {
+    e.preventDefault(); // Estä oletustoiminto, kuten näytön vieritys tai zoomaus
+    this.click(); // Pakota click-tapahtuman laukaisu
+}, false);
