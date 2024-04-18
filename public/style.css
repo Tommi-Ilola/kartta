@@ -4,6 +4,10 @@ body, html {
     padding: 0;
 }
 
+.leaflet-bar-part leaflet-bar-part-single{
+	display: none;
+}
+
 .active:after {
     display: none !important;
 }
