@@ -644,7 +644,7 @@ input[type=password] {
     border-width: 0;
     border-radius: 0.7rem;
     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
-    font-size: 15px;
+    font-size: 16px !important;
 }
 
 h1 {
@@ -785,9 +785,18 @@ th {
 }
 
 .leaflet-control-locate {
-
+    background-color: white;
+    position: absolute !important;
+    z-index: 1000;
+    top: 92vh;
     display: block !important;
-
+    padding: 3pt 3pt 3pt 3pt !important;
+    border: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    border-width: 0px !important;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
 }
 
 #menuButton {
