@@ -1,99 +1,128 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var gpxLayerGroup = L.layerGroup().addTo(map);
-    var geojsonLayerGroup = L.layerGroup().addTo(map);
-    var kmlLayerGroup = L.layerGroup().addTo(map);
-    var csvLayerGroup = L.layerGroup().addTo(map);
-
-    document.getElementById('file-input').addEventListener('change', function (e) {
+	
+    var fileInput = document.getElementById('file-input');
+    fileInput.addEventListener('change', function (e) {
         var file = e.target.files[0];
         if (file) {
             var reader = new FileReader();
             reader.onload = function (event) {
                 var data = event.target.result;
                 var format = file.name.split('.').pop().toLowerCase();
-                switch (format) {
-case 'gpx':
-    try {
-        var gpxLayer = new L.GPX(data, {
-            async: true,
-            marker_options: {
-                startIconUrl: window.location.origin + '/pin-icon-wpt.png', // Määrittele aloitusikonin polku
-                endIconUrl: window.location.origin + 'pin-icon-wpt.png',     // Määrittele lopetusikonin polku
-				  wptIcons: [],
-				  wptIconsType: [],
-                wptIconsUrls: {
-                    '': window.location.origin + 'pin-icon-wpt.png'
-                },
-                wptIconTypeUrls: {
-                    // esimerkki: erityyppiset ikonit eri waypoint-tyypeille
-                    'Geocache Found': window.location.origin + 'pin-icon-wpt.png'
-                },
-                shadowUrl: null, // Jos et käytä varjoa, aseta tämä nulliksi
-                iconSize: [23, 38], // Määrittele ikonin koko
-                iconAnchor: [11, 37], // Määrittele ikonin ankkuri
-				popupAnchor: [0, -38]
-            },
-            polyline_options: {
-                color: 'blue',
-                opacity: 0.75,
-                weight: 3,
-                lineCap: 'round'
-            },
-            onEachFeature: function(feature, layer) {
-                // Tarkistetaan, onko ominaisuus waypoint ja sillä on nimi
-                if (feature.properties && feature.properties.name) {
-                    var popupContent = '<div class="custom-popup-content">';
-                    popupContent += '<h3>' + feature.properties.name + '</h3>';
-                    if (feature.properties.desc) {
-                        popupContent += '<p>' + feature.properties.desc + '</p>';
-                    }
-                    popupContent += '</div>';
+                var layer;
 
-                    // Kytke popup featureen (waypoint)
-                    layer.bindPopup(popupContent, { className: 'custom-popup' });
-                }
-            }
-        }).on('loaded', function(e) {
-            map.fitBounds(gpxLayer.getBounds());
-        }).addTo(gpxLayerGroup);
-    } catch (error) {
-        console.error("Error parsing GPX data:", error);
-    }
-    break;
-					case 'json':
-					case 'geojson':
-						L.geoJSON(JSON.parse(data), {
-							pointToLayer: function (feature, latlng) {
-								return L.marker(latlng, {
-									icon: new L.Icon({
-										iconUrl: window.location.origin + 'pin-icon-wpt.png',
-										iconSize: [23, 38],
-										iconAnchor: [11, 37]
-									})
-								});
-							},
-							onEachFeature: function (feature, layer) {
-								if (feature.properties && feature.properties.name) {
-									layer.bindTooltip(feature.properties.name, {permanent: true, className: 'custom-tooltip'});
-								}
-							}
-						}).addTo(geojsonLayerGroup);
-						break;
+                switch (format) {
+                    case 'gpx':
+                        var gpx = new DOMParser().parseFromString(data, "application/xml");
+                        var geojson = toGeoJSON.gpx(gpx);
+                        layer = L.geoJSON(geojson, {
+                            pointToLayer: function(feature, latlng) {
+                                return L.marker(latlng, {
+                                    icon: L.icon({
+                                        iconUrl: window.location.origin + '/pin-icon-wpt.png', // Huomaa kauttaviiva URL:ssä
+                                        iconSize: [23, 38],
+                                        iconAnchor: [11, 37],
+                                    })
+                                });
+                            },
+                            onEachFeature: function(feature, layer) {
+                                if (feature.properties && feature.properties.name) {
+                                    layer.bindTooltip(feature.properties.name, {permanent: true, className: 'file-tooltip'});
+                                }
+                            }
+                        }).addTo(map);
+                        break;
+
+                    case 'json':
+                    case 'geojson':
+                        layer = L.geoJSON(JSON.parse(data), {
+                            pointToLayer: function (feature, latlng) {
+                                return L.marker(latlng, {
+                                    icon: new L.Icon({
+                                        iconUrl: window.location.origin + '/pin-icon-wpt.png', // Huomaa kauttaviiva URL:ssä
+                                        iconSize: [23, 38],
+                                        iconAnchor: [11, 37]
+                                    })
+                                });
+                            },
+                            onEachFeature: function (feature, layer) {
+                                if (feature.properties && feature.properties.name) {
+                                    layer.bindTooltip(feature.properties.name, {permanent: true, className: 'file-tooltip'});
+                                }
+                            }
+                        }).addTo(map);
+                        break;
+
                     case 'kml':
-                        omnivore.kml.parse(data).addTo(kmlLayerGroup);
+                        layer = omnivore.kml.parse(data, null, L.geoJson(null, {
+                            onEachFeature: function (feature, layer) {
+                                if (feature.properties && feature.properties.name) {
+                                    layer.bindTooltip(feature.properties.name, {permanent: true, className: 'file-tooltip'});
+                                }
+                                if (feature.geometry.type === "Point") {
+                                    layer.setIcon(L.icon({
+                                        iconUrl: window.location.origin + '/pin-icon-wpt.png',
+                                        iconSize: [23, 38],
+                                        iconAnchor: [11, 37]
+                                    }));
+                                }
+                            }
+                        })).addTo(map);
                         break;
+
                     case 'csv':
-                        omnivore.csv.parse(data).addTo(csvLayerGroup);
+                        layer = omnivore.csv.parse(data, null, L.geoJson(null, {
+                            onEachFeature: function (feature, layer) {
+                                if (feature.properties && feature.properties.name) {
+                                    layer.bindTooltip(feature.properties.name, {permanent: true, className: 'file-tooltip'});
+                                }
+                                layer.setIcon(L.icon({
+                                    iconUrl: window.location.origin + '/pin-icon-wpt.png',
+                                    iconSize: [23, 38],
+                                    iconAnchor: [11, 37]
+                                }));
+                            }
+                        })).addTo(map);
                         break;
+
                     default:
                         console.error('Unsupported file format');
+                        return;
                 }
-            };
-            reader.onerror = function (event) {
-                console.error("Failed to read file:", event.target.error);
+
+                // Lisää karttataso kartalle oletuksena
+                if (layer) {
+                    layer.addTo(map);
+                }
+
+                // Luodaan käyttöliittymäelementit tiedoston hallintaan
+                var fileLabel = document.createElement('label');
+                var checkbox = document.createElement('input');
+                var removeButton = document.createElement('button');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                removeButton.textContent = 'Poista';
+
+                // Checkbox to control visibility of the layer
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        layer.addTo(map);
+                    } else {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Button to remove the file and its layer
+                removeButton.addEventListener('click', function () {
+                    map.removeLayer(layer);  // Poista karttataso
+                    fileLabel.remove();      // Poista label käyttöliittymästä
+                });
+
+                fileLabel.appendChild(checkbox);
+                fileLabel.append(` ${file.name} `);
+                fileLabel.appendChild(removeButton);
+                document.getElementById('fileContent').appendChild(fileLabel);
             };
             reader.readAsText(file);
         }
     });
 });
-
