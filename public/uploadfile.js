@@ -17,7 +17,7 @@ case 'gpx':
         var gpxLayer = new L.GPX(data, {
             async: true,
             marker_options: {
-                startIconUrl: window.location.origin + 'pin-icon-wpt.png', // Määrittele aloitusikonin polku
+                startIconUrl: window.location.origin + '/pin-icon-wpt.png', // Määrittele aloitusikonin polku
                 endIconUrl: window.location.origin + 'pin-icon-wpt.png',     // Määrittele lopetusikonin polku
 				  wptIcons: [],
 				  wptIconsType: [],
