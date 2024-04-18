@@ -4,7 +4,9 @@ body, html {
     padding: 0;
 }
 
-
+.active:after {
+    display: none !important;
+}
 
 #file-input {
     display: none; /* Piilota alkuperäinen input-elementti */
