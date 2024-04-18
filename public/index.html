@@ -27,6 +27,7 @@
 
 	<script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/togeojson/3.0.0/togeojson.min.js"></script>
 
 </head>
 
@@ -56,15 +57,16 @@
 			<label><input type="checkbox" id="tasoristeyksetCheckbox"> Näytä tasoristeykset</label>
 			<label><input type="checkbox" id="tilirataosatCheckbox"> Näytä tilirataosat</label>
 			<label><input type="checkbox" id="kilometrimerkitCheckbox" checked> Näytä kilometrimerkit</label>
-			<label><input type="checkbox" id="kayttokeskusalueetCheckbox"> Näytä käyttökeskusalueet</label>
+			<label><input type="checkbox" id="LPCheckbox"> Näytä käyttökeskusalueet</label>
 			<label><input type="checkbox" id="RadatCheckbox"> Näytä radat</label>
 			<label><input type="checkbox" id="ToimialueetCheckbox"> Näytä toimialueet</label>
-			<label><input type="checkbox" id="SyottoAsematCheckbox"> Näytä syöttöasemat</label>
-			<label><input type="checkbox" id="VKCheckbox"> Näytä välikytkiasemat</label>
-			<label><input type="checkbox" id="LaCheckbox"> Näytä vaununlämmitysasemat</label>
-			<label><input type="checkbox" id="JunatCheckbox"> Näytä junat kartalla</label>
-
-			<input type="file" id="file-input" accept=".gpx, .josn, .geojson, .kml, .csv">
+			
+			<span id="fileContent" style="display: flex; flex-direction: column-reverse;">
+				<label for="file-input" class="custom-file-upload">
+					Lisää tiedosto
+				</label>
+				<input type="file" id="file-input" accept=".gpx, .geojson, .kml, .csv" />
+			</span>
 		</div>
 	</div>
 
