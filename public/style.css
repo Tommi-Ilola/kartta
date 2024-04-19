@@ -788,21 +788,6 @@ th {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
 }
 
-.leaflet-control-locate {
-    background-color: white;
-    position: absolute !important;
-    z-index: 1000;
-    top: 54px;
-    display: block !important;
-    padding: 3pt 3pt 3pt 3pt !important;
-    border: 0 !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 10px !important;
-    border-width: 0px !important;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
-}
-
 #menuButton {
     background-color: white;
     border: 1px;
@@ -908,6 +893,28 @@ h1, .tooltip-gm, .tooltip-satellite, .collapsible, #passwordInput, #passwordButt
 a {
     text-decoration: none;
     color: none;
+}
+
+.leaflet-control-locate {
+    background-color: white;
+    top: 54px;
+    display: block !important;
+    padding: 7pt 12pt 24pt 8pt !important;
+    border: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    border-width: 0px !important;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.leaflet-control-locate a .leaflet-control-locate-location-arrow {
+    margin: 0 !important;
+}
+
+.leaflet-touch .leaflet-bar a {
+    width: 0 !important;
+    height: 0 !important;
 }
 
 button {
