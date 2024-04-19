@@ -908,6 +908,19 @@ a {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
 }
 
+.leaflet-control-locate:hover {
+    background-color: white;
+    top: 54px;
+    display: block !important;
+    padding: 3pt 27pt 27pt 3pt !important;
+    border: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    border-width: 0px !important;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
 .leaflet-control-locate a .leaflet-control-locate-location-arrow .leaflet-control-locate-spinner{
     margin: 0 !important;
 }
