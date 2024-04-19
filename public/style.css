@@ -908,7 +908,7 @@ a {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8) !important;
 }
 
-.leaflet-control-locate a .leaflet-control-locate-location-arrow {
+.leaflet-control-locate a .leaflet-control-locate-location-arrow .leaflet-control-locate-spinner{
     margin: 0 !important;
 }
 
