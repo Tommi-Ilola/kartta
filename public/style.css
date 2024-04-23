@@ -4,12 +4,47 @@ body, html {
     padding: 0;
 }
 
-.leaflet-bar-part leaflet-bar-part-single{
-	display: none;
+.leaflet-right {
+    display: none;
+}
+
+.leaflet-control-zoom {
+    top: 0px !important;
+	left: 0px !important;
+	display: block !important;
+	transform: translateX(0) !important;
+}
+
+.leaflet-bar.leaflet-control {
+	top: 184px;
+    left: 54px;
+    display: block;
+    transform: translateX(-100vw);
+}
+
+.leaflet-control-locate {
+	position: absolute !important;
+    top: 146px !important;
+	left: 0px !important;
+	transform: translateX(0) !important;
+}
+
+.polyline-measure-tooltip {
+    font: 12px Calibri, Helvetica, sans-serif !important;
+    line-height: 12px !important;
+    background-color: #ffffffd1 !important;
+    border-radius: 0.5em !important;
+    margin: 0 !important;
+    padding: 4px !important;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
+    width: auto !important;
+    height: auto !important;
+    white-space: nowrap !important;
+    text-align: right !important;
 }
 
 .active:after {
-    display: none !important;
+    content: '' !important;
 }
 
 #file-input {
@@ -43,7 +78,7 @@ body, html {
 }
 
 .file-tooltip {
-    z-index: 1000 !important;
+	z-index: 1000 !important;
     background-color: #fff0 !important;
     border: 1px solid #ddd0 !important;
     border-radius: 4px !important;
@@ -54,8 +89,26 @@ body, html {
     text-shadow: -1px 0 #fff, 0 1px white, 1px 0 white, 0 -1px white !important;
 }
 
+leaflet-bar leaflet-control {
+
+}
+
 input[type="checkbox" i] {
 	vertical-align: middle;
+}
+
+:root {
+    --leaflet-tile-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+    .leaflet-tile {
+        filter: var(--leaflet-tile-filter, none);
+    }
+
+    .leaflet-container {
+        background: #303030;
+    }
 }
 
 label {
@@ -204,12 +257,12 @@ h1 {
 }
 
 #map {
-	opacity: 0;
 	width: 100%;
     height: 100%;
     margin: 0;
 	transform: translate3d(0, 0, 0);
 	cursor: auto;
+	opacity: 0;
 }
 
 .resultItem {
@@ -317,10 +370,8 @@ td {
     background-color: #eeeeee;
 }
 
-.leaflet-control-locate{
-	position: absolute !important;
-    z-index: 1000;
-    top: 146px;
+#locateUser:hover {
+    background-color: #eeeeee;
 }
 
 .locate-button {
@@ -586,6 +637,10 @@ td {
 	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black !important;
 }
 
+.leaflet-control-locate{
+    top: 54px !important;
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -634,7 +689,7 @@ input[type=password] {
     border-width: 0;
     border-radius: 0.7rem;
     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
-    font-size: 16px !important;
+    font-size: 15px;
 }
 
 h1 {
@@ -774,6 +829,24 @@ th {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
 }
 
+#locateUser {
+    z-index: 1000;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    top: unset;
+    right: unset;
+    z-index: 1000;
+    background-color: white;
+    padding: 3pt 3pt 3pt 3pt;
+    border: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border-width: 0px;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
+}
+
 #menuButton {
     background-color: white;
     border: 1px;
@@ -881,6 +954,11 @@ a {
     color: none;
 }
 
+button {
+	-webkit-tap-highlight-color: transparent;
+	font-family: calibri;
+}
+
 .leaflet-control-locate {
     background-color: white;
     top: 54px;
@@ -916,9 +994,8 @@ a {
     height: 0 !important;
 }
 
-button {
-	-webkit-tap-highlight-color: transparent;
-	font-family: calibri;
+.leaflet-control-zoom {
+	display: none !important;
 }
 
 @font-face {
