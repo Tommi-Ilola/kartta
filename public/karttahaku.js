@@ -2,6 +2,110 @@ let liikennepaikatData;
 let liikennepaikkavalitData;
 let klikkausLaskuri = 0;
 let viimeisinMarker = null;
+let mittausKaynnissa = false;
+
+function showMeasureTool(e) {
+    var measureControl = new L.Control.Measure({
+		position: 'topleft',
+        primaryLengthUnit: 'meters',
+        secondaryLengthUnit: 'kilometers',
+        primaryAreaUnit: 'sqmeters',
+        secondaryAreaUnit: 'hectares'
+    });
+    measureControl.addTo(map);
+    measureControl._startMeasure();
+}
+
+let measureControl = new L.Control.PolylineMeasure({
+	position: 'topright',
+    unit: 'metres',
+    showBearings: false,
+    clearMeasurementsOnStop: false,
+    showClearControl: true,
+    showUnitControl: true
+}).addTo(map);
+
+// Odotetaan, että kartta on kokonaan latautunut
+map.whenReady(function() {
+    let measureControlButton = document.querySelector('.polyline-measure-unicode-icon');
+
+    if (measureControlButton) {
+        measureControlButton.addEventListener('click', function() {
+            mittausKaynnissa = !mittausKaynnissa;
+
+            if (mittausKaynnissa) {
+                map.off('click', mapClickEvent);
+            } else {
+                map.on('click', mapClickEvent);
+            }
+        });
+    } else {
+        console.error('Mittauskontrollin painiketta ei löydy.');
+    }
+});
+
+let mapClickEvent = mapOnClick;
+
+function toggleMeasureTool() {
+    // Näytä tai piilota mittaustyökalu
+    const measureBar = document.querySelector('.leaflet-right');
+    if (measureBar.style.display === 'block') {
+        measureBar.style.display = 'none';
+    } else {
+        measureBar.style.display = 'block';
+    }
+}
+
+let avoinContextMenu;
+
+function suljeContextMenu() {
+    if (avoinContextMenu) {
+        avoinContextMenu.remove();
+        avoinContextMenu = null;
+    }
+}
+
+map.on('contextmenu', function(e) {
+    suljeContextMenu();
+
+    e.originalEvent.preventDefault();
+
+    const contextMenu = document.createElement('ul');
+    contextMenu.id = 'map-context-menu';
+    contextMenu.style.cursor = 'pointer';
+    contextMenu.style.borderRadius = '0.5rem';
+    contextMenu.style.position = 'absolute';
+    contextMenu.style.left = `${e.containerPoint.x}px`;
+    contextMenu.style.top = `${e.containerPoint.y}px`;
+    contextMenu.style.listStyleType = 'none';
+    contextMenu.style.padding = '10px';
+    contextMenu.style.backgroundColor = 'white';
+    contextMenu.style.border = '1px solid #999';
+    contextMenu.style.boxShadow = '3px 3px 5px #999';
+    contextMenu.innerHTML = '<li>Etäisyyden mittaus</li>';
+    document.body.appendChild(contextMenu);
+
+    // Event listener for the context menu item click
+    contextMenu.firstChild.addEventListener('click', function() {
+        toggleMeasureTool();
+        suljeContextMenu();
+    });
+
+    // Store the reference to the open context menu
+    avoinContextMenu = contextMenu;
+
+    // Stop the contextmenu event from reaching the map
+    e.originalEvent.stopPropagation();
+});
+
+document.addEventListener('click', function(event) {
+    if (!avoinContextMenu) return;
+    if (!avoinContextMenu.contains(event.target)) {
+        suljeContextMenu();
+    }
+});
+
+
 
 async function lataaGeojsonData(url) {
     try {
@@ -15,14 +119,19 @@ async function lataaGeojsonData(url) {
 }
 
 async function alustaGeojsonData() {
-    liikennepaikatData = await lataaGeojsonData('liikennepaikat.geojson');
-    liikennepaikkavalitData = await lataaGeojsonData('liikennepaikkavalit.geojson');
+    liikennepaikatData = await lataaGeojsonData('https://rata.digitraffic.fi/infra-api/0.7/rautatieliikennepaikat.geojson');
+    liikennepaikkavalitData = await lataaGeojsonData('https://rata.digitraffic.fi/infra-api/0.7/liikennepaikkavalit.geojson');
 }
 
 alustaGeojsonData();
 
 async function mapOnClick(e) {
-    klikkausLaskuri++; // Kasvatetaan klikkauslaskuria jokaisella klikkauksella
+    if (mittausKaynnissa) {
+        // Mittaus on käynnissä, älä tee mitään
+        return;
+    }
+	
+	klikkausLaskuri++; // Kasvatetaan klikkauslaskuria jokaisella klikkauksella
 
     // Jos on pariton klikkaus, lisätään marker
     if (klikkausLaskuri % 2 !== 0) {
@@ -89,7 +198,7 @@ map.on('click', mapOnClick);
 
 function tyhjennaResultItems() {
     const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = ''; // Tyhjennä kaikki result itemit
+    resultsDiv.innerHTML = '';
     resultsDiv.style.display = 'none';
     isSearchActive = false;
 }
@@ -147,3 +256,4 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
 	isSearchActive = true;
     showCloseIcon();
 }
+
