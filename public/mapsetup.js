@@ -46,19 +46,21 @@ var currentBaseLayer = "gm";
             type: "roadmap"
         }).addTo(map);
 
-        var satellite = L.gridLayer.googleMutant({
+        var hybrid = L.gridLayer.googleMutant({
             maxZoom: 24,
-            type: "satellite"
+            type: "hybrid"
         });
 
 		document.getElementById('toggleView').addEventListener('click', function () {
 				if (map.hasLayer(gm)) {
 					map.removeLayer(gm);
-					satellite.addTo(map);
+					hybrid.addTo(map);
 				} else {
-					map.removeLayer(satellite);
+					map.removeLayer(hybrid);
 					gm.addTo(map);
 				}
 			updateMarkerStyles();
 			updateTooltipStyles();
 		});
+
+
