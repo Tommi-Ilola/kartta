@@ -25,7 +25,8 @@ fetch('SA.geojson')
             html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
             iconSize: [20, 20],
             iconAnchor: [9, 12],
-            popupAnchor: [0, -12]
+            popupAnchor: [0, -12],
+	    tooltipAnchor: [0, -12]
         });
 
         data.features.forEach(function(feature) {
