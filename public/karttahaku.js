@@ -3,6 +3,7 @@ let liikennepaikkavalitData;
 let klikkausLaskuri = 0;
 let viimeisinMarker = null;
 let mittausKaynnissa = false;
+let piirtoKaynnissa = false;
 
 function showMeasureTool(e) {
     var measureControl = new L.Control.Measure({
@@ -12,6 +13,7 @@ function showMeasureTool(e) {
         primaryAreaUnit: 'sqmeters',
         secondaryAreaUnit: 'hectares'
     });
+	measureControl.setStyle({className: 'mitta'});
     measureControl.addTo(map);
     measureControl._startMeasure();
 }
@@ -24,6 +26,164 @@ let measureControl = new L.Control.PolylineMeasure({
     showClearControl: true,
     showUnitControl: true
 }).addTo(map);
+
+L.DomUtil.addClass(measureControl.getContainer(),'mitta')
+
+let mapClickEvent = mapOnClick;
+
+function toggleMeasureTool() {
+    const measureBar = document.querySelector('.mitta');
+    if (measureBar.style.display === 'block') {
+        measureBar.style.display = 'none';
+    } else {
+        measureBar.style.display = 'block';
+    }
+}
+
+function toggleGeocoder() {
+    const geocoderBar = document.querySelector('.leaflet-control-geocoder');
+    if (geocoderBar.style.display === 'block') {
+        geocoderBar.style.display = 'none';
+    } else {
+        geocoderBar.style.display = 'block';
+    }
+}
+
+function togglepmControls() {
+    const pmDrawBar = document.querySelector('.leaflet-pm-draw');
+    const pmEditBar = document.querySelector('.leaflet-pm-edit');
+    
+    if (pmDrawBar.style.display === 'block') {
+        pmDrawBar.style.display = 'none';
+    } else {
+        pmDrawBar.style.display = 'block';
+    }
+    
+    if (pmEditBar.style.display === 'block') {
+        pmEditBar.style.display = 'none';
+    } else {
+        pmEditBar.style.display = 'block';
+    }
+}
+
+let avoinContextMenu;
+
+function suljeContextMenu() {
+    if (avoinContextMenu) {
+        avoinContextMenu.remove();
+        avoinContextMenu = null;
+    }
+}
+
+map.on('contextmenu', function(e) {
+    suljeContextMenu();
+
+    e.originalEvent.preventDefault();
+	
+	const contextMenu = document.createElement('div');
+    contextMenu.id = 'map-context-menu';
+	contextMenu.style.fontFamily = 'Calibri';
+    contextMenu.style.cursor = 'pointer';
+    contextMenu.style.borderRadius = '0.5rem';
+    contextMenu.style.position = 'absolute';
+    contextMenu.style.left = `${e.containerPoint.x}px`;
+    contextMenu.style.top = `${e.containerPoint.y}px`;
+    contextMenu.style.listStyleType = 'none';
+    contextMenu.style.padding = '0px';
+    contextMenu.style.backgroundColor = 'white';
+    contextMenu.style.border = '1px solid #999';
+    contextMenu.style.boxShadow = '3px 3px 5px #999';
+	
+	const measureItem = document.createElement('div');
+	measureItem.innerHTML = 'Etäisyyden mittaus';
+	measureItem.className = 'context-menu-item';
+	contextMenu.appendChild(measureItem);
+
+	const geocoderItem = document.createElement('div');
+	geocoderItem.innerHTML = 'Osoitehaku';
+	geocoderItem.className = 'context-menu-item';
+	contextMenu.appendChild(geocoderItem);
+
+	const pmControlsItem = document.createElement('div');
+	pmControlsItem.innerHTML = 'Piirtotyökalut';
+	pmControlsItem.className = 'context-menu-item';
+	contextMenu.appendChild(pmControlsItem);
+
+	document.body.appendChild(contextMenu);
+
+    contextMenu.firstChild.addEventListener('click', function() {
+        toggleMeasureTool();
+        suljeContextMenu();
+    });
+
+    const geocoderMenuItem = contextMenu.children[1];
+    geocoderMenuItem.addEventListener('click', function() {
+        toggleGeocoder();
+        suljeContextMenu();
+    });
+	
+    const pmControlsMenuItem = contextMenu.children[2];
+    pmControlsMenuItem.addEventListener('click', function() {
+        togglepmControls();
+        suljeContextMenu();
+    });	
+
+    avoinContextMenu = contextMenu;
+
+    e.originalEvent.stopPropagation();
+});
+
+document.addEventListener('click', function(event) {
+    if (!avoinContextMenu) return;
+    if (!avoinContextMenu.contains(event.target)) {
+        suljeContextMenu();
+    }
+});
+
+var searchMarker;
+
+var geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false
+}).on('markgeocode', function(e) {
+    // Aseta marker, kuten aiemmin
+    searchMarker = L.marker(e.geocode.center).addTo(map)
+        .bindPopup(e.geocode.name)
+        .openPopup();
+
+    // Muuta suurennuslasin ikonia "X" ikoniksi
+    var geocoderIcon = document.querySelector('.leaflet-control-geocoder-icon');
+    geocoderIcon.classList.add('leaflet-control-geocoder-icon-close');
+
+function handleGeocoderIconClick() {
+    if (searchMarker) {
+        map.removeLayer(searchMarker); // Poista marker kartalta
+        searchMarker = null;
+    }
+    // Tyhjennä hakukenttä
+    document.querySelector('.leaflet-control-geocoder-form input').value = '';
+
+    // Palauta alkuperäinen suurennuslasin ikoni
+    var geocoderIcon = document.querySelector('.leaflet-control-geocoder-icon');
+    geocoderIcon.classList.remove('leaflet-control-geocoder-icon-close');
+    geocoderIcon.removeEventListener('click', handleGeocoderIconClick);
+}
+
+geocoderIcon.addEventListener('click', handleGeocoderIconClick);
+
+}).addTo(map);
+
+map.pm.addControls({
+  position: 'topright',
+  drawCircle: false, 
+});
+
+function checkToolActive() {
+    const pmContainer = document.querySelector('.button-container.active');
+    if (pmContainer && window.getComputedStyle(pmContainer).display !== 'none') {
+        return true;
+    }
+    return false;
+}
 
 // Odotetaan, että kartta on kokonaan latautunut
 map.whenReady(function() {
@@ -44,69 +204,6 @@ map.whenReady(function() {
     }
 });
 
-let mapClickEvent = mapOnClick;
-
-function toggleMeasureTool() {
-    // Näytä tai piilota mittaustyökalu
-    const measureBar = document.querySelector('.leaflet-right');
-    if (measureBar.style.display === 'block') {
-        measureBar.style.display = 'none';
-    } else {
-        measureBar.style.display = 'block';
-    }
-}
-
-let avoinContextMenu;
-
-function suljeContextMenu() {
-    if (avoinContextMenu) {
-        avoinContextMenu.remove();
-        avoinContextMenu = null;
-    }
-}
-
-map.on('contextmenu', function(e) {
-    suljeContextMenu();
-
-    e.originalEvent.preventDefault();
-
-    const contextMenu = document.createElement('ul');
-    contextMenu.id = 'map-context-menu';
-    contextMenu.style.cursor = 'pointer';
-    contextMenu.style.borderRadius = '0.5rem';
-    contextMenu.style.position = 'absolute';
-    contextMenu.style.left = `${e.containerPoint.x}px`;
-    contextMenu.style.top = `${e.containerPoint.y}px`;
-    contextMenu.style.listStyleType = 'none';
-    contextMenu.style.padding = '10px';
-    contextMenu.style.backgroundColor = 'white';
-    contextMenu.style.border = '1px solid #999';
-    contextMenu.style.boxShadow = '3px 3px 5px #999';
-    contextMenu.innerHTML = '<li>Etäisyyden mittaus</li>';
-    document.body.appendChild(contextMenu);
-
-    // Event listener for the context menu item click
-    contextMenu.firstChild.addEventListener('click', function() {
-        toggleMeasureTool();
-        suljeContextMenu();
-    });
-
-    // Store the reference to the open context menu
-    avoinContextMenu = contextMenu;
-
-    // Stop the contextmenu event from reaching the map
-    e.originalEvent.stopPropagation();
-});
-
-document.addEventListener('click', function(event) {
-    if (!avoinContextMenu) return;
-    if (!avoinContextMenu.contains(event.target)) {
-        suljeContextMenu();
-    }
-});
-
-
-
 async function lataaGeojsonData(url) {
     try {
         const vastaus = await fetch(url);
@@ -126,8 +223,13 @@ async function alustaGeojsonData() {
 alustaGeojsonData();
 
 async function mapOnClick(e) {
-    if (mittausKaynnissa) {
-        // Mittaus on käynnissä, älä tee mitään
+    if (checkToolActive()) {
+        console.log('Ttyökalu aktiivinen, klikkausta ei käsitellä.');
+        return;
+    }
+	
+	if (avoinContextMenu) {
+        console.log('Valikko aktiivinen, klikkausta ei käsitellä.');
         return;
     }
 	
@@ -256,4 +358,3 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
 	isSearchActive = true;
     showCloseIcon();
 }
-
