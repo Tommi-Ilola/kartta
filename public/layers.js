@@ -26,7 +26,7 @@ fetch('SA.geojson')
             iconSize: [20, 20],
             iconAnchor: [9, 12],
             popupAnchor: [0, -12],
-	    tooltipAnchor: [0, -12]
+	    tooltipAnchor: [0, -10]
         });
 
         data.features.forEach(function(feature) {
@@ -69,9 +69,10 @@ fetch('VK.geojson')
 	const vkIcon = L.divIcon({
         className: 'custom-icon-container',
         html: "<img src='VK.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
-	iconSize: [20, 20], // Kuvakkeen koko pikseleinä
-	iconAnchor: [9, 12], // Kuvakkeen ankkuripiste (kuvakkeen keskipiste alareunassa)
-	popupAnchor: [0, -12] // Pop-upin ankkurointipiste suhteessa kuvakkeeseen
+	iconSize: [20, 20],
+	iconAnchor: [9, 12],
+        popupAnchor: [0, -12],
+	tooltipAnchor: [0, -10]
 	});
 	
         data.features.forEach(function(feature) {
@@ -116,7 +117,8 @@ fetch('LA.geojson')
             html: "<img src='LA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
             iconSize: [20, 20],
             iconAnchor: [9, 12],
-            popupAnchor: [0, -12]
+            popupAnchor: [0, -12],
+	    tooltipAnchor: [0, -10]
         });
 
         data.features.forEach(function(feature) {
