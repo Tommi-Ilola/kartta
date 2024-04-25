@@ -4,7 +4,52 @@ body, html {
     padding: 0;
 }
 
-.leaflet-right {
+.leaflet-pm-draw {
+    display: none;
+}
+
+.leaflet-pm-edit {
+    display: none;
+}
+
+
+.leaflet-right .leaflet-pm-toolbar .button-container .leaflet-pm-actions-container {
+    right: auto !important;
+    left: 100% !important;
+}
+
+.context-menu-item {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+.context-menu-item:first-child {
+  border-radius: 0.5rem 0.5rem 0rem 0rem;
+}
+
+.context-menu-item:last-child {
+  border-bottom: none;
+  border-radius: 0rem 0rem 0.5rem 0.5rem;
+}
+
+.context-menu-item:hover {
+  background-color: #e0e0e0; /* Hover-efekti */
+}
+
+.leaflet-control-geocoder-icon-close {
+  background: url('path_to_your_close_icon.png') no-repeat center center;
+  background-size: cover;
+}
+
+.leaflet-control-geocoder-expanded {
+    left: 304px !important;
+}
+
+.leaflet-control-geocoder {
+    display: none;
+}
+
+.mitta {
     display: none;
 }
 
@@ -18,7 +63,7 @@ body, html {
 .leaflet-bar.leaflet-control {
 	top: 184px;
     left: 54px;
-    display: block;
+
     transform: translateX(-100vw);
 }
 
@@ -41,10 +86,6 @@ body, html {
     height: auto !important;
     white-space: nowrap !important;
     text-align: right !important;
-}
-
-.active:after {
-    content: '' !important;
 }
 
 #file-input {
@@ -601,7 +642,7 @@ td {
   color: black;
 }
 
-.active:after {
+.collapsible.active:after {
   content: '\25BC';
 }
 
@@ -689,7 +730,7 @@ input[type=password] {
     border-width: 0;
     border-radius: 0.7rem;
     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 h1 {
@@ -913,7 +954,7 @@ th {
   color: black;
 }
 
-.active:after {
+.collapsible.active:after {
   content: '\25BC';
 }
 
