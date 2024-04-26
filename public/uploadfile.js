@@ -95,12 +95,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Luodaan käyttöliittymäelementit tiedoston hallintaan
-                var fileLabel = document.createElement('label');
-                var checkbox = document.createElement('input');
+		const filesDiv = document.getElementById('files');
+		
+		var fileLabel = document.createElement('label');
+		fileLabel.className = 'filelabel'
+	    	var checkbox = document.createElement('input');
                 var removeButton = document.createElement('button');
                 checkbox.type = 'checkbox';
                 checkbox.checked = true;
-                removeButton.textContent = 'Poista';
+		    
+		var removeButton = document.createElement('button');
+		removeButton.textContent = '×';
+		removeButton.className = 'painike';
 
                 // Checkbox to control visibility of the layer
                 checkbox.addEventListener('change', function () {
@@ -113,14 +119,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Button to remove the file and its layer
                 removeButton.addEventListener('click', function () {
-                    map.removeLayer(layer);  // Poista karttataso
-                    fileLabel.remove();      // Poista label käyttöliittymästä
+                map.removeLayer(layer);  // Poista karttataso
+                fileLabel.remove();      // Poista label käyttöliittymästä
                 });
 
-                fileLabel.appendChild(checkbox);
-                fileLabel.append(` ${file.name} `);
-                fileLabel.appendChild(removeButton);
-                document.getElementById('fileContent').appendChild(fileLabel);
+		fileLabel.appendChild(checkbox);
+	    	fileLabel.append(` ${fileName} `);
+		fileLabel.appendChild(removeButton);
+		document.getElementById('fileContent').appendChild(fileLabel);
+
+		filesDiv.appendChild(fileLabel);
             };
             reader.readAsText(file);
         }
