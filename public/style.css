@@ -130,8 +130,33 @@ body, html {
     text-shadow: -1px 0 #fff, 0 1px white, 1px 0 white, 0 -1px white !important;
 }
 
-leaflet-bar leaflet-control {
+#files {
+    display: contents;
+}
 
+.filelabel {
+    display: -webkit-inline-box;
+}
+
+.painike {
+    position: relative;
+    right: 0;
+    background-color: #df1200;
+    color: white;
+    font-size: 15px;
+    width: 17px;
+    height: 17px;
+    border-width: 0;
+    border-radius: 1rem;
+    padding: 0px;
+    margin: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.painike:hover {
+    background-color: #9b0d00;
 }
 
 input[type="checkbox" i] {
@@ -1030,13 +1055,14 @@ button {
     margin: 0 !important;
 }
 
-.leaflet-touch .leaflet-bar a {
-    width: 0 !important;
-    height: 0 !important;
-}
-
 .leaflet-control-zoom {
 	display: none !important;
+}
+
+.leaflet-bar.leaflet-control {
+    top: 20vh;
+    left: 54px;
+    transform: translateX(-100vw);
 }
 
 @font-face {
