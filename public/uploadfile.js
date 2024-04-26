@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function (fileName) {
 	
     var fileInput = document.getElementById('file-input');
     fileInput.addEventListener('change', function (e) {
