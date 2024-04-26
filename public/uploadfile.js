@@ -1,15 +1,15 @@
-document.addEventListener('DOMContentLoaded', function (fileName) {
-	
+document.addEventListener('DOMContentLoaded', function () {
     var fileInput = document.getElementById('file-input');
     fileInput.addEventListener('change', function (e) {
         var file = e.target.files[0];
         if (file) {
+            var fileName = file.name; // Tässä määritellään tiedoston nimi
             var reader = new FileReader();
             reader.onload = function (event) {
                 var data = event.target.result;
                 var format = file.name.split('.').pop().toLowerCase();
                 var layer;
-
+				
                 switch (format) {
                     case 'gpx':
                         var gpx = new DOMParser().parseFromString(data, "application/xml");
