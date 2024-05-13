@@ -584,7 +584,7 @@ function getRailStyle() {
 }
 
 function updateStyles() {
-    const className = currentBaseLayer === "gm" ? 'radat-normal' : 'radat-satellite';
+    const className = currentBaseLayer === "hybrid" ? 'radat-normal' : 'radat-satellite';
 
     geoLayer.eachLayer(function(layer) {
         if (layer._path) {
