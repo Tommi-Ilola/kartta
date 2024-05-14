@@ -1,3 +1,18 @@
+Papa.parse("Sähköratapylväät.csv", {
+    download: true,
+    header: true,
+    dynamicTyping: true,
+    complete: function(results) {
+        results.data.forEach(function(item) {
+            if (item.latitude && item.longitude) {
+                var marker = L.marker([item.latitude, item.longitude]).addTo(map);
+                marker.bindPopup(item.description || 'No description');
+            }
+        });
+    }
+});
+
+
 let tunnelitLayerGroup = L.layerGroup();
 let sillatLayerGroup = L.layerGroup();
 let tilirataosatLayerGroup = L.layerGroup();
