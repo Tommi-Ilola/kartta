@@ -1,16 +1,45 @@
-Papa.parse("Sähköratapylväät.csv", {
-    download: true,
-    header: true,
-    dynamicTyping: true,
-    complete: function(results) {
-        results.data.forEach(function(item) {
-            if (item.latitude && item.longitude) {
-                var marker = L.marker([item.latitude, item.longitude]).addTo(map);
-                marker.bindPopup(item.description || 'No description');
-            }
-        });
+// Aseta zoom-taso, jonka ylittäessä markkerit ladataan
+var minZoomForMarkers = 13;
+
+map.on('zoomend', function() {
+    var currentZoom = map.getZoom();
+    if (currentZoom >= minZoomForMarkers) {
+        loadAndDisplayMarkers();
+    } else {
+        clearMarkers();
     }
 });
+
+function loadAndDisplayMarkers() {
+    // Tarkista onko markkereita jo ladattu kartalle
+    if (map.hasLayer(markersLayer)) return;
+
+Papa.parse("Sähköratapylväät.csv", {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            markersLayer.clearLayers(); // Tyhjennä kaikki aikaisemmat markkerit
+            results.data.forEach(function(item) {
+                if (item.latitude && item.longitude) {
+                    var marker = L.marker([item.latitude, item.longitude]).addTo(markersLayer);
+                    marker.bindPopup(item.description || 'No description');
+                }
+            });
+            markersLayer.addTo(map);
+        }
+    });
+}
+
+function clearMarkers() {
+    if (map.hasLayer(markersLayer)) {
+        map.removeLayer(markersLayer);
+    }
+}
+
+// Luo kerros markkereille
+var markersLayer = L.layerGroup();
 
 
 let tunnelitLayerGroup = L.layerGroup();
