@@ -1,4 +1,5 @@
-// Aseta zoom-taso, jonka ylittäessä markkerit ladataan
+var markersLayer = new L.LayerGroup().addTo(map);
+
 var minZoomForMarkers = 20;
 
 map.on('zoomend', function() {
@@ -15,31 +16,39 @@ function loadAndDisplayMarkers() {
     if (map.hasLayer(markersLayer)) return;
 
 Papa.parse("Sähköratapylväät.csv", {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            markersLayer.clearLayers(); // Tyhjennä kaikki aikaisemmat markkerit
-            results.data.forEach(function(item) {
-                if (item.latitude && item.longitude) {
-                    var marker = L.marker([item.latitude, item.longitude]).addTo(markersLayer);
-                    marker.bindPopup(item.description || 'No description');
+    download: true,
+    header: true,
+    dynamicTyping: true,
+    complete: function(results) {
+        var allData = results.data;
+
+        // Funktio datan filtteröimiseksi ja näyttämiseksi
+        function updateVisibleMarkers() {
+            var bounds = map.getBounds();
+            markersLayer.clearLayers();
+
+            allData.forEach(function(item) {
+                var latLng = L.latLng(item.latitude, item.longitude);
+                if (bounds.contains(latLng)) {
+                    var marker = L.marker(latLng).bindPopup(item.description);
+                    markersLayer.addLayer(marker);
                 }
             });
-            markersLayer.addTo(map);
         }
-    });
-}
+
+        // Päivitä markkerit aina kun karttaa liikutetaan tai zoomataan
+        map.on('moveend', updateVisibleMarkers);
+
+        // Alkuperäinen markkerien lataus
+        updateVisibleMarkers();
+    }
+});
 
 function clearMarkers() {
     if (map.hasLayer(markersLayer)) {
         map.removeLayer(markersLayer);
     }
 }
-
-// Luo kerros markkereille
-var markersLayer = L.layerGroup();
 
 
 let tunnelitLayerGroup = L.layerGroup();
