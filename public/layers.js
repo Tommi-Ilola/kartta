@@ -1,5 +1,5 @@
 // Aseta zoom-taso, jonka ylittäessä markkerit ladataan
-var minZoomForMarkers = 13;
+var minZoomForMarkers = 17;
 
 map.on('zoomend', function() {
     var currentZoom = map.getZoom();
