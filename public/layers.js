@@ -1,20 +1,6 @@
 var markersLayer = new L.LayerGroup().addTo(map);
 
-var minZoomForMarkers = 20;
-
-map.on('zoomend', function() {
-    var currentZoom = map.getZoom();
-    if (currentZoom >= minZoomForMarkers) {
-        loadAndDisplayMarkers();
-    } else {
-        clearMarkers();
-    }
-});
-
-function loadAndDisplayMarkers() {
-    // Tarkista onko markkereita jo ladattu kartalle
-    if (map.hasLayer(markersLayer)) return;
-
+// Lataa koko CSV-tiedosto etukäteen
 Papa.parse("Sähköratapylväät.csv", {
     download: true,
     header: true,
@@ -43,12 +29,6 @@ Papa.parse("Sähköratapylväät.csv", {
         updateVisibleMarkers();
     }
 });
-
-function clearMarkers() {
-    if (map.hasLayer(markersLayer)) {
-        map.removeLayer(markersLayer);
-    }
-}
 
 
 let tunnelitLayerGroup = L.layerGroup();
