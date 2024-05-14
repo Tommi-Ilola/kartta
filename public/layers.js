@@ -1,36 +1,3 @@
-var markersLayer = new L.LayerGroup().addTo(map);
-
-// Lataa koko CSV-tiedosto etukäteen
-Papa.parse("Sähköratapylväät.csv", {
-    download: true,
-    header: true,
-    dynamicTyping: true,
-    complete: function(results) {
-        var allData = results.data;
-
-        // Funktio datan filtteröimiseksi ja näyttämiseksi
-        function updateVisibleMarkers() {
-            var bounds = map.getBounds();
-            markersLayer.clearLayers();
-
-            allData.forEach(function(item) {
-                var latLng = L.latLng(item.latitude, item.longitude);
-                if (bounds.contains(latLng)) {
-                    var marker = L.marker(latLng).bindPopup(item.description);
-                    markersLayer.addLayer(marker);
-                }
-            });
-        }
-
-        // Päivitä markkerit aina kun karttaa liikutetaan tai zoomataan
-        map.on('moveend', updateVisibleMarkers);
-
-        // Alkuperäinen markkerien lataus
-        updateVisibleMarkers();
-    }
-});
-
-
 let tunnelitLayerGroup = L.layerGroup();
 let sillatLayerGroup = L.layerGroup();
 let tilirataosatLayerGroup = L.layerGroup();
