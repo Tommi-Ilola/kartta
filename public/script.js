@@ -179,8 +179,8 @@ function naytaDatanTiedotResultsDivissa(data) {
 
 function visualisoiGeojsonDataKartalla(data) {
     const resultsDiv = document.getElementById('results');
+
     let index = 0; // Indeksi jokaiselle featurelle
-    let currentResultNumber = 1; // Oletetaan, että currentResultNumber aloittaa 1:stä
 
     const layer = L.geoJSON(data, {
         style: function (feature) {
