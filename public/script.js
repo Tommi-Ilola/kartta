@@ -179,8 +179,8 @@ function naytaDatanTiedotResultsDivissa(data) {
 
 function visualisoiGeojsonDataKartalla(data) {
     const resultsDiv = document.getElementById('results');
-
     let index = 0; // Indeksi jokaiselle featurelle
+    let currentResultNumber = 1; // Oletetaan, että currentResultNumber aloittaa 1:stä
 
     const layer = L.geoJSON(data, {
         style: function (feature) {
@@ -197,71 +197,84 @@ function visualisoiGeojsonDataKartalla(data) {
             item.className = 'resultItem';
             item.dataset.index = index++; // Tallenna indeksi
             const properties = feature.properties;
-            item.innerHTML =  `
-            <table class="resultItem" data-index="${index}">
+            item.innerHTML = `
+                <table class="resultItem" data-index="${index}">
                     <tr>
                         <th><strong>${currentResultNumber++}.</strong></th>
                         <td>
-   
-							<strong>Ratanumero:</strong> ${properties.ratanumero}<br>
+                            <strong>Ratanumero:</strong> ${properties.ratanumero}<br>
                             <strong>Alku:</strong> km ${properties.alku.ratakm}+${properties.alku.etaisyys}<br>
                             <strong>Loppu:</strong> km ${properties.loppu.ratakm}+${properties.loppu.etaisyys}<br>
                             <strong>Pituus:</strong> ${properties.pituus} metriä
                         </td>
                     </tr>
-            </table>
-        `;
-		
-		layer.bindTooltip(tooltipText, {permanent: true, direction: 'auto', className: 'search-tooltip'});
-		
-		item.addEventListener('click', function() {
+                </table>
+            `;
+
+            layer.bindTooltip(tooltipText, {permanent: true, direction: 'auto', className: 'search-tooltip'});
+
+            item.addEventListener('click', function () {
                 map.fitBounds(layer.getBounds());
+                highlightLayer(layer);
             });
 
             resultsDiv.appendChild(item);
-		
+
             if (feature.properties && feature.properties.alku && feature.properties.loppu && feature.properties.pituus) {
                 const alku = feature.properties.alku;
                 const loppu = feature.properties.loppu;
                 const pituus = feature.properties.pituus;
 
-                // Oletetaan, että koordinaatit ovat jo EPSG:4326-muodossa (latitude, longitude)
                 const alkuLat = alku.lat; // Oleta, että tämä on saatavilla
                 const alkuLon = alku.lon; // Oleta, että tämä on saatavilla
                 const loppuLat = loppu.lat; // Oleta, että tämä on saatavilla
                 const loppuLon = loppu.lon; // Oleta, että tämä on saatavilla
 
-                // Luo Google Maps URL reitille alkupisteestä loppupisteeseen
                 const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${alkuLat},${alkuLon}&destination=${loppuLat},${loppuLon}&travelmode=driving`;
 
-                // Muodostetaan popupin sisältö
                 const popupContent = `
                     <strong>Ratakilometriväli:</strong><br>
                     km ${alku.ratakm}+${alku.etaisyys}
                     - ${loppu.ratakm}+${loppu.etaisyys}<br>
                     <strong>Pituus:</strong> ${pituus} metriä<br>
-					<a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
+                    <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
                 `;
 
-                // Asetetaan popupin sisältö
                 layer.bindPopup(popupContent);
             }
-		
         },
-        coordsToLatLng: function(coords) {
-            // Muunna koordinaatit EPSG:3067 -> EPSG:4326
+        coordsToLatLng: function (coords) {
             const [lon, lat] = proj4("EPSG:3067", "EPSG:4326", [coords[0], coords[1]]);
             return [lat, lon];
         }
     }).addTo(map);
-	geoJsonLayers.push(layer); // Lisää layeri listaan
-    RemoveMarkersButton(); // Päivitä painikkeen tila
 
-    // Aseta kartan näkymäalue (bounds) vastaamaan GeoJSON-datan aluetta
-	let featureGroup = L.featureGroup(geoJsonLayers);
-	if (featureGroup.getLayers().length > 0) {
-		map.fitBounds(featureGroup.getBounds());
-	}
+    geoJsonLayers.push(layer);
+    RemoveMarkersButton();
+
+    let featureGroup = L.featureGroup(geoJsonLayers);
+    if (featureGroup.getLayers().length > 0) {
+        map.fitBounds(featureGroup.getBounds());
+    }
+
+    function highlightLayer(layer) {
+        resetAllLayersStyle();
+        layer.setStyle({
+            color: '#5eff00',
+            weight: 15,
+            opacity: 0.7
+        });
+    }
+
+    function resetAllLayersStyle() {
+        geoJsonLayers.forEach(layer => {
+            layer.setStyle({
+                color: "#3388ff",
+                weight: 15,
+                opacity: 0.5
+            });
+        });
+    }
 }
 
 function lisaaAlkuJaLoppuPisteetGeoJsonista(data) {
