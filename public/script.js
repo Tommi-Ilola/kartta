@@ -180,7 +180,7 @@ function naytaDatanTiedotResultsDivissa(data) {
 function visualisoiGeojsonDataKartalla(data) {
     const resultsDiv = document.getElementById('results');
 
-    let index = 0; // Indeksi jokaiselle featurelle
+    let index = 0;
 
     const layer = L.geoJSON(data, {
         style: function (feature) {
@@ -211,7 +211,17 @@ function visualisoiGeojsonDataKartalla(data) {
                 </table>
             `;
 
-            layer.bindTooltip(tooltipText, {permanent: true, direction: 'auto', className: 'search-tooltip'});
+            const bounds = layer.getBounds();
+            const width = bounds.getEast() - bounds.getWest();
+            const height = bounds.getNorth() - bounds.getSouth();
+            const direction = width > height ? 'top' : 'left'; // Adjust tooltip direction based on orientation
+
+            layer.bindTooltip(tooltipText, {
+                permanent: true,
+                direction: direction,
+                className: 'search-tooltip',
+                offset: direction === 'top' ? [0, -10] : [-10, 0] // Adjust offset based on direction
+            });
 
             item.addEventListener('click', function () {
                 map.fitBounds(layer.getBounds());
