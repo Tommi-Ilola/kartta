@@ -342,8 +342,8 @@ fetch('sillat.geojson')
                 <b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
                 <b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
 		<b>Omistaja:</b> ${properties.Omistaja}<br>
-  		<b>Sijaintikunta:</b> ${properties.Sijaintikunta}<br>
-	    	<b>Katuosoite:</b> ${properties.Katuosoite}<br>
+  		<b>Sijaintikunta:</b> ${properties.Sijaintikunnat}<br>
+	    	<b>Katuosoite:</b> ${properties.Katuosoitteet}<br>
     		<b>Käyttötarkoitus:</b> ${properties.Käyttötarkoitus}<br>
                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
