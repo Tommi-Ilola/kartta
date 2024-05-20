@@ -313,56 +313,54 @@ fetch('tunnelit.geojson')
 
 // Siltojen lisääminen karttaan
 fetch('sillat.geojson')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
     .then(data => {
-        railGeometryData = data;
-        
-        const transformedData = {
-            ...railGeometryData,
-            features: railGeometryData.features.map(feature => {
-                if (feature.geometry && feature.geometry.coordinates) {
-                    if (feature.geometry.type === 'MultiLineString') {
-                        return {
-                            ...feature,
-                            geometry: {
-                                ...feature.geometry,
-                                coordinates: feature.geometry.coordinates.map(line => 
-                                    line.map(coord => {
-                                        const latlng = proj4('EPSG:3067', 'WGS84', coord);
-                                        return [latlng[0], latlng[1]];
-                                    })
-                                )
-                            }
-                        };
-                    } else {
-                        return feature;
-                    }
-                } else {
-                    return feature;
-                }
-            })
-        };
+        const saIcon = L.divIcon({
+            className: 'custom-icon-container',
+            html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
+            iconSize: [20, 20],
+            iconAnchor: [9, 12],
+            popupAnchor: [0, -12],
+	    tooltipAnchor: [0, -10]
+        });
 
-        const geoLayer = L.geoJSON(transformedData, {
-			style: function(feature) {
-				return { color: "#4caf50", weight: 7, zIndex: 1000 };
-			},
-			onEachFeature: function(feature, layer) {
-				if (feature.properties && feature.properties.nimi) {
-					layer.bindTooltip(feature.properties.nimi, {
-						className: 'custom-tooltip',
-						sticky: true  // Tämä saa tooltipin seuraamaan hiirtä
-					});
-				}
-			}
+        data.features.forEach(function(feature) {
+            const coords = feature.geometry.coordinates;
+            const properties = feature.properties;
 
-		}).addTo(sillatLayerGroup);
+            let popupContent = `<b>Nimi:</b> ${properties.Nimi}<br>
+                <b>Tunnus:</b> ${properties['Tunnus']}<br>
+                <b>Väylänpito:</b> ${properties.Väylänpito}<br>
+                <b>Ratanumero:</b> ${properties.Ratanumero}<br>
+                <b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
+                <b>Tilirataosa:</b> ${properties.Tilirataosa}<br>
+                <b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br>
+                <b>Isännöintialue:</b> ${properties.Isännöintialue}<br>
+		<b>Omistaja:</b> ${properties.Omistaja}<br>
+  		<b>Sijaintikunta:</b> ${properties.Sijaintikunta}<br>
+	    	<b>Katuosoite:</b> ${properties.Katuosoite}<br>
+    		<b>Käyttötarkoitus:</b> ${properties.Käyttötarkoitus}<br>
+                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
-        map.fitBounds(geoLayer.getBounds());
+            const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+                .bindTooltip(properties.Nimi ? properties.Nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindPopup(popupContent)
+                .addTo(sillatLayerGroup);
+            marker.type = 'silta';
+            allMarkers.push(marker);
+        });
+
+        // Kutsu tooltipien päivitysfunktiota
+        updateTooltipsVisibility();
     })
     .catch(error => {
-        console.error("Virhe ladattaessa siltojen geometriaa:", error);
-    });	
+        console.error('Virhe ladattaessa syöttöasemien geometriaa', error);
+    });
 
 fetch('tasoristeykset.geojson')
   .then(response => {
