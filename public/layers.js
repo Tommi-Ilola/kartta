@@ -320,9 +320,9 @@ fetch('sillat.geojson')
         return response.json();
     })
     .then(data => {
-        const saIcon = L.divIcon({
+        const siltaIcon = L.divIcon({
             className: 'custom-icon-container',
-            html: "<img src='SA.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
+            html: "<img src='silta.png' style='width: 20px; height: 20px;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px;'></div>",
             iconSize: [20, 20],
             iconAnchor: [9, 12],
             popupAnchor: [0, -12],
@@ -347,7 +347,7 @@ fetch('sillat.geojson')
     		<b>Käyttötarkoitus:</b> ${properties.Käyttötarkoitus}<br>
                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
-            const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
+            const marker = L.marker([coords[1], coords[0]], {icon: siltaIcon})
                 .bindTooltip(properties.Nimi ? properties.Nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(sillatLayerGroup);
