@@ -1,5 +1,5 @@
 var geojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tunnelit.geojson?';
-var anotherGeojsonUrl = 'sillat.geojson?';
+var anotherGeojsonUrl = 'sillat.geojson';
 var thirdGeojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tasoristeykset.geojson?time=2024-02-22T06%3A53%3A28Z%2F2024-02-22T06%3A53%3A28Z';
 var globalGeoJsonData;
 var globalAnotherGeoJsonData;
