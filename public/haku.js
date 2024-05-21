@@ -75,16 +75,23 @@ function loadAllGeoJsonData() {
 
 loadAllGeoJsonData();
 
-    var customIcon = L.icon({
-	  className: 'tasoristeys-haku',
-      iconUrl: 'tasoristeys1.png', // Markerin kuvatiedoston polku
-      iconSize: [36, 36], // Kuvan koko pikseleinä
-      iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
-      tooltipAnchor: [1, -10]
-    });
-	
-	var bridgeIcon = L.icon({
+var customIcon = L.icon({
+    className: 'tasoristeys-haku',
+    iconUrl: 'tasoristeys1.png',
+    iconSize: [36, 36],
+    iconAnchor: [20, 17],
+    tooltipAnchor: [1, -10]
+});
+
+var bridgeIcon = L.icon({
     iconUrl: 'silta.png',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    tooltipAnchor: [1, -10]
+});
+
+var defaultIcon = L.icon({
+    iconUrl: 'default.png',
     iconSize: [36, 36],
     iconAnchor: [18, 18],
     tooltipAnchor: [1, -10]
@@ -97,11 +104,11 @@ function pointToLayer(feature, latlng) {
     } else if (feature.properties.type === 'tasoristeys') {
         icon = customIcon;
     } else {
-        icon = defaultIcon; // Käytä oletusikonia, jos tyyppiä ei tunnisteta
+        icon = defaultIcon;
     }
     return L.marker(latlng, {icon: icon});
 }
-		
+
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -132,51 +139,25 @@ function searchLocation(searchTerm) {
     }
 }
 
-// Funktiot määritellään ensin
-function style(feature) {
-    if (feature.geometry.type === 'MultiLineString') {
-		return {
-			color: "blue", // Sininen sisäväri
-			weight: 8,
-			opacity: 1
-		};
-    }
+function showCloseIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
 }
 
-    // Käy läpi GeoJSON-datan etsien vastaavuutta
-	function convertCoordinates(feature) {
-		if (feature.geometry.type === 'MultiLineString') {
-			feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
-				line.map(point => proj4(sourceProjection, destinationProjection, point))
-			);
-		} else if (feature.geometry.type === 'MultiPoint') {
-			feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
-				proj4(sourceProjection, destinationProjection, point)
-			);
-		}
-		// Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
-	}
+function showMagnifierIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
+}
 
-Promise.all([
-    fetch(geojsonUrl).then(response => response.json()),
-    fetch(anotherGeojsonUrl).then(response => response.json()),
-    fetch(thirdGeojsonUrl).then(response => response.json())
-]).then(datas => {
-    // Yhdistetään kaikki ladatut datasetit yhteen FeatureCollectioniin
-    var combinedGeoJsonData = {
-        type: "FeatureCollection",
-        features: [].concat(...datas.map(data => data.features))
-    };
+function naytaVirheilmoitus(viesti) {
+    const virheDiv = document.getElementById('virhe');
+    virheDiv.innerHTML = viesti;
+    virheDiv.style.display = 'block';
+}
 
-    // Suoritetaan koordinaattimuunnokset
-    combinedGeoJsonData.features.forEach(convertCoordinates);
-
-    // Piirretään yhdistetty data kartalle
-    globalGeoJsonData = combinedGeoJsonData;
-
-}).catch(error => {
-    console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
-});
+function piilotaVirheilmoitus() {
+    document.getElementById('virhe').style.display = 'none';
+}
 
 function drawGeoJsonOnMap(geoJsonData) {
     if (window.searchResultsLayer) {
@@ -185,16 +166,7 @@ function drawGeoJsonOnMap(geoJsonData) {
 
     window.searchResultsLayer = L.geoJSON(geoJsonData, {
         onEachFeature: onEachFeature,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {
-                icon: L.icon({
-                    iconUrl: 'tasoristeys.png',
-                    iconSize: [30, 30],
-                    iconAnchor: [17, 14],
-                    tooltipAnchor: [1, -10]
-                })
-            });
-        },
+        pointToLayer: pointToLayer,
         style: style
     }).addTo(map);
 
@@ -276,7 +248,7 @@ function displaySearchResults(features) {
                 }).addTo(map);
 
                 if (feature.geometry.type === 'Point') {
-                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                    var latLng = L.latlng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
                     map.setView(latLng, 12);
                 } else {
                     map.fitBounds(currentLayer.getBounds(), {
