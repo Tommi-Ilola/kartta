@@ -333,7 +333,7 @@ fetch('sillat.geojson')
             const coords = feature.geometry.coordinates;
             const properties = feature.properties;
 
-            let popupContent = `<b>Nimi:</b> ${properties.Nimi}<br>
+            let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
                 <b>Tunnus:</b> ${properties['Tunnus']}<br>
                 <b>Väylänpito:</b> ${properties.Väylänpito}<br>
                 <b>Ratanumero:</b> ${properties.Ratanumero}<br>
@@ -348,7 +348,7 @@ fetch('sillat.geojson')
                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
             const marker = L.marker([coords[1], coords[0]], {icon: siltaIcon})
-                .bindTooltip(properties.Nimi ? properties.Nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindTooltip(properties.nimi ? properties.nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(sillatLayerGroup);
             marker.type = 'silta';
