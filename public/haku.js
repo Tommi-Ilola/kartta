@@ -51,12 +51,12 @@ function loadThirdGeoJsonData() {
         .then(data => {
             globalThirdGeoJsonData = data;
             console.log('Kolmas GeoJSON data ladattu:', globalThirdGeoJsonData);
-            // Suorita koordinaattimuunnos
+            // Suorita koordinaattimuunnos ja vaihda koordinaattien järjestys
             globalThirdGeoJsonData.features.forEach(feature => {
                 if (feature.geometry.type === 'Point') {
-                    feature.geometry.coordinates = proj4(sourceProjection, destinationProjection, feature.geometry.coordinates);
+                    feature.geometry.coordinates = proj4(sourceProjection, destinationProjection, feature.geometry.coordinates).reverse();
                 } else if (feature.geometry.type === 'MultiPoint') {
-                    feature.geometry.coordinates = feature.geometry.coordinates.map(coord => proj4(sourceProjection, destinationProjection, coord));
+                    feature.geometry.coordinates = feature.geometry.coordinates.map(coord => proj4(sourceProjection, destinationProjection, coord).reverse());
                 }
             });
         })
