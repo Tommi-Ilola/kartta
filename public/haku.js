@@ -248,7 +248,7 @@ function displaySearchResults(features) {
                 }).addTo(map);
 
                 if (feature.geometry.type === 'Point') {
-                    var latLng = L.latlng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
                     map.setView(latLng, 12);
                 } else {
                     map.fitBounds(currentLayer.getBounds(), {
@@ -273,5 +273,20 @@ function style(feature) {
             weight: 8,
             opacity: 1
         };
+    }
+}
+
+document.getElementById('searchButton').addEventListener('click', function(event) {
+    event.preventDefault();
+    if (isSearchActive && this.innerHTML.includes('close-icon')) {
+        resetSearch();
+    } else {
+        performSearch();
+    }
+});
+
+document.getElementById('closeSearchBtn').addEventListener('click', function() {
+    resetSearch();
+});
     }
 }
