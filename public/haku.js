@@ -1,5 +1,5 @@
 var geojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tunnelit.geojson?';
-var anotherGeojsonUrl = 'sillat.geojson';
+var anotherGeojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/sillat.geojson?';
 var thirdGeojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tasoristeykset.geojson?time=2024-02-22T06%3A53%3A28Z%2F2024-02-22T06%3A53%3A28Z';
 var globalGeoJsonData;
 var globalAnotherGeoJsonData;
@@ -82,6 +82,25 @@ loadAllGeoJsonData();
       iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
       tooltipAnchor: [1, -10]
     });
+	
+	var bridgeIcon = L.icon({
+    iconUrl: 'silta.png',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    tooltipAnchor: [1, -10]
+});
+
+function pointToLayer(feature, latlng) {
+    let icon;
+    if (feature.properties.type === 'silta') {
+        icon = bridgeIcon;
+    } else if (feature.properties.type === 'tasoristeys') {
+        icon = customIcon;
+    } else {
+        icon = defaultIcon; // Käytä oletusikonia, jos tyyppiä ei tunnisteta
+    }
+    return L.marker(latlng, {icon: icon});
+}
 		
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
@@ -97,9 +116,7 @@ function searchLocation(searchTerm) {
         if (filteredData.features.length > 0) {
             if (currentLayer) map.removeLayer(currentLayer);
             currentLayer = L.geoJSON(filteredData, {
-                pointToLayer: function(feature, latlng) {
-                    return L.marker(latlng, {icon: customIcon});
-                }
+                pointToLayer: pointToLayer
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
             isSearchActive = true;
@@ -248,9 +265,7 @@ function displaySearchResults(features) {
                 }
 
                 currentLayer = L.geoJSON(feature, {
-                    pointToLayer: function(feature, latlng) {
-                        return L.marker(latlng, {icon: customIcon});
-                    },
+                    pointToLayer: pointToLayer,
                     style: function(feature) {
                         return {
                             color: "blue",
