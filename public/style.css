@@ -4,6 +4,44 @@ body, html {
     padding: 0;
 }
 
+#closeSearchBtn {
+    margin-left: 10px;
+    padding: 6px 8px 11px 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: white;
+    position: absolute;
+    right: 1px;
+}
+
+#fa-download {
+    display: block;
+    position: absolute;
+    bottom: 10px;
+}
+
+tbody {
+    width: 100%;
+}
+
+.tasoristeys-haku {
+    background-color: #ccc;
+    border-radius: 2rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	z-index: 10000 !important;
+}
+
+.tasoristeys-haku img {
+    width: 32px; /* Adjust to fit within the background */
+    height: 32px; /* Adjust to fit within the background */
+    border-radius: 2rem; /* Match the background border radius */
+}
+
 .leaflet-pm-draw {
     display: none;
 }
@@ -336,8 +374,9 @@ h1 {
     border-bottom: 1px solid #ccc;
     cursor: pointer;
     column-width: 10px;
-    width: 100%;
+    width: -webkit-fill-available;
     text-align: left;
+	display: flex;
 }
 
 .resultItem:hover {
@@ -1060,7 +1099,7 @@ button {
 }
 
 .leaflet-bar.leaflet-control {
-    top: 20vh;
+    top: 110px;
     left: 54px;
     transform: translateX(-100vw);
 }
