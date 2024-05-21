@@ -523,7 +523,7 @@ function piilotaVirheilmoitus() {
 
 function showCloseIcon() {
     const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>'; // Sulje-ikoni
+    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
 }
 
 function showMagnifierIcon() {
@@ -535,13 +535,6 @@ function naytaVirheilmoitus(viesti) {
     const virheDiv = document.getElementById('virhe');
     virheDiv.innerText = viesti;
     virheDiv.style.display = 'block';
-}
-
-function piilotaVirheilmoitus() {
-    const virheDiv = document.getElementById('virhe');
-    if (virheDiv) {
-        virheDiv.style.display = 'none';
-    }
 }
 
 function RemoveMarkersButton() {
@@ -572,18 +565,19 @@ function poistaKaikkiMarkerit() {
     }
     RemoveMarkersButton();
     currentResultNumber = 1;
-	resetSearch()
 }
 
 document.getElementById('searchButton').addEventListener('click', function(event) {
     event.preventDefault(); // Estä lomakkeen oletustoiminta
     if (isSearchActive && this.innerHTML.includes('close-icon')) {
-        // Jos haku on aktiivinen ja käyttäjä klikkaa "x" ikonia, resetoi haku
         resetSearch();
     } else {
-        // Muussa tapauksessa suorita haku
         performSearch();
     }
+});
+
+document.getElementById('closeSearchBtn').addEventListener('click', function() {
+    resetSearch();
 });
 
 function performSearch() {
@@ -593,31 +587,47 @@ function performSearch() {
         naytaVirheilmoitus('Syötä hakutermi');
         return;
     }
+	piilotaVirheilmoitus();
 
-    // Tarkistetaan, onko syöte koordinaatteja
     if (searchTerm.match(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/)) {
         const [lat, lng] = searchTerm.split(',').map(Number);
         haeTiedotKoordinaateistaJaLisaaMarker(lat, lng);
     } else if (searchTerm.includes('-')) {
-        // Suorita ratakilometrivälihaku
         haeRatakilometriValinSijainnit(searchTerm);
     } else if (searchTerm.includes('+') || !isNaN(searchTerm)) {
-        // Suorita ratakilometrihaku
         haeRatakilometrinSijainnit(searchTerm);
     } else {
-        // Suorita paikannimihaku
         searchLocation(searchTerm);
     }
-    isSearchActive = true;
-    showCloseIcon();
 }
 
-// Lisätään funktio aiempien hakutulosten tyhjentämiseksi
 function clearResults() {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     resultsDiv.style.display = 'none';
 }
+
+function showMagnifierIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
+}
+
+function hideCloseSearchBtn() {
+    const closeSearchBtn = document.getElementById('closeSearchBtn');
+    closeSearchBtn.style.display = 'none';
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    var searchTerm = this.value.toLowerCase();
+    if (searchTerm.length > 0) {
+        var filteredData = globalGeoJsonData.features.filter(function(feature) {
+            return feature.properties.nimi.toLowerCase().includes(searchTerm);
+        });
+        displaySearchResults(filteredData);
+    } else {
+        document.getElementById('results').style.display = 'none';
+    }
+});
 
 document.getElementById('searchInput').addEventListener('keyup', function(event) {
     if (event.key === 'Enter' || event.keyCode === 13) {
@@ -626,21 +636,21 @@ document.getElementById('searchInput').addEventListener('keyup', function(event)
 });
 
 function resetSearch() {
-    clearResults(); // Tyhjennä hakutulokset
-    document.getElementById('searchInput').value = ''; // Tyhjennä hakukenttä
-    isSearchActive = false; // Aseta haku ei-aktiiviseksi
-    showMagnifierIcon(); // Näytä suurennuslasi-ikoni
+    document.getElementById('searchInput').value = '';
+    clearResults(); 
+    showMagnifierIcon(); 
+    RemoveMarkersButton(); 
+    isSearchActive = false;
+    hideCloseSearchBtn();
+    poistaKaikkiMarkerit();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    RemoveMarkersButton(); // Päivitä painikkeen tila kun sivu on ladattu
-
-    // Aseta tapahtumankuuntelija poistopainikkeelle
     const removeButton = document.getElementById('removeMarkersButton');
     if (removeButton) {
         removeButton.addEventListener('click', poistaKaikkiMarkerit);
     } else {
-        console.error('RemoveMarkersButton-painiketta ei löydy');
+        console.log('RemoveMarkersButton-painiketta ei löydy');
     }
 });
 
