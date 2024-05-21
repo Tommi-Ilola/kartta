@@ -275,18 +275,3 @@ function style(feature) {
         };
     }
 }
-
-document.getElementById('searchButton').addEventListener('click', function(event) {
-    event.preventDefault();
-    if (isSearchActive && this.innerHTML.includes('close-icon')) {
-        resetSearch();
-    } else {
-        performSearch();
-    }
-});
-
-document.getElementById('closeSearchBtn').addEventListener('click', function() {
-    resetSearch();
-});
-    }
-}
