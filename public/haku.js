@@ -45,26 +45,6 @@ function loadAnotherGeoJsonData() {
 
 loadAnotherGeoJsonData();
 
-function loadThirdGeoJsonData() {
-    fetch(thirdGeojsonUrl)
-        .then(response => response.json())
-        .then(data => {
-            globalThirdGeoJsonData = data;
-            console.log('Kolmas GeoJSON data ladattu:', globalThirdGeoJsonData);
-            // Suorita koordinaattimuunnos ja vaihda koordinaattien järjestys
-            globalThirdGeoJsonData.features.forEach(feature => {
-                if (feature.geometry.type === 'Point') {
-                    feature.geometry.coordinates = proj4(sourceProjection, destinationProjection, feature.geometry.coordinates).reverse();
-                } else if (feature.geometry.type === 'MultiPoint') {
-                    feature.geometry.coordinates = feature.geometry.coordinates.map(coord => proj4(sourceProjection, destinationProjection, coord).reverse());
-                }
-            });
-        })
-        .catch(error => console.error('Virhe ladattaessa kolmatta GeoJSON-tiedostoa:', error));
-}
-
-loadThirdGeoJsonData();
-
 function combineAllGeoJsonData() {
     if (globalGeoJsonData && globalAnotherGeoJsonData && globalThirdGeoJsonData) {
         var combinedFeatures = globalGeoJsonData.features
@@ -108,13 +88,6 @@ var bridgeIcon = L.icon({
     tooltipAnchor: [1, -10]
 });
 
-var defaultIcon = L.icon({
-    iconUrl: 'default.png',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    tooltipAnchor: [1, -10]
-});
-
 function pointToLayer(feature, latlng) {
     let icon;
     if (feature.properties.type === 'silta') {
@@ -122,7 +95,7 @@ function pointToLayer(feature, latlng) {
     } else if (feature.properties.type === 'tasoristeys') {
         icon = customIcon;
     } else {
-        icon = defaultIcon;
+        icon = defaultIcon; // Käytä oletusikonia, jos tyyppiä ei tunnisteta
     }
     return L.marker(latlng, {icon: icon});
 }
