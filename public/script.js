@@ -526,9 +526,14 @@ function showCloseIcon() {
     searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
 }
 
+function hideCloseIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
+}
+
 function showMagnifierIcon() {
     const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>'; // Suurennuslasi-ikoni
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
 }
 
 function naytaVirheilmoitus(viesti) {
@@ -568,7 +573,7 @@ function poistaKaikkiMarkerit() {
 }
 
 document.getElementById('searchButton').addEventListener('click', function(event) {
-    event.preventDefault(); // Estä lomakkeen oletustoiminta
+    event.preventDefault();
     if (isSearchActive && this.innerHTML.includes('close-icon')) {
         resetSearch();
     } else {
@@ -587,7 +592,6 @@ function performSearch() {
         naytaVirheilmoitus('Syötä hakutermi');
         return;
     }
-	piilotaVirheilmoitus();
 
     if (searchTerm.match(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/)) {
         const [lat, lng] = searchTerm.split(',').map(Number);
@@ -605,11 +609,6 @@ function clearResults() {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     resultsDiv.style.display = 'none';
-}
-
-function showMagnifierIcon() {
-    const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
 }
 
 function hideCloseSearchBtn() {
@@ -637,11 +636,10 @@ document.getElementById('searchInput').addEventListener('keyup', function(event)
 
 function resetSearch() {
     document.getElementById('searchInput').value = '';
-    clearResults(); 
-    showMagnifierIcon(); 
-    RemoveMarkersButton(); 
+    clearResults();
+    showMagnifierIcon();
     isSearchActive = false;
-    hideCloseSearchBtn();
+    hideCloseIcon();
     poistaKaikkiMarkerit();
 }
 
