@@ -572,17 +572,92 @@ function poistaKaikkiMarkerit() {
     currentResultNumber = 1;
 }
 
-document.getElementById('searchButton').addEventListener('click', function(event) {
-    event.preventDefault();
-    if (isSearchActive && this.innerHTML.includes('close-icon')) {
-        resetSearch();
+document.getElementById('searchInput').addEventListener('input', function() {
+    var searchTerm = this.value.trim();
+    var resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    // Näytä "km: [syöte]" -ehdotus, jos hakutermissä on vain numeroita tai numeroita plus-merkillä
+    if (searchTerm.length > 0) {
+        if (!isNaN(searchTerm) || searchTerm.match(/^\d+\+\d+$/)) {
+            var kmSuggestion = document.createElement('div');
+            kmSuggestion.className = 'resultItem';
+            kmSuggestion.innerHTML = `<strong>km:</strong> ${searchTerm}`;
+            kmSuggestion.addEventListener('click', function() {
+                haeRatakilometrinSijainnit(searchTerm);
+            });
+            resultsDiv.appendChild(kmSuggestion);
+        }
+
+        // Lisää ehdotus ratakilometrivälille
+        if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
+            var kmValiSuggestion = document.createElement('div');
+            kmValiSuggestion.className = 'resultItem';
+            kmValiSuggestion.innerHTML = `<strong>km:</strong> ${searchTerm}`;
+            kmValiSuggestion.addEventListener('click', function() {
+                haeRatakilometriValinSijainnit(searchTerm);
+            });
+            resultsDiv.appendChild(kmValiSuggestion);
+        }
+
+        resultsDiv.style.display = 'block';
+
+        if (globalGeoJsonData) {
+            var filteredData = globalGeoJsonData.features.filter(function(feature) {
+                return feature.properties.nimi.toLowerCase().includes(searchTerm.toLowerCase());
+            });
+
+            if (filteredData.length > 0) {
+                filteredData.forEach(function(feature) {
+                    var resultItem = document.createElement('div');
+                    resultItem.className = 'resultItem';
+                    resultItem.textContent = feature.properties.nimi;
+
+                    resultItem.addEventListener('click', function() {
+                        if (currentLayer) {
+                            map.removeLayer(currentLayer);
+                        }
+
+                        currentLayer = L.geoJSON(feature, {
+                            pointToLayer: pointToLayer,
+                            style: function(feature) {
+                                return {
+                                    color: "blue",
+                                    weight: 8,
+                                    opacity: 1
+                                };
+                            }
+                        }).addTo(map);
+
+                        if (feature.geometry.type === 'Point') {
+                            var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                            map.setView(latLng, 12);
+                        } else {
+                            map.fitBounds(currentLayer.getBounds(), {
+                                maxZoom: 12
+                            });
+                        }
+                    });
+                    resultsDiv.appendChild(resultItem);
+                });
+                isSearchActive = true;
+                showCloseIcon();
+            }
+        }
     } else {
-        performSearch();
+        resultsDiv.style.display = 'none';
     }
 });
 
-document.getElementById('closeSearchBtn').addEventListener('click', function() {
-    resetSearch();
+document.getElementById('searchButton').addEventListener('click', function(event) {
+    event.preventDefault();
+    performSearch();
+});
+
+document.getElementById('searchInput').addEventListener('keyup', function(event) {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        performSearch();
+    }
 });
 
 function performSearch() {
@@ -611,29 +686,6 @@ function clearResults() {
     resultsDiv.style.display = 'none';
 }
 
-function hideCloseSearchBtn() {
-    const closeSearchBtn = document.getElementById('closeSearchBtn');
-    closeSearchBtn.style.display = 'none';
-}
-
-document.getElementById('searchInput').addEventListener('input', function() {
-    var searchTerm = this.value.toLowerCase();
-    if (searchTerm.length > 0) {
-        var filteredData = globalGeoJsonData.features.filter(function(feature) {
-            return feature.properties.nimi.toLowerCase().includes(searchTerm);
-        });
-        displaySearchResults(filteredData);
-    } else {
-        document.getElementById('results').style.display = 'none';
-    }
-});
-
-document.getElementById('searchInput').addEventListener('keyup', function(event) {
-    if (event.key === 'Enter' || event.keyCode === 13) {
-        performSearch();
-    }
-});
-
 function resetSearch() {
     document.getElementById('searchInput').value = '';
     clearResults();
@@ -641,6 +693,21 @@ function resetSearch() {
     isSearchActive = false;
     hideCloseIcon();
     poistaKaikkiMarkerit();
+}
+
+function showMagnifierIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
+}
+
+function hideCloseIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
+}
+
+function showCloseIcon() {
+    const searchButton = document.getElementById('searchButton');
+    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -652,9 +719,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
 async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
     const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
-    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.8/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
+    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
 
     const tempPopupContent = "Haetaan tietoja...";
     const marker = L.marker([lat, lng], {
@@ -700,4 +768,7 @@ async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
         console.error('Error while fetching data from API:', error);
         marker.setPopupContent("Virhe tietojen haussa.");
     }
+	RemoveMarkersButton();
 }
+
+
