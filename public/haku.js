@@ -37,45 +37,16 @@ function loadGeoJsonData(url, type, callback) {
         });
 }
 
-function combineAllGeoJsonData() {
-    if (globalGeoJsonData && globalAnotherGeoJsonData && globalThirdGeoJsonData && globalSAGeoJsonData && globalVKGeoJsonData) {
-        var combinedFeatures = globalGeoJsonData.features
-            .concat(globalAnotherGeoJsonData.features)
-            .concat(globalThirdGeoJsonData.features)
-            .concat(globalSAGeoJsonData.features)
-            .concat(globalVKGeoJsonData.features);
-        globalGeoJsonData = {
-            type: "FeatureCollection",
-            features: combinedFeatures
-        };
-        console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
-    }
+function combineAllGeoJsonData(data) {
+    globalGeoJsonData.features = globalGeoJsonData.features.concat(data.features);
+    console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
 }
 
-loadGeoJsonData(geojsonUrl, null, data => {
-    globalGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(anotherGeojsonUrl, 'silta', data => {
-    globalAnotherGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => {
-    globalThirdGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(SAGeojsonUrl, 'SA', data => {
-    globalSAGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(VKGeojsonUrl, 'VK', data => {
-    globalVKGeoJsonData = data;
-    combineAllGeoJsonData();
-});
+loadGeoJsonData(geojsonUrl, 'tunneli', data => combineAllGeoJsonData(data));
+loadGeoJsonData(anotherGeojsonUrl, 'silta', data => combineAllGeoJsonData(data));
+loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => combineAllGeoJsonData(data));
+loadGeoJsonData(SAGeojsonUrl, 'SA', data => combineAllGeoJsonData(data));
+loadGeoJsonData(VKGeojsonUrl, 'VK', data => combineAllGeoJsonData(data));
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
@@ -95,7 +66,7 @@ var bridgeIcon = L.icon({
 
 var SAIcon = L.icon({
     className: 'SA-haku',
-    iconUrl: 'SA.png', // Rampit
+    iconUrl: 'SA.png', // Rampeille
     iconSize: [36, 36], // Kuvan koko pikseleinä
     iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
@@ -103,7 +74,7 @@ var SAIcon = L.icon({
 
 var VKIcon = L.icon({
     className: 'VK-haku',
-    iconUrl: 'VK.png', // Alitus
+    iconUrl: 'VK.png', // Alituksille
     iconSize: [36, 36], // Kuvan koko pikseleinä
     iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
