@@ -48,12 +48,12 @@ function loadAnotherGeoJsonData() {
 }
 
 function loadSAGeoJsonData() {
-    fetch(rampitGeojsonUrl)
+    fetch(SAGeojsonUrl)
         .then(response => response.json())
         .then(data => {
             // Lisätään tyyppiominaisuus rampeille
             data.features.forEach(feature => {
-                feature.properties.type = 'rampit';
+                feature.properties.type = 'SA';
             });
             globalSAGeoJsonData = data;
             console.log('SA GeoJSON data ladattu:', globalSAGeoJsonData);
@@ -62,12 +62,12 @@ function loadSAGeoJsonData() {
 }
 
 function loadVKGeoJsonData() {
-    fetch(alitusGeojsonUrl)
+    fetch(VKGeojsonUrl)
         .then(response => response.json())
         .then(data => {
             // Lisätään tyyppiominaisuus alituksille
             data.features.forEach(feature => {
-                feature.properties.type = 'alitus';
+                feature.properties.type = 'VK';
             });
             globalVKGeoJsonData = data;
             console.log('VK GeoJSON data ladattu:', globalVKGeoJsonData);
