@@ -1,9 +1,15 @@
 var geojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tunnelit.geojson?';
 var anotherGeojsonUrl = 'sillat.geojson';
 var thirdGeojsonUrl = 'tasoristeykset.geojson';
+var SAGeojsonUrl = 'SA.geojson';
+var VKGeojsonUrl = 'VK.geojson';
+
+
 var globalGeoJsonData;
 var globalAnotherGeoJsonData;
 var globalThirdGeoJsonData;
+var globalSAGeoJsonData;
+var globalVKGeoJsonData;
 
 // Määritä projektiot
 proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
@@ -41,38 +47,68 @@ function loadAnotherGeoJsonData() {
         .catch(error => console.error('Virhe ladattaessa toista GeoJSON-tiedostoa:', error));
 }
 
-function loadThirdGeoJsonData() {
-    fetch(thirdGeojsonUrl)
+function loadSAGeoJsonData() {
+    fetch(rampitGeojsonUrl)
         .then(response => response.json())
         .then(data => {
-            // Lisätään tyyppiominaisuus tasoristeyksille
+            // Lisätään tyyppiominaisuus rampeille
             data.features.forEach(feature => {
-                feature.properties.type = 'tasoristeys';
+                feature.properties.type = 'rampit';
             });
-            globalThirdGeoJsonData = data;
-            console.log('Kolmas GeoJSON data ladattu:', globalThirdGeoJsonData);
+            globalSAGeoJsonData = data;
+            console.log('SA GeoJSON data ladattu:', globalSAGeoJsonData);
         })
-        .catch(error => console.error('Virhe ladattaessa kolmatta GeoJSON-tiedostoa:', error));
+        .catch(error => console.error('Virhe ladattaessa rampit GeoJSON-tiedostoa:', error));
 }
 
-// Kutsu molempia funktioita ladataksesi datan
+function loadVKGeoJsonData() {
+    fetch(alitusGeojsonUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Lisätään tyyppiominaisuus alituksille
+            data.features.forEach(feature => {
+                feature.properties.type = 'alitus';
+            });
+            globalVKGeoJsonData = data;
+            console.log('VK GeoJSON data ladattu:', globalVKGeoJsonData);
+        })
+        .catch(error => console.error('Virhe ladattaessa alitus GeoJSON-tiedostoa:', error));
+}
+
+// Kutsu funktioita ladataksesi datan
 loadGeoJsonData();
 loadAnotherGeoJsonData();
-loadThirdGeoJsonData();
+loadSAGeoJsonData();
+loadVKGeoJsonData();
 
 function combineAllGeoJsonData() {
-    if (globalGeoJsonData && globalAnotherGeoJsonData && globalThirdGeoJsonData) {
-        // Yhdistä kaikki features kolmesta datasetistä
+    if (globalGeoJsonData && globalAnotherGeoJsonData && globalThirdGeoJsonData && globalSAGeoJsonData && globalVKGeoJsonData) {
         var combinedFeatures = globalGeoJsonData.features
             .concat(globalAnotherGeoJsonData.features)
-            .concat(globalThirdGeoJsonData.features);
+            .concat(globalThirdGeoJsonData.features)
+            .concat(globalSAGeoJsonData.features)
+            .concat(globalVKGeoJsonData.features);
         globalGeoJsonData.features = combinedFeatures;
         console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
         // Tässä voit suorittaa muita toimenpiteitä yhdistetyn datan kanssa
     }
 }
 
-// Kutsu combineGeoJsonData-funktiota sen jälkeen, kun molemmat datasetit on ladattu
+// Kutsu yhdistämisfunktiota sen jälkeen, kun kaikki datasetit on ladattu
+Promise.all([
+    fetch(geojsonUrl).then(response => response.json()),
+    fetch(anotherGeojsonUrl).then(response => response.json()),
+    fetch(thirdGeojsonUrl).then(response => response.json()),
+    fetch(SAGeojsonUrl).then(response => response.json()),
+    fetch(VKGeojsonUrl).then(response => response.json())
+]).then(datas => {
+    globalGeoJsonData = {
+        type: "FeatureCollection",
+        features: [].concat(...datas.map(data => data.features))
+    };
+}).catch(error => {
+    console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
+});
 
 function loadAllGeoJsonData() {
     Promise.all([
@@ -107,14 +143,35 @@ var bridgeIcon = L.icon({
     tooltipAnchor: [1, -10]
 });
 
-function getIconForFeature(feature) {
-    if (feature.properties && feature.properties.type === 'silta') {
-        return bridgeIcon;
-    } else {
-        return customIcon;
-    }
-}
+var SAIcon = L.icon({
+    className: 'SA-haku',
+    iconUrl: 'SA.png', // Rampit
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    tooltipAnchor: [1, -10]
+});
 
+var VKIcon = L.icon({
+    className: 'VK-haku',
+    iconUrl: 'VK.png', // Alitus
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    tooltipAnchor: [1, -10]
+});
+
+function getIconForFeature(feature) {
+    if (feature.properties) {
+        if (feature.properties.type === 'silta') {
+            return bridgeIcon;
+        } else if (feature.properties.type === 'SA') {
+            return SAIcon;
+        } else if (feature.properties.type === 'VK') {
+            return VKIcon;
+        }
+    }
+    return customIcon;
+}
+		
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -130,16 +187,15 @@ function searchLocation(searchTerm) {
             if (currentLayer) map.removeLayer(currentLayer);
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
-                    var icon = getIconForFeature(feature);
-                    return L.marker(latlng, {icon: icon});
+                    // Tässä käytetään L.marker kustomoidun ikonin kanssa jokaiselle hakutulokselle
+                    return L.marker(latlng, {icon: customIcon});
                 }
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
             isSearchActive = true;
             showCloseIcon();
         } else {
-            // Jos ei tuloksia
-            naytaVirheilmoitus('Ei hakutuloksia');
+		
         }
     } else {
         console.error('Hakukenttä on tyhjä tai dataa ei ole vielä ladattu.');
@@ -151,26 +207,27 @@ function searchLocation(searchTerm) {
 // Funktiot määritellään ensin
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
-        return {
-            color: "blue", // Sininen sisäväri
-            weight: 8,
-            opacity: 1
-        };
+		return {
+			color: "blue", // Sininen sisäväri
+			weight: 8,
+			opacity: 1
+		};
     }
 }
 
-function convertCoordinates(feature) {
-    if (feature.geometry.type === 'MultiLineString') {
-        feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
-            line.map(point => proj4(sourceProjection, destinationProjection, point))
-        );
-    } else if (feature.geometry.type === 'MultiPoint') {
-        feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
-            proj4(sourceProjection, destinationProjection, point)
-        );
-    }
-    // Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
-}
+    // Käy läpi GeoJSON-datan etsien vastaavuutta
+	function convertCoordinates(feature) {
+		if (feature.geometry.type === 'MultiLineString') {
+			feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
+				line.map(point => proj4(sourceProjection, destinationProjection, point))
+			);
+		} else if (feature.geometry.type === 'MultiPoint') {
+			feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
+				proj4(sourceProjection, destinationProjection, point)
+			);
+		}
+		// Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
+	}
 
 Promise.all([
     fetch(geojsonUrl).then(response => response.json()),
@@ -206,29 +263,30 @@ function drawGeoJsonOnMap(geoJsonData) {
             return L.marker(latlng, {
                 icon: L.icon({
                     iconUrl: 'tasoristeys.png', // Osoita oikea polku ikonitiedostoosi
-                    iconSize: [30, 30], // Kuvan koko pikseleinä
-                    iconAnchor: [17, 14], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
-                    tooltipAnchor: [1, -10], // Popup-ikkunan sijainti suhteessa markerin ankkuriin
+					iconSize: [30, 30], // Kuvan koko pikseleinä
+					iconAnchor: [17, 14], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+					tooltipAnchor: [1, -10], // Popup-ikkunan sijainti suhteessa markerin ankkuriin
                 })
             });
         },
-        style: style
+		style: style
     }).addTo(map);
+	
 
-    L.geoJSON(geoJsonData, {
-        style: function(feature) {
-            if (feature.geometry.type === 'MultiLineString') {
-                return {
-                    color: "#00a8f3", // Sininen sisäväri
-                    weight: 3,
-                    opacity: 0
-                };
-            }
-        },
-        pointToLayer: pointToLayer
-    }).addTo(map);
-}
+	L.geoJSON(geoJsonData, {
+		style: function(feature) {
+			if (feature.geometry.type === 'MultiLineString') {
+				return {
+					color: "#00a8f3", // Sininen sisäväri
+					weight: 3,
+					opacity: 0
+				};
+			}
+		},
+		pointToLayer: pointToLayer
+	}).addTo(map);
 
+// Funktio, joka ajetaan jokaiselle featurelle, kun se lisätään kartalle
 function onEachFeature(feature, layer) {
     if (feature.properties && feature.properties.nimi) {
         layer.bindTooltip(feature.properties.nimi, {
@@ -245,8 +303,9 @@ L.geoJSON(geoJsonData, {
     style: style // Jos määrittelet tyylejä
 }).addTo(map);
 
-if (geoJsonData.features.length > 0) {
-    map.fitBounds(window.searchResultsLayer.getBounds());
+    if (geoJsonData.features.length > 0) {
+        map.fitBounds(window.searchResultsLayer.getBounds());
+    }
 }
 
 document.getElementById('searchInput').addEventListener('input', function() {
@@ -256,7 +315,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
             return feature.properties.nimi.toLowerCase().includes(searchTerm);
         });
         displaySearchResults(filteredData);
-        piilotaVirheilmoitus();
+		piilotaVirheilmoitus();
     } else {
         document.getElementById('results').style.display = 'none';
     }
