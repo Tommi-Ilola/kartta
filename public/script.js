@@ -8,7 +8,7 @@ let isSearchActive = false;
 
 function haeKaikkiRatanumerot() {
     naytaDatanLatausIndikaattori();
-    const url = 'https://rata.digitraffic.fi/infra-api/0.7/radat.geojson';
+    const url = 'https://rata.digitraffic.fi/infra-api/0.8/radat.geojson';
 	
     console.log("Tehdään API-kutsu osoitteeseen:", url); // Lisätty console.log
     fetch(url)
@@ -40,7 +40,7 @@ function haeRatakilometrinSijainnit(ratakilometri) {
         while (activeRequests < MAX_CONCURRENT_REQUESTS && currentIndex < ratanumerot.length) {
             const ratanumero = ratanumerot[currentIndex++];
             const muokattuRatanumero = encodeURIComponent(ratanumero.trim());
-            const url = `https://rata.digitraffic.fi/infra-api/0.7/radat/${muokattuRatanumero}/${ratakm}+${etaisyys}.geojson`;
+            const url = `https://rata.digitraffic.fi/infra-api/0.8/radat/${muokattuRatanumero}/${ratakm}+${etaisyys}.geojson`;
             console.log("Tehdään API-kutsu osoitteeseen:", url);
 
             activeRequests++;
@@ -119,7 +119,7 @@ function haeRatakilometriValinSijainnit(ratakilometriVali) {
 
         ratanumerot.forEach(ratanumero => {
             const muokattuRatanumero = encodeURIComponent(ratanumero);
-            const url = `https://rata.digitraffic.fi/infra-api/0.7/radat/${muokattuRatanumero}/${ratakm1}+${etaisyys1}-${ratakm2}+${etaisyys2}.geojson`;
+            const url = `https://rata.digitraffic.fi/infra-api/0.8/radat/${muokattuRatanumero}/${ratakm1}+${etaisyys1}-${ratakm2}+${etaisyys2}.geojson`;
             console.log("Tehdään API-kutsu osoitteeseen:", url);
 
             fetch(url)
@@ -142,7 +142,7 @@ function haeRatakilometriValinSijainnit(ratakilometriVali) {
 
 function haeRatakilometrinSijainnitJaLisaaMarkerit(ratakm, etaisyys, ratanumero) {
     // Muodosta URL käyttäen ratakm, etaisyys ja ratanumero arvoja
-    const url = `https://rata.digitraffic.fi/infra-api/0.7/radat/${encodeURIComponent(ratanumero)}/${ratakm}+${etaisyys}.geojson`;
+    const url = `https://rata.digitraffic.fi/infra-api/0.8/radat/${encodeURIComponent(ratanumero)}/${ratakm}+${etaisyys}.geojson`;
     fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
     const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
-    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
+    const apiUrl = `https://rata.digitraffic.fi/infra-api/0.8/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
 
     const tempPopupContent = "Haetaan tietoja...";
     const marker = L.marker([lat, lng], {
