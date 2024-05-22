@@ -33,7 +33,7 @@ fetch('SA.geojson')
             const coords = feature.geometry.coordinates;
             const properties = feature.properties;
 
-            let popupContent = `<b>Nimi:</b> ${properties.name}<br>
+            let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
                 <b>Tunnus:</b> ${properties['SyöttöasemanTunnus']}<br>
                 <b>Tyyppi:</b> ${properties.Tyyppi}<br>
                 <b>Ratanumero:</b> ${properties.Ratanumero}<br>
@@ -44,7 +44,7 @@ fetch('SA.geojson')
                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
             const marker = L.marker([coords[1], coords[0]], {icon: saIcon})
-                .bindTooltip(properties.name ? properties.name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindTooltip(properties.nimi ? properties.nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(SyottoAsematLayerGroup);
             marker.type = 'SA';
@@ -79,7 +79,7 @@ fetch('VK.geojson')
             const coords = feature.geometry.coordinates;
             const properties = feature.properties;
 
-            let popupContent = `<b>Nimi:</b> ${properties.Name}<br>
+            let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
 				<b>Tyyppi:</b> ${properties.Tyyppi}<br>
 				<b>Ratanumero:</b> ${properties.Ratanumero}<br>
 				<b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br>
@@ -90,7 +90,7 @@ fetch('VK.geojson')
 				`;
                 
             const marker = L.marker([coords[1], coords[0]], {icon: vkIcon})
-                .bindTooltip(properties.Name ? properties.Name.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
+                .bindTooltip(properties.nimi ? properties.nimi.toString() : "Nimetön", {permanent: false, direction: 'top', className: 'custom-tooltip'})
                 .bindPopup(popupContent)
                 .addTo(VKLayerGroup);
             marker.type = 'VK';
