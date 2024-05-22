@@ -10,12 +10,6 @@ proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
 
-// Muunna koordinaatit
-var point = [381586.25, 6681171.85]; // Esimerkkikoordinaatit EPSG:3067:ssä
-var convertedPoint = proj4(sourceProjection, destinationProjection, point);
-
-console.log(convertedPoint); // Tulostaa muunnetut koordinaatit EPSG:4326:ssa
-
 function loadGeoJsonData() {
     fetch(geojsonUrl)
         .then(response => {
@@ -39,9 +33,12 @@ function loadAnotherGeoJsonData() {
     fetch(anotherGeojsonUrl)
         .then(response => response.json())
         .then(data => {
+            // Lisätään tyyppiominaisuus silloille
+            data.features.forEach(feature => {
+                feature.properties.type = 'silta';
+            });
             globalAnotherGeoJsonData = data;
             console.log('Toinen GeoJSON data ladattu:', globalAnotherGeoJsonData);
-            // Voit yhdistää datan tässä vaiheessa tai suorittaa koordinaattimuunnoksen tarvittaessa
         })
         .catch(error => console.error('Virhe ladattaessa toista GeoJSON-tiedostoa:', error));
 }
@@ -82,13 +79,29 @@ function loadAllGeoJsonData() {
 
 loadAllGeoJsonData();
 
-    var customIcon = L.icon({
-	  className: 'tasoristeys-haku',
-      iconUrl: 'tasoristeys1.png', // Markerin kuvatiedoston polku
-      iconSize: [36, 36], // Kuvan koko pikseleinä
-      iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
-      tooltipAnchor: [1, -10]
-    });
+var customIcon = L.icon({
+    className: 'tasoristeys-haku',
+    iconUrl: 'tasoristeys1.png', // Tasoristeyksille
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    tooltipAnchor: [1, -10]
+});
+
+var bridgeIcon = L.icon({
+    className: 'silta-haku',
+    iconUrl: 'silta.png', // Silloille
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    tooltipAnchor: [1, -10]
+});
+
+function getIconForFeature(feature) {
+    if (feature.properties && feature.properties.type === 'silta') {
+        return bridgeIcon;
+    } else {
+        return customIcon;
+    }
+}
 		
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
@@ -260,7 +273,8 @@ function displaySearchResults(features) {
 
                 currentLayer = L.geoJSON(feature, {
                     pointToLayer: function(feature, latlng) {
-                        return L.marker(latlng, {icon: customIcon});
+                        var icon = getIconForFeature(feature);
+                        return L.marker(latlng, { icon: icon });
                     },
                     style: function(feature) {
                         // Tässä esimerkissä oletetaan, että käytät samaa tyyliä kaikille featureille
@@ -274,7 +288,7 @@ function displaySearchResults(features) {
 
                 // Kohdista kartta valitun kohteen mukaan
                 if (feature.geometry.type === 'Point') {
-                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                    var latLng = L.latlng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
                     map.setView(latLng, 12);
                 } else {
                     map.fitBounds(currentLayer.getBounds(), {
@@ -289,6 +303,5 @@ function displaySearchResults(features) {
     } else {
         resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
         isSearchActive = false;
-       
     }
 }
