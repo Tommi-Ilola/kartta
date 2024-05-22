@@ -16,8 +16,8 @@ proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
 
-function loadGeoJsonData() {
-    fetch(geojsonUrl)
+function loadGeoJsonData(url, type, callback) {
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Verkkovirhe ladattaessa GeoJSON-tiedostoa: ' + response.statusText);
@@ -25,61 +25,17 @@ function loadGeoJsonData() {
             return response.json();
         })
         .then(data => {
-            globalGeoJsonData = data;
-            console.log('GeoJSON data ladattu:', globalGeoJsonData);
+            if (type) {
+                data.features.forEach(feature => {
+                    feature.properties.type = type;
+                });
+            }
+            callback(data);
         })
         .catch(error => {
             console.error('Virhe ladattaessa GeoJSON-tiedostoa:', error);
         });
 }
-
-function loadAnotherGeoJsonData() {
-    fetch(anotherGeojsonUrl)
-        .then(response => response.json())
-        .then(data => {
-            // Lisätään tyyppiominaisuus silloille
-            data.features.forEach(feature => {
-                feature.properties.type = 'silta';
-            });
-            globalAnotherGeoJsonData = data;
-            console.log('Toinen GeoJSON data ladattu:', globalAnotherGeoJsonData);
-        })
-        .catch(error => console.error('Virhe ladattaessa toista GeoJSON-tiedostoa:', error));
-}
-
-function loadSAGeoJsonData() {
-    fetch(SAGeojsonUrl)
-        .then(response => response.json())
-        .then(data => {
-            // Lisätään tyyppiominaisuus rampeille
-            data.features.forEach(feature => {
-                feature.properties.type = 'SA';
-            });
-            globalSAGeoJsonData = data;
-            console.log('SA GeoJSON data ladattu:', globalSAGeoJsonData);
-        })
-        .catch(error => console.error('Virhe ladattaessa rampit GeoJSON-tiedostoa:', error));
-}
-
-function loadVKGeoJsonData() {
-    fetch(VKGeojsonUrl)
-        .then(response => response.json())
-        .then(data => {
-            // Lisätään tyyppiominaisuus alituksille
-            data.features.forEach(feature => {
-                feature.properties.type = 'VK';
-            });
-            globalVKGeoJsonData = data;
-            console.log('VK GeoJSON data ladattu:', globalVKGeoJsonData);
-        })
-        .catch(error => console.error('Virhe ladattaessa alitus GeoJSON-tiedostoa:', error));
-}
-
-// Kutsu funktioita ladataksesi datan
-loadGeoJsonData();
-loadAnotherGeoJsonData();
-loadSAGeoJsonData();
-loadVKGeoJsonData();
 
 function combineAllGeoJsonData() {
     if (globalGeoJsonData && globalAnotherGeoJsonData && globalThirdGeoJsonData && globalSAGeoJsonData && globalVKGeoJsonData) {
@@ -88,44 +44,38 @@ function combineAllGeoJsonData() {
             .concat(globalThirdGeoJsonData.features)
             .concat(globalSAGeoJsonData.features)
             .concat(globalVKGeoJsonData.features);
-        globalGeoJsonData.features = combinedFeatures;
+        globalGeoJsonData = {
+            type: "FeatureCollection",
+            features: combinedFeatures
+        };
         console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
-        // Tässä voit suorittaa muita toimenpiteitä yhdistetyn datan kanssa
     }
 }
 
-// Kutsu yhdistämisfunktiota sen jälkeen, kun kaikki datasetit on ladattu
-Promise.all([
-    fetch(geojsonUrl).then(response => response.json()),
-    fetch(anotherGeojsonUrl).then(response => response.json()),
-    fetch(thirdGeojsonUrl).then(response => response.json()),
-    fetch(SAGeojsonUrl).then(response => response.json()),
-    fetch(VKGeojsonUrl).then(response => response.json())
-]).then(datas => {
-    globalGeoJsonData = {
-        type: "FeatureCollection",
-        features: [].concat(...datas.map(data => data.features))
-    };
-}).catch(error => {
-    console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
+loadGeoJsonData(geojsonUrl, null, data => {
+    globalGeoJsonData = data;
+    combineAllGeoJsonData();
 });
 
-function loadAllGeoJsonData() {
-    Promise.all([
-        fetch(geojsonUrl).then(response => response.json()),
-        fetch(anotherGeojsonUrl).then(response => response.json()),
-        fetch(thirdGeojsonUrl).then(response => response.json())
-    ]).then(datas => {
-        globalGeoJsonData = {
-            type: "FeatureCollection",
-            features: [].concat(...datas.map(data => data.features))
-        };
-    }).catch(error => {
-        console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
-    });
-}
+loadGeoJsonData(anotherGeojsonUrl, 'silta', data => {
+    globalAnotherGeoJsonData = data;
+    combineAllGeoJsonData();
+});
 
-loadAllGeoJsonData();
+loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => {
+    globalThirdGeoJsonData = data;
+    combineAllGeoJsonData();
+});
+
+loadGeoJsonData(SAGeojsonUrl, 'SA', data => {
+    globalSAGeoJsonData = data;
+    combineAllGeoJsonData();
+});
+
+loadGeoJsonData(VKGeojsonUrl, 'VK', data => {
+    globalVKGeoJsonData = data;
+    combineAllGeoJsonData();
+});
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
@@ -171,7 +121,7 @@ function getIconForFeature(feature) {
     }
     return customIcon;
 }
-		
+
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -187,15 +137,15 @@ function searchLocation(searchTerm) {
             if (currentLayer) map.removeLayer(currentLayer);
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
-                    // Tässä käytetään L.marker kustomoidun ikonin kanssa jokaiselle hakutulokselle
-                    return L.marker(latlng, {icon: customIcon});
+                    var icon = getIconForFeature(feature);
+                    return L.marker(latlng, {icon: icon});
                 }
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
             isSearchActive = true;
             showCloseIcon();
         } else {
-		
+            console.error('Ei hakutuloksia.');
         }
     } else {
         console.error('Hakukenttä on tyhjä tai dataa ei ole vielä ladattu.');
@@ -207,43 +157,39 @@ function searchLocation(searchTerm) {
 // Funktiot määritellään ensin
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
-		return {
-			color: "blue", // Sininen sisäväri
-			weight: 8,
-			opacity: 1
-		};
+        return {
+            color: "blue", // Sininen sisäväri
+            weight: 8,
+            opacity: 1
+        };
     }
 }
 
-    // Käy läpi GeoJSON-datan etsien vastaavuutta
-	function convertCoordinates(feature) {
-		if (feature.geometry.type === 'MultiLineString') {
-			feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
-				line.map(point => proj4(sourceProjection, destinationProjection, point))
-			);
-		} else if (feature.geometry.type === 'MultiPoint') {
-			feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
-				proj4(sourceProjection, destinationProjection, point)
-			);
-		}
-		// Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
-	}
+function convertCoordinates(feature) {
+    if (feature.geometry.type === 'MultiLineString') {
+        feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
+            line.map(point => proj4(sourceProjection, destinationProjection, point))
+        );
+    } else if (feature.geometry.type === 'MultiPoint') {
+        feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
+            proj4(sourceProjection, destinationProjection, point)
+        );
+    }
+    // Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
+}
 
 Promise.all([
     fetch(geojsonUrl).then(response => response.json()),
     fetch(anotherGeojsonUrl).then(response => response.json()),
     fetch(thirdGeojsonUrl).then(response => response.json())
 ]).then(datas => {
-    // Yhdistetään kaikki ladatut datasetit yhteen FeatureCollectioniin
     var combinedGeoJsonData = {
         type: "FeatureCollection",
         features: [].concat(...datas.map(data => data.features))
     };
 
-    // Suoritetaan koordinaattimuunnokset
     combinedGeoJsonData.features.forEach(convertCoordinates);
 
-    // Piirretään yhdistetty data kartalle
     globalGeoJsonData = combinedGeoJsonData;
 
 }).catch(error => {
@@ -251,57 +197,53 @@ Promise.all([
 });
 
 function drawGeoJsonOnMap(geoJsonData) {
-    // Poistetaan aikaisemmat hakutulokset kartalta
     if (window.searchResultsLayer) {
         map.removeLayer(window.searchResultsLayer);
     }
 
-    // Piirretään hakutulokset kartalle
     window.searchResultsLayer = L.geoJSON(geoJsonData, {
         onEachFeature: onEachFeature,
         pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {
                 icon: L.icon({
-                    iconUrl: 'tasoristeys.png', // Osoita oikea polku ikonitiedostoosi
-					iconSize: [30, 30], // Kuvan koko pikseleinä
-					iconAnchor: [17, 14], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
-					tooltipAnchor: [1, -10], // Popup-ikkunan sijainti suhteessa markerin ankkuriin
+                    iconUrl: 'tasoristeys.png',
+                    iconSize: [30, 30],
+                    iconAnchor: [17, 14],
+                    tooltipAnchor: [1, -10]
                 })
             });
         },
-		style: style
+        style: style
     }).addTo(map);
-	
 
-	L.geoJSON(geoJsonData, {
-		style: function(feature) {
-			if (feature.geometry.type === 'MultiLineString') {
-				return {
-					color: "#00a8f3", // Sininen sisäväri
-					weight: 3,
-					opacity: 0
-				};
-			}
-		},
-		pointToLayer: pointToLayer
-	}).addTo(map);
+    L.geoJSON(geoJsonData, {
+        style: function(feature) {
+            if (feature.geometry.type === 'MultiLineString') {
+                return {
+                    color: "#00a8f3",
+                    weight: 3,
+                    opacity: 0
+                };
+            }
+        },
+        pointToLayer: pointToLayer
+    }).addTo(map);
 
-// Funktio, joka ajetaan jokaiselle featurelle, kun se lisätään kartalle
-function onEachFeature(feature, layer) {
-    if (feature.properties && feature.properties.nimi) {
-        layer.bindTooltip(feature.properties.nimi, {
-            permanent: false, // Tooltip näkyy vain, kun hiiri on elementin päällä
-            direction: 'auto', // Tooltipin suunta määräytyy automaattisesti
-            className: 'custom-tooltip' // Voit määritellä custom-luokan CSS-tyylien käyttöä varten
-        });
+    function onEachFeature(feature, layer) {
+        if (feature.properties && feature.properties.nimi) {
+            layer.bindTooltip(feature.properties.nimi, {
+                permanent: false,
+                direction: 'auto',
+                className: 'custom-tooltip'
+            });
+        }
     }
-}
 
-L.geoJSON(geoJsonData, {
-    onEachFeature: onEachFeature,
-    pointToLayer: pointToLayer, // Jos käytät custom pointToLayer-funktiota
-    style: style // Jos määrittelet tyylejä
-}).addTo(map);
+    L.geoJSON(geoJsonData, {
+        onEachFeature: onEachFeature,
+        pointToLayer: pointToLayer,
+        style: style
+    }).addTo(map);
 
     if (geoJsonData.features.length > 0) {
         map.fitBounds(window.searchResultsLayer.getBounds());
@@ -315,13 +257,13 @@ document.getElementById('searchInput').addEventListener('input', function() {
             return feature.properties.nimi.toLowerCase().includes(searchTerm);
         });
         displaySearchResults(filteredData);
-		piilotaVirheilmoitus();
+        piilotaVirheilmoitus();
     } else {
         document.getElementById('results').style.display = 'none';
     }
 });
 
-var currentLayer; // Määritellään currentLayer globaalilla tasolla
+var currentLayer;
 
 function displaySearchResults(features) {
     let resultsDiv = document.getElementById('results');
@@ -337,7 +279,7 @@ function displaySearchResults(features) {
 
             resultItem.addEventListener('click', function() {
                 if (currentLayer) {
-                    map.removeLayer(currentLayer); // Poista aiempi kerros, jos sellainen on
+                    map.removeLayer(currentLayer);
                 }
 
                 currentLayer = L.geoJSON(feature, {
