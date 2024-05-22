@@ -1,4 +1,4 @@
-var geojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tunnelit.geojson?';
+var geojsonUrl = 'tunnelit.geojson';
 var anotherGeojsonUrl = 'sillat.geojson';
 var thirdGeojsonUrl = 'tasoristeykset.geojson';
 var SAGeojsonUrl = 'SA.geojson';
