@@ -582,7 +582,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
         if (!isNaN(searchTerm) || searchTerm.match(/^\d+\+\d+$/)) {
             var kmSuggestion = document.createElement('div');
             kmSuggestion.className = 'resultItem';
-            kmSuggestion.innerHTML = `<strong>km:</strong> ${searchTerm}`;
+            kmSuggestion.innerHTML = `<strong>km: </strong> ${searchTerm}`;
             kmSuggestion.addEventListener('click', function() {
                 haeRatakilometrinSijainnit(searchTerm);
             });
@@ -593,7 +593,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
         if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
             var kmValiSuggestion = document.createElement('div');
             kmValiSuggestion.className = 'resultItem';
-            kmValiSuggestion.innerHTML = `<strong>km:</strong> ${searchTerm}`;
+            kmValiSuggestion.innerHTML = `<strong>km: </strong> ${searchTerm}`;
             kmValiSuggestion.addEventListener('click', function() {
                 haeRatakilometriValinSijainnit(searchTerm);
             });
@@ -651,7 +651,11 @@ document.getElementById('searchInput').addEventListener('input', function() {
 
 document.getElementById('searchButton').addEventListener('click', function(event) {
     event.preventDefault();
-    performSearch();
+    if (isSearchActive && this.innerHTML.includes('close-icon')) {
+        resetSearch();
+    } else {
+        performSearch();
+    }
 });
 
 document.getElementById('searchInput').addEventListener('keyup', function(event) {
@@ -671,19 +675,13 @@ function performSearch() {
     if (searchTerm.match(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/)) {
         const [lat, lng] = searchTerm.split(',').map(Number);
         haeTiedotKoordinaateistaJaLisaaMarker(lat, lng);
-    } else if (searchTerm.includes('-')) {
+    } else if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
         haeRatakilometriValinSijainnit(searchTerm);
     } else if (searchTerm.includes('+') || !isNaN(searchTerm)) {
         haeRatakilometrinSijainnit(searchTerm);
     } else {
         searchLocation(searchTerm);
     }
-}
-
-function clearResults() {
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '';
-    resultsDiv.style.display = 'none';
 }
 
 function resetSearch() {
@@ -693,6 +691,12 @@ function resetSearch() {
     isSearchActive = false;
     hideCloseIcon();
     poistaKaikkiMarkerit();
+}
+
+function clearResults() {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+    resultsDiv.style.display = 'none';
 }
 
 function showMagnifierIcon() {
@@ -770,5 +774,3 @@ async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
     }
 	RemoveMarkersButton();
 }
-
-
