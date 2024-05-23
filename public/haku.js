@@ -72,7 +72,7 @@ var SAIcon = L.icon({
     className: 'SA-haku',
     iconUrl: 'SA1.png', // Syöttöasemille
     iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconAnchor: [17, 19], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
