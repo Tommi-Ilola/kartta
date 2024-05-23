@@ -1,15 +1,15 @@
 var geojsonUrl = 'tunnelit.geojson';
 var anotherGeojsonUrl = 'sillat.geojson';
 var thirdGeojsonUrl = 'tasoristeykset.geojson';
-var SAGeojsonUrl = 'SA.geojson';
-var VKGeojsonUrl = 'VK.geojson';
+var saGeojsonUrl = 'SA.geojson';
+var vkGeojsonUrl = 'VK.geojson';
 
 
 var globalGeoJsonData;
 var globalAnotherGeoJsonData;
 var globalThirdGeoJsonData;
-var globalSAGeoJsonData;
-var globalVKGeoJsonData;
+var globalsageoJsonData;
+var globalvkGeoJsonData;
 
 // Määritä projektiot
 proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
@@ -45,8 +45,8 @@ function combineAllGeoJsonData(data) {
 loadGeoJsonData(geojsonUrl, 'tunneli', data => combineAllGeoJsonData(data));
 loadGeoJsonData(anotherGeojsonUrl, 'silta', data => combineAllGeoJsonData(data));
 loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => combineAllGeoJsonData(data));
-loadGeoJsonData(SAGeojsonUrl, 'SA', data => combineAllGeoJsonData(data));
-loadGeoJsonData(VKGeojsonUrl, 'VK', data => combineAllGeoJsonData(data));
+loadGeoJsonData(saGeojsonUrl, 'sa', data => combineAllGeoJsonData(data));
+loadGeoJsonData(vkGeojsonUrl, 'vk', data => combineAllGeoJsonData(data));
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
@@ -64,7 +64,7 @@ var bridgeIcon = L.icon({
     tooltipAnchor: [1, -10]
 });
 
-var SAIcon = L.icon({
+var saIcon = L.icon({
     className: 'SA-haku',
     iconUrl: 'SA.png', // Rampeille
     iconSize: [36, 36], // Kuvan koko pikseleinä
@@ -72,7 +72,7 @@ var SAIcon = L.icon({
     tooltipAnchor: [1, -10]
 });
 
-var VKIcon = L.icon({
+var vkIcon = L.icon({
     className: 'VK-haku',
     iconUrl: 'VK.png', // Alituksille
     iconSize: [36, 36], // Kuvan koko pikseleinä
@@ -85,9 +85,9 @@ function getIconForFeature(feature) {
         if (feature.properties.type === 'silta') {
             return bridgeIcon;
         } else if (feature.properties.type === 'SA') {
-            return SAIcon;
+            return saIcon;
         } else if (feature.properties.type === 'VK') {
-            return VKIcon;
+            return vkIcon;
         }
     }
     return customIcon;
