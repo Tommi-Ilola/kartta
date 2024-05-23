@@ -40,45 +40,10 @@ function loadGeoJsonData(url, type, callback) {
         });
 }
 
-function combineAllGeoJsonData() {
-    if (globalGeoJsonData && globalAnotherGeoJsonData && globalThirdGeoJsonData && globalSAGeoJsonData && globalVKGeoJsonData) {
-        var combinedFeatures = globalGeoJsonData.features
-            .concat(globalAnotherGeoJsonData.features)
-            .concat(globalThirdGeoJsonData.features)
-            .concat(globalSAGeoJsonData.features)
-            .concat(globalVKGeoJsonData.features);
-        globalGeoJsonData = {
-            type: "FeatureCollection",
-            features: combinedFeatures
-        };
-        console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
-    }
+function combineAllGeoJsonData(data) {
+    globalGeoJsonData.features = globalGeoJsonData.features.concat(data.features);
+    console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
 }
-
-loadGeoJsonData(geojsonUrl, null, data => {
-    globalGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(anotherGeojsonUrl, 'silta', data => {
-    globalAnotherGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => {
-    globalThirdGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(SAGeojsonUrl, 'SA', data => {
-    globalSAGeoJsonData = data;
-    combineAllGeoJsonData();
-});
-
-loadGeoJsonData(VKGeojsonUrl, 'VK', data => {
-    globalVKGeoJsonData = data;
-    combineAllGeoJsonData();
-});
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
