@@ -64,7 +64,7 @@ var bridgeIcon = L.icon({
     className: 'silta-haku',
     iconUrl: 'silta1.png', // Silloille
     iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconAnchor: [17, 19], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
@@ -80,7 +80,7 @@ var VKIcon = L.icon({
     className: 'VK-haku',
     iconUrl: 'VK1.png', // Välikytkinasemille
     iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconAnchor: [17, 19], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
