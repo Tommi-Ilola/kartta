@@ -26,8 +26,9 @@ tbody {
 }
 
 .tasoristeys-haku {
-    background-color: #ccc;
+    background-color: #aaa;
     border-radius: 2rem;
+    border: 1px solid #ffffff;
     width: 36px;
     height: 36px;
     display: flex;
@@ -37,9 +38,59 @@ tbody {
 }
 
 .tasoristeys-haku img {
-    width: 32px; /* Adjust to fit within the background */
-    height: 32px; /* Adjust to fit within the background */
-    border-radius: 2rem; /* Match the background border radius */
+    width: 32px;
+    height: 32px;
+}
+
+.sillat-haku {
+    background-color: #aaa;
+    border-radius: 2rem;
+    border: 1px solid #ffffff;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	z-index: 10000 !important;
+}
+
+.sillat-haku img {
+    width: 32px;
+    height: 32px;
+}
+
+.SA-haku {
+    background-color: #aaa;
+    border-radius: 2rem;
+    border: 1px solid #ffffff;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	z-index: 10000 !important;
+}
+
+.SA-haku img {
+    width: 32px;
+    height: 32px;
+}
+
+.VK-haku {
+    background-color: #aaa;
+    border-radius: 2rem;
+    border: 1px solid #ffffff;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	z-index: 10000 !important;
+}
+
+.VK-haku img {
+    width: 32px;
+    height: 32px;
 }
 
 .leaflet-pm-draw {
