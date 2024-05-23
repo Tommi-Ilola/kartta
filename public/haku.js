@@ -60,7 +60,7 @@ var customIcon = L.icon({
 
 var bridgeIcon = L.icon({
     className: 'silta-haku',
-    iconUrl: 'silta.png', // Silloille
+    iconUrl: 'silta1.png', // Silloille
     iconSize: [36, 36], // Kuvan koko pikseleinä
     iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
@@ -68,7 +68,7 @@ var bridgeIcon = L.icon({
 
 var SAIcon = L.icon({
     className: 'SA-haku',
-    iconUrl: 'SA.png', // Rampeille
+    iconUrl: 'SA1.png', // Rampeille
     iconSize: [36, 36], // Kuvan koko pikseleinä
     iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
@@ -76,7 +76,7 @@ var SAIcon = L.icon({
 
 var VKIcon = L.icon({
     className: 'VK-haku',
-    iconUrl: 'VK.png', // Alituksille
+    iconUrl: 'VK1.png', // Alituksille
     iconSize: [36, 36], // Kuvan koko pikseleinä
     iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
