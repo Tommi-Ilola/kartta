@@ -289,43 +289,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
                 return feature.properties.nimi.toLowerCase().includes(searchTerm.toLowerCase());
             });
 			displaySearchResults(filteredData);
-
-            if (filteredData.length > 0) {
-                filteredData.forEach(function(feature) {
-                    var resultItem = document.createElement('div');
-                    resultItem.className = 'resultItem';
-                    resultItem.textContent = feature.properties.nimi;
-
-                    resultItem.addEventListener('click', function() {
-                        if (currentLayer) {
-                            map.removeLayer(currentLayer);
-                        }
-
-                        currentLayer = L.geoJSON(feature, {
-                            pointToLayer: pointToLayer,
-                            style: function(feature) {
-                                return {
-                                    color: "blue",
-                                    weight: 8,
-                                    opacity: 1
-                                };
-                            }
-                        }).addTo(map);
-
-                        if (feature.geometry.type === 'Point') {
-                            var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            map.setView(latLng, 12);
-                        } else {
-                            map.fitBounds(currentLayer.getBounds(), {
-                                maxZoom: 12
-                            });
-                        }
-                    });
-                    resultsDiv.appendChild(resultItem);
-                });
-                isSearchActive = true;
-                showCloseIcon();
-            }
         }
     } else {
         resultsDiv.style.display = 'none';
