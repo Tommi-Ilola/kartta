@@ -64,7 +64,7 @@ var bridgeIcon = L.icon({
     className: 'silta-haku',
     iconUrl: 'silta1.png', // Silloille
     iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [17, 19], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconAnchor: [17, 20], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
@@ -72,7 +72,7 @@ var SAIcon = L.icon({
     className: 'SA-haku',
     iconUrl: 'SA1.png', // Syöttöasemille
     iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [17, 19], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconAnchor: [17, 20], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
@@ -80,7 +80,7 @@ var VKIcon = L.icon({
     className: 'VK-haku',
     iconUrl: 'VK1.png', // Välikytkinasemille
     iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [17, 19], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconAnchor: [17, 20], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
@@ -128,19 +128,6 @@ function searchLocation(searchTerm) {
         showMagnifierIcon();
     }
 }
-
-document.getElementById('searchInput').addEventListener('input', function() {
-    var searchTerm = this.value.toLowerCase();
-    if (searchTerm.length > 0) {
-        var filteredData = globalGeoJsonData.features.filter(function(feature) {
-            return feature.properties.nimi.toLowerCase().includes(searchTerm);
-        });
-        displaySearchResults(filteredData);
-        piilotaVirheilmoitus();
-    } else {
-        document.getElementById('results').style.display = 'none';
-    }
-});
 
 var currentLayer;
 
