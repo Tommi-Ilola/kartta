@@ -4,7 +4,11 @@ var thirdGeojsonUrl = 'tasoristeykset.geojson';
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
 
-var globalGeoJsonData;
+var globalGeoJsonData = {
+    type: "FeatureCollection",
+    features: []
+};
+
 var globalAnotherGeoJsonData;
 var globalThirdGeoJsonData;
 var globalsageoJsonData;
