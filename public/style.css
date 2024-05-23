@@ -26,7 +26,7 @@ tbody {
 }
 
 .tasoristeys-haku {
-    background-color: #aaa;
+    background-color: #aaaaaac4;
     border-radius: 2rem;
     border: 1px solid #ffffff;
     width: 36px;
@@ -42,8 +42,8 @@ tbody {
     height: 32px;
 }
 
-.sillat-haku {
-    background-color: #aaa;
+.silta-haku {
+    background-color: #aaaaaac4;
     border-radius: 2rem;
     border: 1px solid #ffffff;
     width: 36px;
@@ -54,13 +54,13 @@ tbody {
 	z-index: 10000 !important;
 }
 
-.sillat-haku img {
+.silta-haku img {
     width: 32px;
     height: 32px;
 }
 
 .SA-haku {
-    background-color: #aaa;
+    background-color: #aaaaaac4;
     border-radius: 2rem;
     border: 1px solid #ffffff;
     width: 36px;
@@ -77,7 +77,7 @@ tbody {
 }
 
 .VK-haku {
-    background-color: #aaa;
+    background-color: #aaaaaac4;
     border-radius: 2rem;
     border: 1px solid #ffffff;
     width: 36px;
