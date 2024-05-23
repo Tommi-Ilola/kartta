@@ -9,11 +9,6 @@ var globalGeoJsonData = {
     features: []
 };
 
-var globalAnotherGeoJsonData;
-var globalThirdGeoJsonData;
-var globalsageoJsonData;
-var globalvkGeoJsonData;
-
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
@@ -95,6 +90,10 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
+function convertCoordinates(coords) {
+    return proj4(sourceProjection, destinationProjection, coords);
+}
+
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -111,7 +110,13 @@ function searchLocation(searchTerm) {
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
                     var icon = getIconForFeature(feature);
-                    return L.marker(latlng, {icon: icon});
+                    if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+                        var coordinates = feature.geometry.coordinates[0];
+                        coordinates = convertCoordinates(coordinates);
+                        return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                    } else {
+                        return L.marker(latlng, { icon: icon });
+                    }
                 }
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
@@ -162,7 +167,13 @@ function displaySearchResults(features) {
                 currentLayer = L.geoJSON(feature, {
                     pointToLayer: function(feature, latlng) {
                         var icon = getIconForFeature(feature);
-                        return L.marker(latlng, { icon: icon });
+                        if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+                            var coordinates = feature.geometry.coordinates[0];
+                            coordinates = convertCoordinates(coordinates);
+                            return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                        } else {
+                            return L.marker(latlng, { icon: icon });
+                        }
                     },
                     style: function(feature) {
                         return {
