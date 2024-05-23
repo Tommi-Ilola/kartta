@@ -95,6 +95,7 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
+
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -111,7 +112,16 @@ function searchLocation(searchTerm) {
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
                     var icon = getIconForFeature(feature);
-                    return L.marker(latlng, {icon: icon});
+                    var coordinates = feature.geometry.coordinates;
+                    if (feature.geometry.type === 'Point') {
+                        coordinates = convertCoordinates(coordinates);
+                        return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                    } else if (feature.geometry.type === 'MultiPoint') {
+                        coordinates = coordinates.map(coord => convertCoordinates(coord));
+                        return L.multiMarker(coordinates.map(coord => L.marker([coord[1], coord[0]], { icon: icon })));
+                    } else {
+                        return L.marker(latlng, { icon: icon });
+                    }
                 }
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
@@ -162,7 +172,16 @@ function displaySearchResults(features) {
                 currentLayer = L.geoJSON(feature, {
                     pointToLayer: function(feature, latlng) {
                         var icon = getIconForFeature(feature);
-                        return L.marker(latlng, { icon: icon });
+                        var coordinates = feature.geometry.coordinates;
+                        if (feature.geometry.type === 'Point') {
+                            coordinates = convertCoordinates(coordinates);
+                            return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                        } else if (feature.geometry.type === 'MultiPoint') {
+                            coordinates = coordinates.map(coord => convertCoordinates(coord));
+                            return L.multiMarker(coordinates.map(coord => L.marker([coord[1], coord[0]], { icon: icon })));
+                        } else {
+                            return L.marker(latlng, { icon: icon });
+                        }
                     },
                     style: function(feature) {
                         return {
