@@ -115,9 +115,11 @@ function searchLocation(searchTerm) {
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
                     var icon = getIconForFeature(feature);
-                    if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                        var coordinates = feature.geometry.coordinates[0];
-                        coordinates = convertCoordinates(coordinates);
+                    if (feature.geometry.type === 'Point') {
+                        var coordinates = convertCoordinates(feature.geometry.coordinates);
+                        return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                    } else if (feature.geometry.type === 'MultiPoint') {
+                        var coordinates = convertCoordinates(feature.geometry.coordinates[0]);
                         return L.marker([coordinates[1], coordinates[0]], { icon: icon });
                     } else {
                         return L.marker(latlng, { icon: icon });
@@ -172,9 +174,11 @@ function displaySearchResults(features) {
                 currentLayer = L.geoJSON(feature, {
                     pointToLayer: function(feature, latlng) {
                         var icon = getIconForFeature(feature);
-                        if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                            var coordinates = feature.geometry.coordinates[0];
-                            coordinates = convertCoordinates(coordinates);
+                        if (feature.geometry.type === 'Point') {
+                            var coordinates = convertCoordinates(feature.geometry.coordinates);
+                            return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                        } else if (feature.geometry.type === 'MultiPoint') {
+                            var coordinates = convertCoordinates(feature.geometry.coordinates[0]);
                             return L.marker([coordinates[1], coordinates[0]], { icon: icon });
                         } else {
                             return L.marker(latlng, { icon: icon });
@@ -189,8 +193,9 @@ function displaySearchResults(features) {
                     }
                 }).addTo(map);
 
-                if (feature.geometry.type === 'Point') {
-                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+                    var coordinates = convertCoordinates(feature.geometry.coordinates);
+                    var latLng = L.latLng(coordinates[1], coordinates[0]);
                     map.setView(latLng, 12);
                 } else {
                     map.fitBounds(currentLayer.getBounds(), {
