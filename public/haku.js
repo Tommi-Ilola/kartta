@@ -87,31 +87,25 @@ function getIconForFeature(feature) {
             return SAIcon;
         } else if (feature.properties.type === 'VK') {
             return VKIcon;
+        } else if (feature.properties.type === 'tasoristeys') {
+            return VKIcon;
         }
     }
-    return customIcon;
+
 }
 
 function searchLocation(searchTerm) {
-    var searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+    var searchTerm = document.getElementById('searchInput').value.trim();
 
     if (searchTerm.length > 0 && globalGeoJsonData) {
         var filteredData = {
             type: "FeatureCollection",
             features: globalGeoJsonData.features.filter(function(feature) {
-                return feature.properties.nimi && feature.properties.nimi.toLowerCase().includes(searchTerm);
+                return feature.properties.nimi.toLowerCase().includes(searchTerm.toLowerCase());
             })
         };
 
         if (filteredData.features.length > 0) {
-            filteredData.features.forEach(function(feature) {
-                if (feature.geometry.type === 'MultiPoint') {
-                    feature.geometry.coordinates = feature.geometry.coordinates.map(coord => convertCoordinates(coord));
-                } else if (feature.geometry.type === 'Point') {
-                    feature.geometry.coordinates = convertCoordinates(feature.geometry.coordinates);
-                }
-            });
-
             if (currentLayer) map.removeLayer(currentLayer);
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
@@ -132,43 +126,43 @@ function searchLocation(searchTerm) {
     }
 }
 
+// Funktiot määritellään ensin
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
         return {
-            color: "blue",
+            color: "blue", // Sininen sisäväri
             weight: 8,
             opacity: 1
         };
     }
 }
 
-function convertCoordinates(coordinates) {
-    if (Array.isArray(coordinates[0])) {
-        return coordinates.map(point => proj4(sourceProjection, destinationProjection, point));
-    } else {
-        return proj4(sourceProjection, destinationProjection, coordinates);
+function convertCoordinates(feature) {
+    if (feature.geometry.type === 'MultiLineString') {
+        feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
+            line.map(point => proj4(sourceProjection, destinationProjection, point))
+        );
+    } else if (feature.geometry.type === 'MultiPoint') {
+        feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
+            proj4(sourceProjection, destinationProjection, point)
+        );
     }
+    // Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
 }
 
 Promise.all([
     fetch(geojsonUrl).then(response => response.json()),
     fetch(anotherGeojsonUrl).then(response => response.json()),
     fetch(thirdGeojsonUrl).then(response => response.json()),
-    fetch(SAGeojsonUrl).then(response => response.json()),
-    fetch(VKGeojsonUrl).then(response => response.json())
+	fetch(SAGeojsonUrl).then(response => response.json()),
+	fetch(VKGeojsonUrl).then(response => response.json())
 ]).then(datas => {
     var combinedGeoJsonData = {
         type: "FeatureCollection",
         features: [].concat(...datas.map(data => data.features))
     };
 
-    combinedGeoJsonData.features.forEach(feature => {
-        if (feature.geometry.type === 'MultiPoint' || feature.geometry.type === 'Point') {
-            feature.geometry.coordinates = convertCoordinates(feature.geometry.coordinates);
-        } else if (feature.geometry.type === 'MultiLineString') {
-            feature.geometry.coordinates = feature.geometry.coordinates.map(line => convertCoordinates(line));
-        }
-    });
+    combinedGeoJsonData.features.forEach(convertCoordinates);
 
     globalGeoJsonData = combinedGeoJsonData;
 
@@ -176,11 +170,65 @@ Promise.all([
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
 });
 
+function drawGeoJsonOnMap(geoJsonData) {
+    if (window.searchResultsLayer) {
+        map.removeLayer(window.searchResultsLayer);
+    }
+
+    window.searchResultsLayer = L.geoJSON(geoJsonData, {
+        onEachFeature: onEachFeature,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                icon: L.icon({
+                    iconUrl: 'tasoristeys.png',
+                    iconSize: [30, 30],
+                    iconAnchor: [17, 14],
+                    tooltipAnchor: [1, -10]
+                })
+            });
+        },
+        style: style
+    }).addTo(map);
+
+    L.geoJSON(geoJsonData, {
+        style: function(feature) {
+            if (feature.geometry.type === 'MultiLineString') {
+                return {
+                    color: "#00a8f3",
+                    weight: 3,
+                    opacity: 0
+                };
+            }
+        },
+        pointToLayer: pointToLayer
+    }).addTo(map);
+
+    function onEachFeature(feature, layer) {
+        if (feature.properties && feature.properties.nimi) {
+            layer.bindTooltip(feature.properties.nimi, {
+                permanent: false,
+                direction: 'auto',
+                className: 'custom-tooltip'
+            });
+        }
+    }
+
+    L.geoJSON(geoJsonData, {
+        onEachFeature: onEachFeature,
+        pointToLayer: pointToLayer,
+        style: style
+    }).addTo(map);
+
+    if (geoJsonData.features.length > 0) {
+        map.fitBounds(window.searchResultsLayer.getBounds());
+    }
+}
+
 document.getElementById('searchInput').addEventListener('input', function() {
     var searchTerm = this.value.toLowerCase();
     if (searchTerm.length > 0) {
         var filteredData = globalGeoJsonData.features.filter(function(feature) {
-            return feature.properties.nimi && feature.properties.nimi.toLowerCase().includes(searchTerm);
+            return feature.properties.nimi.toLowerCase().includes(searchTerm);
         });
         displaySearchResults(filteredData);
         piilotaVirheilmoitus();
