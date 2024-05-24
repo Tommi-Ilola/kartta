@@ -10,7 +10,7 @@ var globalGeoJsonData = {
 };
 
 // Määritä projektiot
-proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
 
@@ -210,10 +210,11 @@ function convertCoordinates(feature) {
         );
     } else if (feature.geometry.type === 'MultiPoint' || feature.geometry.type === 'Point') {
         feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
-            Array.isArray(point[0]) ? point.map(p => proj4(sourceProjection, destinationProjection, p)) : proj4(sourceProjection, destinationProjection, point)
+            Array.isArray(point) && point.length === 2 && typeof point[0] === 'number' && typeof point[1] === 'number'
+                ? proj4(sourceProjection, destinationProjection, point)
+                : point
         );
     }
-    // Lisää tähän käsittely muille geometriatyypeille, kuten 'Polygon', jne.
 }
 
 Promise.all([
