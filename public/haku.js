@@ -86,6 +86,7 @@ function getIconForFeature(feature) {
             return customIcon;
         }
     }
+    return customIcon;
 }
 
 function searchLocation(searchTerm) {
@@ -224,6 +225,7 @@ Promise.all([
     combinedGeoJsonData.features.forEach(convertCoordinates);
 
     globalGeoJsonData = combinedGeoJsonData;
+    drawGeoJsonOnMap(globalGeoJsonData); // Kutsutaan drawGeoJsonOnMap funktiota
 
 }).catch(error => {
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
@@ -258,16 +260,3 @@ function onEachFeature(feature, layer) {
         });
     }
 }
-
-L.geoJSON(geoJsonData, {
-    style: function(feature) {
-        if (feature.geometry.type === 'MultiLineString') {
-            return {
-                color: "#00a8f3",
-                weight: 3,
-                opacity: 0
-            };
-        }
-    },
-    pointToLayer: pointToLayer
-}).addTo(map);
