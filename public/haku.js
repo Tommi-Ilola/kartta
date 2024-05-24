@@ -75,6 +75,7 @@ var VKIcon = L.icon({
 
 function getIconForFeature(feature) {
     if (feature.properties) {
+        console.log('Feature type:', feature.properties.type); // Lisätty vianmääritys
         if (feature.properties.type === 'silta') {
             return bridgeIcon;
         } else if (feature.properties.type === 'SA') {
@@ -224,6 +225,7 @@ Promise.all([
     combinedGeoJsonData.features.forEach(convertCoordinates);
 
     globalGeoJsonData = combinedGeoJsonData;
+    drawGeoJsonOnMap(globalGeoJsonData); // Kutsutaan drawGeoJsonOnMap funktiota
 
 }).catch(error => {
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
@@ -237,23 +239,24 @@ function drawGeoJsonOnMap(geoJsonData) {
     window.searchResultsLayer = L.geoJSON(geoJsonData, {
         onEachFeature: onEachFeature,
         pointToLayer: function(feature, latlng) {
-            var icon = getIconForFeature(feature);
-            return L.marker(latlng, { icon: icon });
+            return L.marker(latlng, {
+                icon: getIconForFeature(feature)
+            });
         },
         style: style
     }).addTo(map);
 
-    function onEachFeature(feature, layer) {
-        if (feature.properties && feature.properties.nimi) {
-            layer.bindTooltip(feature.properties.nimi, {
-                permanent: false,
-                direction: 'auto',
-                className: 'custom-tooltip'
-            });
-        }
-    }
-
     if (geoJsonData.features.length > 0) {
         map.fitBounds(window.searchResultsLayer.getBounds());
+    }
+}
+
+function onEachFeature(feature, layer) {
+    if (feature.properties && feature.properties.nimi) {
+        layer.bindTooltip(feature.properties.nimi, {
+            permanent: false,
+            direction: 'auto',
+            className: 'custom-tooltip'
+        });
     }
 }
