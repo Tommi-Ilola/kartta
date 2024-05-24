@@ -9,11 +9,6 @@ var globalGeoJsonData = {
     features: []
 };
 
-var globalAnotherGeoJsonData;
-var globalThirdGeoJsonData;
-var globalsageoJsonData;
-var globalvkGeoJsonData;
-
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
@@ -84,6 +79,7 @@ var VKIcon = L.icon({
 
 function getIconForFeature(feature) {
     if (feature.properties) {
+        console.log('Feature type:', feature.properties.type); // Debug-tulostus
         if (feature.properties.type === 'silta') {
             return bridgeIcon;
         } else if (feature.properties.type === 'SA') {
@@ -233,3 +229,4 @@ function displaySearchResults(features) {
         isSearchActive = false;
     }
 }
+
