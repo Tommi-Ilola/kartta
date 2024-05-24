@@ -10,11 +10,6 @@ var globalThirdGeoJsonData;
 var globalSAGeoJsonData;
 var globalVKGeoJsonData;
 
-var globalGeoJsonData = {
-    type: "FeatureCollection",
-    features: []
-};
-
 // Määritä projektiot
 proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
@@ -210,20 +205,20 @@ function convertCoordinates(feature) {
         feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
             line.map(point => proj4(sourceProjection, destinationProjection, point))
         );
-    } else if (feature.geometry.type === 'MultiPoint') {
+    } else if (feature.geometry.type === 'MultiPoint' || feature.geometry.type === 'Point') {
         feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
             proj4(sourceProjection, destinationProjection, point)
         );
     }
-    // Lisää tähän käsittely muille geometriatyypeille, kuten 'Point', 'Polygon', jne.
+    // Lisää tähän käsittely muille geometriatyypeille, kuten 'Polygon', jne.
 }
 
 Promise.all([
     fetch(geojsonUrl).then(response => response.json()),
     fetch(anotherGeojsonUrl).then(response => response.json()),
     fetch(thirdGeojsonUrl).then(response => response.json()),
-	fetch(SAGeojsonUrl).then(response => response.json()),
-	fetch(VKGeojsonUrl).then(response => response.json())
+    fetch(SAGeojsonUrl).then(response => response.json()),
+    fetch(VKGeojsonUrl).then(response => response.json())
 ]).then(datas => {
     var combinedGeoJsonData = {
         type: "FeatureCollection",
@@ -237,3 +232,32 @@ Promise.all([
 }).catch(error => {
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
 });
+
+function drawGeoJsonOnMap(geoJsonData) {
+    if (window.searchResultsLayer) {
+        map.removeLayer(window.searchResultsLayer);
+    }
+
+    window.searchResultsLayer = L.geoJSON(geoJsonData, {
+        onEachFeature: onEachFeature,
+        pointToLayer: function(feature, latlng) {
+            var icon = getIconForFeature(feature);
+            return L.marker(latlng, {icon: icon});
+        },
+        style: style
+    }).addTo(map);
+
+    function onEachFeature(feature, layer) {
+        if (feature.properties && feature.properties.nimi) {
+            layer.bindTooltip(feature.properties.nimi, {
+                permanent: false,
+                direction: 'auto',
+                className: 'custom-tooltip'
+            });
+        }
+    }
+
+    if (geoJsonData.features.length > 0) {
+        map.fitBounds(window.searchResultsLayer.getBounds());
+    }
+}
