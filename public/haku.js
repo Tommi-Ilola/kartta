@@ -90,8 +90,17 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
+function isValidCoordinate(coord) {
+    return Array.isArray(coord) && coord.length === 2 && isFinite(coord[0]) && isFinite(coord[1]);
+}
+
 function convertCoordinates(coordinates) {
-    return proj4(sourceProjection, destinationProjection, coordinates);
+    if (isValidCoordinate(coordinates)) {
+        return proj4(sourceProjection, destinationProjection, coordinates);
+    } else {
+        console.error('Virheellinen koordinaatti:', coordinates);
+        return null;
+    }
 }
 
 function pointToLayer(feature, latlng) {
@@ -113,7 +122,7 @@ function searchLocation(searchTerm) {
         if (filteredData.features.length > 0) {
             filteredData.features.forEach(function(feature) {
                 if (feature.geometry.type === 'MultiPoint') {
-                    feature.geometry.coordinates = feature.geometry.coordinates.map(convertCoordinates);
+                    feature.geometry.coordinates = feature.geometry.coordinates.map(coord => convertCoordinates(coord));
                 } else if (feature.geometry.type === 'Point') {
                     feature.geometry.coordinates = convertCoordinates(feature.geometry.coordinates);
                 }
@@ -168,7 +177,11 @@ function displaySearchResults(features) {
                     map.removeLayer(currentLayer);
                 }
 
-                feature.geometry.coordinates = feature.geometry.coordinates.map(coord => convertCoordinates(coord));
+                if (feature.geometry.type === 'MultiPoint') {
+                    feature.geometry.coordinates = feature.geometry.coordinates.map(coord => convertCoordinates(coord));
+                } else if (feature.geometry.type === 'Point') {
+                    feature.geometry.coordinates = convertCoordinates(feature.geometry.coordinates);
+                }
 
                 currentLayer = L.geoJSON(feature, {
                     pointToLayer: pointToLayer,
