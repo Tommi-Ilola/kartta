@@ -115,26 +115,31 @@ function searchLocation(searchTerm) {
 
         if (filteredData.features.length > 0) {
             if (currentLayer) map.removeLayer(currentLayer);
-            currentLayer = L.geoJSON(filteredData, {
-                pointToLayer: function(feature, latlng) {
-                    var icon = getIconForFeature(feature);
-                    var coordinates = feature.geometry.coordinates;
+            currentLayer = L.featureGroup();
+            filteredData.features.forEach(function(feature) {
+                L.geoJSON(feature, {
+                    pointToLayer: function(feature, latlng) {
+                        var icon = getIconForFeature(feature);
+                        var coordinates = feature.geometry.coordinates;
 
-                    if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                        if (feature.geometry.type === 'MultiPoint') {
-                            return L.layerGroup(coordinates.map(coord => {
-                                var convertedCoord = convertCoordinates(coord);
+                        if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+                            if (feature.geometry.type === 'MultiPoint') {
+                                var markers = coordinates.map(coord => {
+                                    var convertedCoord = convertCoordinates(coord);
+                                    return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
+                                });
+                                return L.featureGroup(markers);
+                            } else {
+                                var convertedCoord = convertCoordinates(coordinates);
                                 return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
-                            }));
+                            }
                         } else {
-                            var convertedCoord = convertCoordinates(coordinates);
-                            return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
+                            return L.marker(latlng, { icon: icon });
                         }
-                    } else {
-                        return L.marker(latlng, { icon: icon });
                     }
-                }
-            }).addTo(map);
+                }).addTo(currentLayer);
+            });
+            currentLayer.addTo(map);
             map.fitBounds(currentLayer.getBounds());
             isSearchActive = true;
             showCloseIcon();
@@ -180,16 +185,18 @@ function displaySearchResults(features) {
                     map.removeLayer(currentLayer);
                 }
 
-                currentLayer = L.geoJSON(feature, {
+                currentLayer = L.featureGroup();
+                L.geoJSON(feature, {
                     pointToLayer: function(feature, latlng) {
                         var icon = getIconForFeature(feature);
                         var coordinates = feature.geometry.coordinates;
                         if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
                             if (feature.geometry.type === 'MultiPoint') {
-                                return L.layerGroup(coordinates.map(coord => {
+                                var markers = coordinates.map(coord => {
                                     var convertedCoord = convertCoordinates(coord);
                                     return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
-                                }));
+                                });
+                                return L.featureGroup(markers);
                             } else {
                                 var convertedCoord = convertCoordinates(coordinates);
                                 return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
@@ -205,7 +212,8 @@ function displaySearchResults(features) {
                             opacity: 1
                         };
                     }
-                }).addTo(map);
+                }).addTo(currentLayer);
+                currentLayer.addTo(map);
 
                 if (feature.geometry.type === 'Point') {
                     var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
