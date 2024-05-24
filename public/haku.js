@@ -4,32 +4,25 @@ var thirdGeojsonUrl = 'tasoristeykset.geojson';
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
 
-var globalGeoJsonData;
+var globalGeoJsonData = {
+    type: "FeatureCollection",
+    features: []
+};
 
-// Määritä projektiot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
-var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
+var destinationProjection = proj4.defs("EPSG:4326");
 
 function loadGeoJsonData(url, type, callback) {
     fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Verkkovirhe ladattaessa GeoJSON-tiedostoa: ' + response.statusText);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            if (data && data.features) {
-                if (type) {
-                    data.features.forEach(feature => {
-                        feature.properties.type = type;
-                    });
-                }
-                callback(data);
-            } else {
-                throw new Error('GeoJSON data puuttuu tai on virheellinen: ' + url);
+            if (type) {
+                data.features.forEach(feature => {
+                    feature.properties.type = type;
+                });
             }
+            callback(data);
         })
         .catch(error => {
             console.error('Virhe ladattaessa GeoJSON-tiedostoa:', error);
@@ -50,32 +43,32 @@ loadGeoJsonData(VKGeojsonUrl, 'VK', data => combineAllGeoJsonData(data));
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
     iconUrl: 'tasoristeys1.png', // Tasoristeyksille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconSize: [36, 36],
+    iconAnchor: [20, 17],
     tooltipAnchor: [1, -10]
 });
 
 var bridgeIcon = L.icon({
     className: 'silta-haku',
     iconUrl: 'silta1.png', // Silloille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconSize: [36, 36],
+    iconAnchor: [20, 17],
     tooltipAnchor: [1, -10]
 });
 
 var SAIcon = L.icon({
     className: 'SA-haku',
     iconUrl: 'SA1.png', // Rampeille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconSize: [36, 36],
+    iconAnchor: [20, 17],
     tooltipAnchor: [1, -10]
 });
 
 var VKIcon = L.icon({
     className: 'VK-haku',
     iconUrl: 'VK1.png', // Alituksille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconSize: [36, 36],
+    iconAnchor: [20, 17],
     tooltipAnchor: [1, -10]
 });
 
@@ -87,6 +80,8 @@ function getIconForFeature(feature) {
             return SAIcon;
         } else if (feature.properties.type === 'VK') {
             return VKIcon;
+        } else if (feature.properties.type === 'tasoristeys') {
+            return customIcon;
         }
     }
     return customIcon;
@@ -108,7 +103,7 @@ function searchLocation(searchTerm) {
             currentLayer = L.geoJSON(filteredData, {
                 pointToLayer: function(feature, latlng) {
                     var icon = getIconForFeature(feature);
-                    return L.marker(latlng, {icon: icon});
+                    return L.marker(latlng, { icon: icon });
                 }
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
@@ -189,11 +184,10 @@ function displaySearchResults(features) {
     }
 }
 
-// Funktiot määritellään ensin
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
         return {
-            color: "blue", // Sininen sisäväri
+            color: "blue",
             weight: 8,
             opacity: 1
         };
@@ -202,11 +196,11 @@ function style(feature) {
 
 function convertCoordinates(feature) {
     if (feature.geometry.type === 'MultiLineString') {
-        feature.geometry.coordinates = feature.geometry.coordinates.map(line => 
+        feature.geometry.coordinates = feature.geometry.coordinates.map(line =>
             line.map(point => proj4(sourceProjection, destinationProjection, point))
         );
     } else if (feature.geometry.type === 'MultiPoint' || feature.geometry.type === 'Point') {
-        feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
+        feature.geometry.coordinates = feature.geometry.coordinates.map(point =>
             Array.isArray(point) && point.length === 2 && typeof point[0] === 'number' && typeof point[1] === 'number'
                 ? proj4(sourceProjection, destinationProjection, point)
                 : point
@@ -243,7 +237,7 @@ function drawGeoJsonOnMap(geoJsonData) {
         onEachFeature: onEachFeature,
         pointToLayer: function(feature, latlng) {
             var icon = getIconForFeature(feature);
-            return L.marker(latlng, {icon: icon});
+            return L.marker(latlng, { icon: icon });
         },
         style: style
     }).addTo(map);
