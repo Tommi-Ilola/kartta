@@ -79,7 +79,6 @@ var VKIcon = L.icon({
 
 function getIconForFeature(feature) {
     if (feature.properties) {
-        console.log('Feature type:', feature.properties.type); // Debug-tulostus
         if (feature.properties.type === 'silta') {
             return bridgeIcon;
         } else if (feature.properties.type === 'SA') {
@@ -91,51 +90,39 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
-function convertCoordinates(coords) {
-    if (Array.isArray(coords) && coords.length === 2 && isFinite(coords[0]) && isFinite(coords[1])) {
-        return proj4(sourceProjection, destinationProjection, coords);
-    }
-    throw new Error('Invalid coordinates');
+function convertCoordinates(coordinates) {
+    return proj4(sourceProjection, destinationProjection, coordinates);
+}
+
+function pointToLayer(feature, latlng) {
+    var icon = getIconForFeature(feature);
+    return L.marker(latlng, { icon: icon });
 }
 
 function searchLocation(searchTerm) {
-    var searchTerm = document.getElementById('searchInput').value.trim();
+    var searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    if (searchTerm.length > 0 && globalGeoJsonData) {
+    if (searchTerm.length > 0 && globalGeoJsonData.features.length > 0) {
         var filteredData = {
             type: "FeatureCollection",
             features: globalGeoJsonData.features.filter(function(feature) {
-                return feature.properties.nimi.toLowerCase().includes(searchTerm.toLowerCase());
+                return feature.properties.nimi.toLowerCase().includes(searchTerm);
             })
         };
 
         if (filteredData.features.length > 0) {
-            if (currentLayer) map.removeLayer(currentLayer);
-            currentLayer = L.featureGroup();
             filteredData.features.forEach(function(feature) {
-                L.geoJSON(feature, {
-                    pointToLayer: function(feature, latlng) {
-                        var icon = getIconForFeature(feature);
-                        var coordinates = feature.geometry.coordinates;
-
-                        if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                            if (feature.geometry.type === 'MultiPoint') {
-                                var markers = coordinates.map(coord => {
-                                    var convertedCoord = convertCoordinates(coord);
-                                    return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
-                                });
-                                return L.featureGroup(markers);
-                            } else {
-                                var convertedCoord = convertCoordinates(coordinates);
-                                return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
-                            }
-                        } else {
-                            return L.marker(latlng, { icon: icon });
-                        }
-                    }
-                }).addTo(currentLayer);
+                if (feature.geometry.type === 'MultiPoint') {
+                    feature.geometry.coordinates = feature.geometry.coordinates.map(convertCoordinates);
+                } else if (feature.geometry.type === 'Point') {
+                    feature.geometry.coordinates = convertCoordinates(feature.geometry.coordinates);
+                }
             });
-            currentLayer.addTo(map);
+
+            if (currentLayer) map.removeLayer(currentLayer);
+            currentLayer = L.geoJSON(filteredData, {
+                pointToLayer: pointToLayer
+            }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
             isSearchActive = true;
             showCloseIcon();
@@ -181,26 +168,10 @@ function displaySearchResults(features) {
                     map.removeLayer(currentLayer);
                 }
 
-                currentLayer = L.featureGroup();
-                L.geoJSON(feature, {
-                    pointToLayer: function(feature, latlng) {
-                        var icon = getIconForFeature(feature);
-                        var coordinates = feature.geometry.coordinates;
-                        if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                            if (feature.geometry.type === 'MultiPoint') {
-                                var markers = coordinates.map(coord => {
-                                    var convertedCoord = convertCoordinates(coord);
-                                    return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
-                                });
-                                return L.featureGroup(markers);
-                            } else {
-                                var convertedCoord = convertCoordinates(coordinates);
-                                return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
-                            }
-                        } else {
-                            return L.marker(latlng, { icon: icon });
-                        }
-                    },
+                feature.geometry.coordinates = feature.geometry.coordinates.map(coord => convertCoordinates(coord));
+
+                currentLayer = L.geoJSON(feature, {
+                    pointToLayer: pointToLayer,
                     style: function(feature) {
                         return {
                             color: "blue",
@@ -208,10 +179,9 @@ function displaySearchResults(features) {
                             opacity: 1
                         };
                     }
-                }).addTo(currentLayer);
-                currentLayer.addTo(map);
+                }).addTo(map);
 
-                if (feature.geometry.type === 'Point') {
+                if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
                     var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
                     map.setView(latLng, 12);
                 } else {
@@ -229,4 +199,3 @@ function displaySearchResults(features) {
         isSearchActive = false;
     }
 }
-
