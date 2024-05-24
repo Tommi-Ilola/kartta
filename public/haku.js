@@ -1,6 +1,7 @@
 var geojsonUrl = 'tunnelit.geojson';
 var anotherGeojsonUrl = 'sillat.geojson';
 var thirdGeojsonUrl = 'tasoristeykset.geojson';
+
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
 
@@ -74,6 +75,7 @@ var VKIcon = L.icon({
 
 function getIconForFeature(feature) {
     if (feature.properties) {
+        console.log('Feature type:', feature.properties.type); // Lisätty vianmääritys
         if (feature.properties.type === 'silta') {
             return bridgeIcon;
         } else if (feature.properties.type === 'SA') {
@@ -236,23 +238,37 @@ function drawGeoJsonOnMap(geoJsonData) {
     window.searchResultsLayer = L.geoJSON(geoJsonData, {
         onEachFeature: onEachFeature,
         pointToLayer: function(feature, latlng) {
-            var icon = getIconForFeature(feature);
-            return L.marker(latlng, { icon: icon });
+            return L.marker(latlng, {
+                icon: getIconForFeature(feature)
+            });
         },
         style: style
     }).addTo(map);
-
-    function onEachFeature(feature, layer) {
-        if (feature.properties && feature.properties.nimi) {
-            layer.bindTooltip(feature.properties.nimi, {
-                permanent: false,
-                direction: 'auto',
-                className: 'custom-tooltip'
-            });
-        }
-    }
 
     if (geoJsonData.features.length > 0) {
         map.fitBounds(window.searchResultsLayer.getBounds());
     }
 }
+
+function onEachFeature(feature, layer) {
+    if (feature.properties && feature.properties.nimi) {
+        layer.bindTooltip(feature.properties.nimi, {
+            permanent: false,
+            direction: 'auto',
+            className: 'custom-tooltip'
+        });
+    }
+}
+
+L.geoJSON(geoJsonData, {
+    style: function(feature) {
+        if (feature.geometry.type === 'MultiLineString') {
+            return {
+                color: "#00a8f3",
+                weight: 3,
+                opacity: 0
+            };
+        }
+    },
+    pointToLayer: pointToLayer
+}).addTo(map);
