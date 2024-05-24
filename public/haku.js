@@ -230,13 +230,10 @@ Promise.all([
 ]).then(datas => {
     var combinedGeoJsonData = {
         type: "FeatureCollection",
-        features: [].concat(...datas.map(data => {
+        features: [].concat(...datas.map((data, index) => {
+            const types = ['tunneli', 'silta', 'tasoristeys', 'SA', 'VK'];
             data.features.forEach(feature => {
-                if (data === datas[0]) feature.properties.type = 'tunneli';
-                if (data === datas[1]) feature.properties.type = 'silta';
-                if (data === datas[2]) feature.properties.type = 'tasoristeys';
-                if (data === datas[3]) feature.properties.type = 'SA';
-                if (data === datas[4]) feature.properties.type = 'VK';
+                feature.properties.type = types[index];
             });
             return data.features;
         }))
@@ -280,15 +277,67 @@ function onEachFeature(feature, layer) {
     }
 }
 
-L.geoJSON(geoJsonData, {
-    style: function(feature) {
-        if (feature.geometry.type === 'MultiLineString') {
-            return {
-                color: "#00a8f3",
-                weight: 3,
-                opacity: 0
-            };
-        }
-    },
-    pointToLayer: pointToLayer
-}).addTo(map);
+document.getElementById('searchInput').addEventListener('input', function() {
+    var searchTerm = this.value.toLowerCase();
+    if (searchTerm.length > 0) {
+        var filteredData = globalGeoJsonData.features.filter(function(feature) {
+            return feature.properties.nimi.toLowerCase().includes(searchTerm);
+        });
+        displaySearchResults(filteredData);
+        piilotaVirheilmoitus();
+    } else {
+        document.getElementById('results').style.display = 'none';
+    }
+});
+
+var currentLayer;
+
+function displaySearchResults(features) {
+    let resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    if (features.length > 0) {
+        resultsDiv.style.display = 'block';
+
+        features.forEach(function(feature) {
+            var resultItem = document.createElement('div');
+            resultItem.className = 'resultItem';
+            resultItem.textContent = feature.properties.nimi;
+
+            resultItem.addEventListener('click', function() {
+                if (currentLayer) {
+                    map.removeLayer(currentLayer);
+                }
+
+                currentLayer = L.geoJSON(feature, {
+                    pointToLayer: function(feature, latlng) {
+                        var icon = getIconForFeature(feature);
+                        return L.marker(latlng, { icon: icon });
+                    },
+                    style: function(feature) {
+                        return {
+                            color: "blue",
+                            weight: 8,
+                            opacity: 1
+                        };
+                    }
+                }).addTo(map);
+
+                if (feature.geometry.type === 'Point') {
+                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                    map.setView(latLng, 12);
+                } else {
+                    map.fitBounds(currentLayer.getBounds(), {
+                        maxZoom: 12
+                    });
+                }
+            });
+            resultsDiv.appendChild(resultItem);
+        });
+        isSearchActive = true;
+        showCloseIcon();
+    } else {
+        resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+        isSearchActive = false;
+    }
+}
