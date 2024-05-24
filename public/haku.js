@@ -86,7 +86,6 @@ function getIconForFeature(feature) {
             return customIcon;
         }
     }
-    return customIcon;
 }
 
 function searchLocation(searchTerm) {
