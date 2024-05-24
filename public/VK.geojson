@@ -2,7 +2,7 @@
 "type": "FeatureCollection",
 "feature.properties.type": "VK", 
 "nimi": "VK",
-"crs": { "type": "nimi", "properties": { "nimi": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"crs": { "type": "VK", "properties": { "nimi": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "nimi": "Ahvenus VK", "Tyyppi": "1x25kV", "Latitude": 61.656348259222298, "Longitude": 23.503531918066688, "Isännöintialue": "Länsi-Suomi", "Käyttökeskusalue": "Tampere", "Kunnossapitoalue": "3", "Tilirataosa": "1302 (Tampere)–(Seinäjoki)", "Ratanumero": "003", "Ratakilometrisijainti": "0212+0845" }, "geometry": { "type": "Point", "coordinates": [ 23.503531918066688, 61.656348259222298 ] } },
 { "type": "Feature", "properties": { "nimi": "Vahojärvi VK", "Tyyppi": "1x25kV", "Latitude": 61.93889829711847, "Longitude": 23.202320494951401, "Isännöintialue": "Länsi-Suomi", "Käyttökeskusalue": "Tampere", "Kunnossapitoalue": "3", "Tilirataosa": "1302 (Tampere)–(Seinäjoki)", "Ratanumero": "003", "Ratakilometrisijainti": "0248+0208" }, "geometry": { "type": "Point", "coordinates": [ 23.202320494951401, 61.93889829711847 ] } },
