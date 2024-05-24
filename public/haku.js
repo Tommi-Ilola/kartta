@@ -96,7 +96,10 @@ function getIconForFeature(feature) {
 }
 
 function convertCoordinates(coords) {
-    return proj4(sourceProjection, destinationProjection, coords);
+    if (Array.isArray(coords) && coords.length === 2 && isFinite(coords[0]) && isFinite(coords[1])) {
+        return proj4(sourceProjection, destinationProjection, coords);
+    }
+    throw new Error('Invalid coordinates');
 }
 
 function searchLocation(searchTerm) {
@@ -118,16 +121,15 @@ function searchLocation(searchTerm) {
                     var coordinates = feature.geometry.coordinates;
 
                     if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                        coordinates = coordinates.map(coord => convertCoordinates(coord));
                         if (feature.geometry.type === 'MultiPoint') {
-                            return L.multiMarker(coordinates.map(coord => L.marker([coord[1], coord[0]], { icon: icon })));
+                            return L.layerGroup(coordinates.map(coord => {
+                                var convertedCoord = convertCoordinates(coord);
+                                return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
+                            }));
                         } else {
-                            coordinates = convertCoordinates(coordinates);
-                            return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                            var convertedCoord = convertCoordinates(coordinates);
+                            return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
                         }
-                    } else if (feature.geometry.type === 'MultiPoint') {
-                        coordinates = coordinates.map(coord => convertCoordinates(coord));
-                        return L.multiMarker(coordinates.map(coord => L.marker([coord[1], coord[0]], { icon: icon })));
                     } else {
                         return L.marker(latlng, { icon: icon });
                     }
@@ -183,16 +185,15 @@ function displaySearchResults(features) {
                         var icon = getIconForFeature(feature);
                         var coordinates = feature.geometry.coordinates;
                         if (feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-                            coordinates = coordinates.map(coord => convertCoordinates(coord));
                             if (feature.geometry.type === 'MultiPoint') {
-                                return L.multiMarker(coordinates.map(coord => L.marker([coord[1], coord[0]], { icon: icon })));
+                                return L.layerGroup(coordinates.map(coord => {
+                                    var convertedCoord = convertCoordinates(coord);
+                                    return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
+                                }));
                             } else {
-                                coordinates = convertCoordinates(coordinates);
-                                return L.marker([coordinates[1], coordinates[0]], { icon: icon });
+                                var convertedCoord = convertCoordinates(coordinates);
+                                return L.marker([convertedCoord[1], convertedCoord[0]], { icon: icon });
                             }
-                        } else if (feature.geometry.type === 'MultiPoint') {
-                            coordinates = coordinates.map(coord => convertCoordinates(coord));
-                            return L.multiMarker(coordinates.map(coord => L.marker([coord[1], coord[0]], { icon: icon })));
                         } else {
                             return L.marker(latlng, { icon: icon });
                         }
