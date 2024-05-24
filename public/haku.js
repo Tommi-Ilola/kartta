@@ -4,7 +4,6 @@ var thirdGeojsonUrl = 'tasoristeykset.geojson';
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
 
-var globalGeoJsonData;
 var globalAnotherGeoJsonData;
 var globalThirdGeoJsonData;
 var globalSAGeoJsonData;
@@ -225,9 +224,7 @@ function convertCoordinates(feature) {
 Promise.all([
     fetch(geojsonUrl).then(response => response.json()),
     fetch(anotherGeojsonUrl).then(response => response.json()),
-    fetch(thirdGeojsonUrl).then(response => response.json()),
-    fetch(SAGeojsonUrl).then(response => response.json()),
-    fetch(VKGeojsonUrl).then(response => response.json())
+    fetch(thirdGeojsonUrl).then(response => response.json())
 ]).then(datas => {
     var combinedGeoJsonData = {
         type: "FeatureCollection",
