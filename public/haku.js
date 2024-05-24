@@ -10,6 +10,11 @@ var globalThirdGeoJsonData;
 var globalSAGeoJsonData;
 var globalVKGeoJsonData;
 
+var globalGeoJsonData = {
+    type: "FeatureCollection",
+    features: []
+};
+
 // Määritä projektiot
 proj4.defs("EPSG:3067","+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
@@ -24,12 +29,16 @@ function loadGeoJsonData(url, type, callback) {
             return response.json();
         })
         .then(data => {
-            if (type) {
-                data.features.forEach(feature => {
-                    feature.properties.type = type;
-                });
+            if (data && data.features) {
+                if (type) {
+                    data.features.forEach(feature => {
+                        feature.properties.type = type;
+                    });
+                }
+                callback(data);
+            } else {
+                throw new Error('GeoJSON data puuttuu tai on virheellinen: ' + url);
             }
-            callback(data);
         })
         .catch(error => {
             console.error('Virhe ladattaessa GeoJSON-tiedostoa:', error);
