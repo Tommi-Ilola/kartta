@@ -100,6 +100,113 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
+function searchLocation(searchTerm) {
+    var searchTerm = document.getElementById('searchInput').value.trim();
+
+    if (searchTerm.length > 0 && globalGeoJsonData) {
+        var filteredData = {
+            type: "FeatureCollection",
+            features: globalGeoJsonData.features.filter(function(feature) {
+                return feature.properties.nimi.toLowerCase().includes(searchTerm.toLowerCase());
+            })
+        };
+
+        if (filteredData.features.length > 0) {
+            if (currentLayer) map.removeLayer(currentLayer);
+            currentLayer = L.geoJSON(filteredData, {
+                pointToLayer: function(feature, latlng) {
+                    var icon = getIconForFeature(feature);
+                    return L.marker(latlng, { icon: icon });
+                }
+            }).addTo(map);
+            map.fitBounds(currentLayer.getBounds());
+            isSearchActive = true;
+            showCloseIcon();
+        } else {
+            console.error('Ei hakutuloksia.');
+        }
+    } else {
+        console.error('Hakukenttä on tyhjä tai dataa ei ole vielä ladattu.');
+        naytaVirheilmoitus('Hakukenttä on tyhjä tai dataa ei ole vielä ladattu.');
+        showMagnifierIcon();
+    }
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    var searchTerm = this.value.toLowerCase();
+    if (searchTerm.length > 0) {
+        var filteredData = globalGeoJsonData.features.filter(function(feature) {
+            return feature.properties.nimi.toLowerCase().includes(searchTerm);
+        });
+        displaySearchResults(filteredData);
+        piilotaVirheilmoitus();
+    } else {
+        document.getElementById('results').style.display = 'none';
+    }
+});
+
+var currentLayer;
+
+function displaySearchResults(features) {
+    let resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    if (features.length > 0) {
+        resultsDiv.style.display = 'block';
+
+        features.forEach(function(feature) {
+            var resultItem = document.createElement('div');
+            resultItem.className = 'resultItem';
+            resultItem.textContent = feature.properties.nimi;
+
+            resultItem.addEventListener('click', function() {
+                if (currentLayer) {
+                    map.removeLayer(currentLayer);
+                }
+
+                currentLayer = L.geoJSON(feature, {
+                    pointToLayer: function(feature, latlng) {
+                        var icon = getIconForFeature(feature);
+                        return L.marker(latlng, { icon: icon });
+                    },
+                    style: function(feature) {
+                        return {
+                            color: "blue",
+                            weight: 8,
+                            opacity: 1
+                        };
+                    }
+                }).addTo(map);
+
+                if (feature.geometry.type === 'Point') {
+                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                    map.setView(latLng, 12);
+                } else {
+                    map.fitBounds(currentLayer.getBounds(), {
+                        maxZoom: 12
+                    });
+                }
+            });
+            resultsDiv.appendChild(resultItem);
+        });
+        isSearchActive = true;
+        showCloseIcon();
+    } else {
+        resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+        isSearchActive = false;
+    }
+}
+
+function style(feature) {
+    if (feature.geometry.type === 'MultiLineString') {
+        return {
+            color: "blue",
+            weight: 8,
+            opacity: 1
+        };
+    }
+}
+
 function convertCoordinates(feature) {
     if (feature.geometry.type === 'MultiLineString') {
         feature.geometry.coordinates = feature.geometry.coordinates.map(line =>
@@ -142,3 +249,46 @@ Promise.all([
 }).catch(error => {
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
 });
+
+function drawGeoJsonOnMap(geoJsonData) {
+    if (window.searchResultsLayer) {
+        map.removeLayer(window.searchResultsLayer);
+    }
+
+    window.searchResultsLayer = L.geoJSON(geoJsonData, {
+        onEachFeature: onEachFeature,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                icon: getIconForFeature(feature)
+            });
+        },
+        style: style
+    }).addTo(map);
+
+    if (geoJsonData.features.length > 0) {
+        map.fitBounds(window.searchResultsLayer.getBounds());
+    }
+}
+
+function onEachFeature(feature, layer) {
+    if (feature.properties && feature.properties.nimi) {
+        layer.bindTooltip(feature.properties.nimi, {
+            permanent: false,
+            direction: 'auto',
+            className: 'custom-tooltip'
+        });
+    }
+}
+
+L.geoJSON(geoJsonData, {
+    style: function(feature) {
+        if (feature.geometry.type === 'MultiLineString') {
+            return {
+                color: "#00a8f3",
+                weight: 3,
+                opacity: 0
+            };
+        }
+    },
+    pointToLayer: pointToLayer
+}).addTo(map);
