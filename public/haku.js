@@ -4,11 +4,6 @@ var thirdGeojsonUrl = 'tasoristeykset.geojson';
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
 
-var globalAnotherGeoJsonData;
-var globalThirdGeoJsonData;
-var globalSAGeoJsonData;
-var globalVKGeoJsonData;
-
 var globalGeoJsonData = {
     type: "FeatureCollection",
     features: []
@@ -215,13 +210,16 @@ function convertCoordinates(feature) {
         );
     } else if (feature.geometry.type === 'MultiPoint' || feature.geometry.type === 'Point') {
         feature.geometry.coordinates = feature.geometry.coordinates.map(point => 
-            proj4(sourceProjection, destinationProjection, point)
+            Array.isArray(point[0]) ? point.map(p => proj4(sourceProjection, destinationProjection, p)) : proj4(sourceProjection, destinationProjection, point)
         );
     }
     // Lisää tähän käsittely muille geometriatyypeille, kuten 'Polygon', jne.
 }
 
 Promise.all([
+    fetch(geojsonUrl).then(response => response.json()),
+    fetch(anotherGeojsonUrl).then(response => response.json()),
+    fetch(thirdGeojsonUrl).then(response => response.json()),
     fetch(SAGeojsonUrl).then(response => response.json()),
     fetch(VKGeojsonUrl).then(response => response.json())
 ]).then(datas => {
