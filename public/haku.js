@@ -162,7 +162,7 @@ Promise.all([
 
     combinedGeoJsonData.features.forEach(convertCoordinates);
 
-
+    globalGeoJsonData = combinedGeoJsonData;
 
 }).catch(error => {
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
