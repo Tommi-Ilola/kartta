@@ -363,19 +363,13 @@ fetch('sillat.geojson')
     });
 
 fetch('tasoristeykset.geojson')
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Verkkovirhe' + response.status);
-    }
-    return response.json();
-  })
-  .then(data => {
-    geojsonLayer = L.geoJSON(data, {
-      onEachFeature: function (feature, layer) {
-        // Popupin määrittely tulee tänne...
-      },
-      pointToLayer: function (feature, latlng) {
-        // Oletetaan, että sinulla on 'marker-icon.png' kuvatiedosto projektin kansiossa
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
         var customIcon = L.icon({
           iconUrl: 'tasoristeys.png', // Markerin kuvatiedoston polku
           iconSize: [30, 30], // Kuvan koko pikseleinä
@@ -383,22 +377,30 @@ fetch('tasoristeykset.geojson')
           tooltipAnchor: [1, -10], // Popup-ikkunan sijainti suhteessa markerin ankkuriin
         });
 
-        // Muunnetaan koordinaatit EPSG:3067:stä EPSG:4326:een
-        const transformedCoords = proj4('EPSG:3067', 'EPSG:4326', [latlng.lng, latlng.lat]);
+        data.features.forEach(function(feature) {
+            const coords = feature.geometry.coordinates;
+            const properties = feature.properties;
 
-        // Käytä customIconia markerin luomisessa
+            let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
+								<b>Tunnus:</b> ${properties['Tunnus']}<br>
+								<b>Sijaintiraide:</b> ${properties.Sijaintiraide}<br>
+								<b>Ratanumero:</b> ${properties.Ratanumero}<br>
+								<b>Ratakilometrisijainti:</b> ${properties.ratakm}+${properties.etaisyys}<br>
+								<a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+
         return L.marker([transformedCoords[1], transformedCoords[0]], {icon: customIcon})
           .bindTooltip(`Tunnus: ${feature.properties.tunnus}<br>Nimi: ${feature.properties.nimi}`, {
             permanent: false,
             direction: 'top',
             className: 'custom-tooltip'
           });
-      }
-    }).addTo(tasoristeyksetLayerGroup); // Lisää geojsonLayer suoraan tasoristeyksetLayerGroupiin
-  })
-  .catch(error => {
-    console.error('Virhe ladattaessa tasoristeysten geometriaa:', error);
-  });
+
+        // Kutsu tooltipien päivitysfunktiota
+        updateTooltipsVisibility();
+    })
+    .catch(error => {
+        console.error('Virhe ladattaessa lämmitysasemien geometriaa', error);
+    });
 
 fetch('tilirataosat.geojson')
     .then(response => {
