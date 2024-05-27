@@ -365,7 +365,7 @@ fetch('sillat.geojson')
 fetch('tasoristeykset.geojson')
     .then(response => {
         if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
+            throw new Error(`HTTP error ${response.status}`);
         }
         return response.json();
     })
@@ -378,29 +378,37 @@ fetch('tasoristeykset.geojson')
         });
 
         data.features.forEach(function(feature) {
-            const coords = feature.geometry.coordinates;
+            const geometry = feature.geometry;
             const properties = feature.properties;
 
-            // Koordinaattien muunnos EPSG:3067 -> WGS84 (EPSG:4326)
-            const transformedCoords = proj4('EPSG:3067', 'EPSG:4326', coords);
+            if (geometry.type === 'MultiPoint') {
+                geometry.coordinates.forEach(coords => {
+                    // Tarkistetaan, että koordinaatit ovat kelvollisia
+                    if (Array.isArray(coords) && coords.length === 2 && coords.every(Number.isFinite)) {
+                        let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
+                                            <b>Tunnus:</b> ${properties.tunnus}<br>
+											<b>Varoituslaitos:</b> ${properties.varoituslaitos}<br>
+											<b>Tielaji:</b> ${properties.tielaji}<br>
+                                            <b>Ratanumero:</b> ${properties.virallinenSijainti.ratanumero}<br>
+                                            <b>Ratakilometrisijainti:</b> ${properties.virallinenSijainti.ratakm}+${properties.virallinenSijainti.etaisyys}<br>
+                                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
-            let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
-								<b>Tunnus:</b> ${properties['Tunnus']}<br>
-								<b>Sijaintiraide:</b> ${properties.Sijaintiraide}<br>
-								<b>Ratanumero:</b> ${properties.Ratanumero}<br>
-								<b>Ratakilometrisijainti:</b> ${properties.ratakm}+${properties.etaisyys}<br>
-								<a href="https://www.google.com/maps/?q=${transformedCoords[1]},${transformedCoords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
-
-            // Lisää marker kartalle
-            L.marker([transformedCoords[1], transformedCoords[0]], {icon: customIcon})
-                .bindTooltip(`Tunnus: ${properties.tunnus}<br>Nimi: ${properties.nimi}`, {
-                    permanent: false,
-                    direction: 'top',
-                    className: 'custom-tooltip'
-                })
-                .bindPopup(popupContent)
-                .addTo(map); // Varmista, että karttaobjekti `map` on määritelty
-
+                        // Lisää marker kartalle
+                        L.marker([coords[1], coords[0]], {icon: customIcon})
+                            .bindTooltip(`Tunnus: ${properties.tunnus}<br>Nimi: ${properties.nimi}`, {
+                                permanent: false,
+                                direction: 'top',
+                                className: 'custom-tooltip'
+                            })
+                            .bindPopup(popupContent)
+                            .addTo(tasoristeyksetLayerGroup); // Varmista, että karttaobjekti `map` on määritelty
+                    } else {
+                        console.error('Invalid coordinates for feature:', feature);
+                    }
+                });
+            } else {
+                console.error('Unsupported geometry type:', geometry.type);
+            }
         });
 
         // Kutsu tooltipien päivitysfunktiota, jos sellainen on
@@ -408,7 +416,7 @@ fetch('tasoristeykset.geojson')
         // Huom: Jos tätä funktiota ei ole määritelty, poista tämä rivi tai määrittele funktio
     })
     .catch(error => {
-        console.error('Virhe ladattaessa tasoristeysten geometriaa', error);
+        console.error('Virhe ladattaessa tasoristeysten geometriaa:', error);
     });
 
 fetch('tilirataosat.geojson')
