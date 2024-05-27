@@ -1,6 +1,6 @@
 var geojsonUrl = 'tunnelit.geojson';
 var anotherGeojsonUrl = 'sillat.geojson';
-var thirdGeojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.8/tasoristeykset.geojson?srsName=crs%3A84&time=2024-05-24T14%3A26%3A22Z%2F2024-05-24T15%3A26%3A22Z';
+var thirdGeojsonUrl = 'tasoristeykset.geojson';
 
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
