@@ -13,7 +13,7 @@ var globalGeoJsonData = {
 // Määritä projektiot
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
-var destinationProjection = proj4.defs("EPSG:4326");
+var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
 
 function loadGeoJsonData(url, type, callback) {
     fetch(url)
@@ -36,6 +36,7 @@ function combineAllGeoJsonData(data) {
     console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
 }
 
+// Lataa GeoJSON-data ja lisää `type`-ominaisuus
 loadGeoJsonData(geojsonUrl, 'tunneli', data => combineAllGeoJsonData(data));
 loadGeoJsonData(anotherGeojsonUrl, 'silta', data => combineAllGeoJsonData(data));
 loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => combineAllGeoJsonData(data));
@@ -44,33 +45,33 @@ loadGeoJsonData(VKGeojsonUrl, 'VK', data => combineAllGeoJsonData(data));
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
-    iconUrl: 'tasoristeys1.png',
-    iconSize: [36, 36],
-    iconAnchor: [20, 17],
+    iconUrl: 'tasoristeys1.png', // Tasoristeyksille
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
 var bridgeIcon = L.icon({
     className: 'silta-haku',
-    iconUrl: 'silta1.png',
-    iconSize: [36, 36],
-    iconAnchor: [20, 17],
+    iconUrl: 'silta1.png', // Silloille
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
 var SAIcon = L.icon({
     className: 'SA-haku',
-    iconUrl: 'SA1.png',
-    iconSize: [36, 36],
-    iconAnchor: [20, 17],
+    iconUrl: 'SA1.png', // Rampeille
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
 var VKIcon = L.icon({
     className: 'VK-haku',
-    iconUrl: 'VK1.png',
-    iconSize: [36, 36],
-    iconAnchor: [20, 17],
+    iconUrl: 'VK1.png', // Alituksille
+    iconSize: [36, 36], // Kuvan koko pikseleinä
+    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
     tooltipAnchor: [1, -10]
 });
 
@@ -233,7 +234,11 @@ Promise.all([
         }))
     };
 
-    combinedGeoJsonData.features.forEach(convertCoordinates);
+    combinedGeoJsonData.features.forEach(feature => {
+        if (feature.properties.type !== 'tasoristeys') {
+            convertCoordinates(feature);
+        }
+    });
 
     globalGeoJsonData = combinedGeoJsonData;
     console.log('Kaikki GeoJSON datasetit yhdistetty ja muunnettu:', globalGeoJsonData);
@@ -268,70 +273,5 @@ function onEachFeature(feature, layer) {
             direction: 'auto',
             className: 'custom-tooltip'
         });
-    }
-}
-
-document.getElementById('searchInput').addEventListener('input', function() {
-    var searchTerm = this.value.toLowerCase();
-    if (searchTerm.length > 0) {
-        var filteredData = globalGeoJsonData.features.filter(function(feature) {
-            return feature.properties.nimi.toLowerCase().includes(searchTerm);
-        });
-        displaySearchResults(filteredData);
-        piilotaVirheilmoitus();
-    } else {
-        document.getElementById('results').style.display = 'none';
-    }
-});
-
-var currentLayer;
-
-function displaySearchResults(features) {
-    let resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '';
-
-    if (features.length > 0) {
-        resultsDiv.style.display = 'block';
-
-        features.forEach(function(feature) {
-            var resultItem = document.createElement('div');
-            resultItem.className = 'resultItem';
-            resultItem.textContent = feature.properties.nimi;
-
-            resultItem.addEventListener('click', function() {
-                if (currentLayer) {
-                    map.removeLayer(currentLayer);
-                }
-
-                currentLayer = L.geoJSON(feature, {
-                    pointToLayer: function(feature, latlng) {
-                        var icon = getIconForFeature(feature);
-                        return L.marker(latlng, { icon: icon });
-                    },
-                    style: function(feature) {
-                        return {
-                            color: "blue",
-                            weight: 8,
-                            opacity: 1
-                        };
-                    }
-                }).addTo(map);
-
-                if (feature.geometry.type === 'Point') {
-                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                    map.setView(latLng, 12);
-                } else {
-                    map.fitBounds(currentLayer.getBounds(), {
-                        maxZoom: 12
-                    });
-                }
-            });
-            resultsDiv.appendChild(resultItem);
-        });
-        isSearchActive = true;
-        showCloseIcon();
-    } else {
-        resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
-        isSearchActive = false;
     }
 }
