@@ -621,6 +621,7 @@ function clearResults() {
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     resultsDiv.style.display = 'none';
+    map.removeLayer(currentLayer);
 }
 
 function showMagnifierIcon() {
