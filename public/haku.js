@@ -127,19 +127,6 @@ function searchLocation(searchTerm) {
     }
 }
 
-document.getElementById('searchInput').addEventListener('input', function() {
-    var searchTerm = this.value.toLowerCase();
-    if (searchTerm.length > 0) {
-        var filteredData = globalGeoJsonData.features.filter(function(feature) {
-            return feature.properties.nimi.toLowerCase().includes(searchTerm);
-        });
-        displaySearchResults(filteredData);
-        piilotaVirheilmoitus();
-    } else {
-        document.getElementById('results').style.display = 'none';
-    }
-});
-
 var currentLayer;
 
 function displaySearchResults(features) {
