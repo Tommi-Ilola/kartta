@@ -371,35 +371,44 @@ fetch('tasoristeykset.geojson')
     })
     .then(data => {
         var customIcon = L.icon({
-          iconUrl: 'tasoristeys.png', // Markerin kuvatiedoston polku
-          iconSize: [30, 30], // Kuvan koko pikseleinä
-          iconAnchor: [17, 14], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
-          tooltipAnchor: [1, -10], // Popup-ikkunan sijainti suhteessa markerin ankkuriin
+            iconUrl: 'tasoristeys.png', // Markerin kuvatiedoston polku
+            iconSize: [30, 30], // Kuvan koko pikseleinä
+            iconAnchor: [17, 14], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+            tooltipAnchor: [1, -10] // Popup-ikkunan sijainti suhteessa markerin ankkuriin
         });
 
         data.features.forEach(function(feature) {
             const coords = feature.geometry.coordinates;
             const properties = feature.properties;
 
+            // Koordinaattien muunnos EPSG:3067 -> WGS84 (EPSG:4326)
+            const transformedCoords = proj4('EPSG:3067', 'EPSG:4326', coords);
+
             let popupContent = `<b>Nimi:</b> ${properties.nimi}<br>
 								<b>Tunnus:</b> ${properties['Tunnus']}<br>
 								<b>Sijaintiraide:</b> ${properties.Sijaintiraide}<br>
 								<b>Ratanumero:</b> ${properties.Ratanumero}<br>
 								<b>Ratakilometrisijainti:</b> ${properties.ratakm}+${properties.etaisyys}<br>
-								<a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+								<a href="https://www.google.com/maps/?q=${transformedCoords[1]},${transformedCoords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
 
-        return L.marker([transformedCoords[1], transformedCoords[0]], {icon: customIcon})
-          .bindTooltip(`Tunnus: ${feature.properties.tunnus}<br>Nimi: ${feature.properties.nimi}`, {
-            permanent: false,
-            direction: 'top',
-            className: 'custom-tooltip'
-          });
+            // Lisää marker kartalle
+            L.marker([transformedCoords[1], transformedCoords[0]], {icon: customIcon})
+                .bindTooltip(`Tunnus: ${properties.tunnus}<br>Nimi: ${properties.nimi}`, {
+                    permanent: false,
+                    direction: 'top',
+                    className: 'custom-tooltip'
+                })
+                .bindPopup(popupContent)
+                .addTo(map); // Varmista, että karttaobjekti `map` on määritelty
 
-        // Kutsu tooltipien päivitysfunktiota
-        updateTooltipsVisibility();
+        });
+
+        // Kutsu tooltipien päivitysfunktiota, jos sellainen on
+        // updateTooltipsVisibility(); 
+        // Huom: Jos tätä funktiota ei ole määritelty, poista tämä rivi tai määrittele funktio
     })
     .catch(error => {
-        console.error('Virhe ladattaessa lämmitysasemien geometriaa', error);
+        console.error('Virhe ladattaessa tasoristeysten geometriaa', error);
     });
 
 fetch('tilirataosat.geojson')
