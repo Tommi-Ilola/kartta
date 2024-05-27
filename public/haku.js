@@ -137,7 +137,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
         if (!isNaN(searchTerm) || searchTerm.match(/^\d+\+\d+$/)) {
             var kmSuggestion = document.createElement('div');
             kmSuggestion.className = 'resultItem';
-            kmSuggestion.innerHTML = `<strong>km: </strong> ${searchTerm}`;
+            kmSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmSuggestion.addEventListener('click', function() {
                 haeRatakilometrinSijainnit(searchTerm);
             });
@@ -148,7 +148,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
         if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
             var kmValiSuggestion = document.createElement('div');
             kmValiSuggestion.className = 'resultItem';
-            kmValiSuggestion.innerHTML = `<strong>km: </strong> ${searchTerm}`;
+            kmValiSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmValiSuggestion.addEventListener('click', function() {
                 haeRatakilometriValinSijainnit(searchTerm);
             });
