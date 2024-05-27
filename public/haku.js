@@ -31,6 +31,11 @@ function loadGeoJsonData(url, type, callback) {
 }
 
 function combineAllGeoJsonData(data) {
+    data.features.forEach(feature => {
+        if (!feature.properties.type) {
+            feature.properties.type = 'undefined';
+        }
+    });
     globalGeoJsonData.features = globalGeoJsonData.features.concat(data.features);
     console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
 }
@@ -225,38 +230,7 @@ Promise.all([
     combinedGeoJsonData.features.forEach(convertCoordinates);
 
     globalGeoJsonData = combinedGeoJsonData;
-    drawGeoJsonOnMap(globalGeoJsonData); // Kutsutaan drawGeoJsonOnMap funktiota
-
+    console.log('Kaikki GeoJSON datasetit yhdistetty:', globalGeoJsonData);
 }).catch(error => {
     console.error('Virhe ladattaessa GeoJSON-tietoja:', error);
 });
-
-function drawGeoJsonOnMap(geoJsonData) {
-    if (window.searchResultsLayer) {
-        map.removeLayer(window.searchResultsLayer);
-    }
-
-    window.searchResultsLayer = L.geoJSON(geoJsonData, {
-        onEachFeature: onEachFeature,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {
-                icon: getIconForFeature(feature)
-            });
-        },
-        style: style
-    }).addTo(map);
-
-    if (geoJsonData.features.length > 0) {
-        map.fitBounds(window.searchResultsLayer.getBounds());
-    }
-}
-
-function onEachFeature(feature, layer) {
-    if (feature.properties && feature.properties.nimi) {
-        layer.bindTooltip(feature.properties.nimi, {
-            permanent: false,
-            direction: 'auto',
-            className: 'custom-tooltip'
-        });
-    }
-}
