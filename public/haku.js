@@ -201,18 +201,6 @@ function displaySearchResults(features) {
             resultItem.className = 'resultItem';
             resultItem.textContent = feature.properties.nimi;
 
-            // Hae kaupungin nimi koordinaattien perusteella
-            if (feature.geometry.type === 'Point') {
-                let lon = feature.geometry.coordinates[0];
-                let lat = feature.geometry.coordinates[1];
-
-                getCityFromCoordinates(lon, lat, function(getCityName) {
-                    resultItem.textContent += ` (${getCityName})`;
-                });
-            } else {
-                resultItem.textContent += ' (Ei tiedossa)';
-            }
-
             resultItem.addEventListener('click', function() {
                 if (currentLayer) {
                     map.removeLayer(currentLayer);
@@ -340,10 +328,10 @@ function onEachFeature(feature, layer) {
                 popupContent += '<br><strong>Tyyppi:</strong> Silta';
                 break;
             case 'tasoristeys':
-                popupContent += '<br><strong>Tyyppi:</strong> Tasoristeys';
+                popupContent += '<b>Nimi:</b> ${properties.nimi}<br><b>Tunnus:</b> ${properties.tunnus}<br><b>Varoituslaitos:</b> ${properties.varoituslaitos}<br><b>Tielaji:</b> ${properties.tielaji}<br><b>Ratanumero:</b> ${properties.virallinenSijainti.ratanumero}<br><b>Ratakilometrisijainti:</b> ${properties.virallinenSijainti.ratakm}+${properties.virallinenSijainti.etaisyys}<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>';
                 break;
             case 'SA':
-                popupContent += '<br><strong>Tyyppi:</strong> SA';
+                popupContent += '<b>Nimi:</b> ${properties.nimi}<br><b>Tunnus:</b> ${properties.SyöttöasemanTunnus}<br><b>Tyyppi:</b> ${properties.Tyyppi}<br><b>Ratanumero:</b> ${properties.Ratanumero}<br><b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br><b>Tilirataosa:</b> ${properties.Tilirataosa}<br><b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br><b>Isännöintialue:</b> ${properties.Isännöintialue}<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>';
                 break;
             case 'VK':
                 popupContent += '<br><strong>Tyyppi:</strong> VK';
