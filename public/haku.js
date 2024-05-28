@@ -181,8 +181,8 @@ document.getElementById('searchInput').addEventListener('input', function() {
                             },
                             style: function(feature) {
                                 return {
-                                    color: "blue",
-                                    weight: 8,
+                                    color: "#5eff00",
+                                    weight: 12,
                                     opacity: 1
                                 };
                             },
@@ -235,8 +235,8 @@ function displaySearchResults(features) {
                     },
                     style: function(feature) {
                         return {
-                            color: "blue",
-                            weight: 8,
+                            color: "#5eff00",
+                            weight: 12,
                             opacity: 1
                         };
                     },
