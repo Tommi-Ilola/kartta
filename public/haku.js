@@ -112,7 +112,8 @@ function searchLocation(searchTerm) {
                 pointToLayer: function(feature, latlng) {
                     var icon = getIconForFeature(feature);
                     return L.marker(latlng, { icon: icon });
-                }
+                },
+                onEachFeature: onEachFeature
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
             isSearchActive = true;
@@ -184,7 +185,8 @@ document.getElementById('searchInput').addEventListener('input', function() {
                                     weight: 8,
                                     opacity: 1
                                 };
-                            }
+                            },
+                            onEachFeature: onEachFeature
                         }).addTo(map);
 
                         if (feature.geometry.type === 'Point') {
@@ -237,7 +239,8 @@ function displaySearchResults(features) {
                             weight: 8,
                             opacity: 1
                         };
-                    }
+                    },
+                    onEachFeature: onEachFeature
                 }).addTo(map);
 
                 if (feature.geometry.type === 'Point') {
@@ -335,10 +338,36 @@ function drawGeoJsonOnMap(geoJsonData) {
 
 function onEachFeature(feature, layer) {
     if (feature.properties && feature.properties.nimi) {
-        layer.bindTooltip(feature.properties.nimi, {
-            permanent: false,
+        var tooltipContent = feature.properties.nimi;
+        var popupContent = '<strong>Nimi:</strong> ' + feature.properties.nimi;
+
+        switch (feature.properties.type) {
+            case 'tunneli':
+                popupContent += '<br><strong>Tyyppi:</strong> Tunneli';
+                break;
+            case 'silta':
+                popupContent += '<br><strong>Tyyppi:</strong> Silta';
+                break;
+            case 'tasoristeys':
+                popupContent += '<br><strong>Tyyppi:</strong> Tasoristeys';
+                break;
+            case 'SA':
+                popupContent += '<br><strong>Tyyppi:</strong> SA';
+                break;
+            case 'VK':
+                popupContent += '<br><strong>Tyyppi:</strong> VK';
+                break;
+        }
+
+        layer.bindTooltip(tooltipContent, {
+            permanent: true,
             direction: 'auto',
-            className: 'custom-tooltip'
+            className: 'custom-tooltip',
+            offset: [0, -15] // Määritä tooltipin ankkurointi
+        });
+
+        layer.bindPopup(popupContent, {
+            offset: L.point(0, -10) // Määritä popupin ankkurointi
         });
     }
 }
