@@ -164,42 +164,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
             });
 
             if (filteredData.length > 0) {
-                filteredData.forEach(function(feature) {
-                    var resultItem = document.createElement('div');
-                    resultItem.className = 'resultItem';
-                    resultItem.textContent = feature.properties.nimi;
-
-                    resultItem.addEventListener('click', function() {
-                        if (currentLayer) {
-                            map.removeLayer(currentLayer);
-                        }
-
-                        currentLayer = L.geoJSON(feature, {
-                            pointToLayer: function(feature, latlng) {
-                                var icon = getIconForFeature(feature);
-                                return L.marker(latlng, { icon: icon });
-                            },
-                            style: function(feature) {
-                                return {
-                                    color: "#5eff00",
-                                    weight: 12,
-                                    opacity: 1
-                                };
-                            },
-                            onEachFeature: onEachFeature
-                        }).addTo(map);
-
-                        if (feature.geometry.type === 'Point') {
-                            var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            map.setView(latLng, 12);
-                        } else {
-                            map.fitBounds(currentLayer.getBounds(), {
-                                maxZoom: 12
-                            });
-                        }
-                    });
-                    resultsDiv.appendChild(resultItem);
-                });
+                displaySearchResults(filteredData);
                 isSearchActive = true;
                 showCloseIcon();
             }
@@ -211,6 +176,19 @@ document.getElementById('searchInput').addEventListener('input', function() {
 
 var currentLayer;
 
+function getCity(lon, lat, callback) {
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+    .then(response => response.json())
+    .then(data => {
+      let getCityName = data.address.city || data.address.town || 'Ei tiedossa';
+      callback(getCityName);
+    })
+    .catch(error => {
+      console.error("Error fetching city:", error);
+      callback('Ei tiedossa');
+    });
+}
+
 function displaySearchResults(features) {
     let resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
@@ -219,9 +197,21 @@ function displaySearchResults(features) {
         resultsDiv.style.display = 'block';
 
         features.forEach(function(feature) {
-            var resultItem = document.createElement('div');
+            let resultItem = document.createElement('div');
             resultItem.className = 'resultItem';
             resultItem.textContent = feature.properties.nimi;
+
+            // Hae kaupungin nimi koordinaattien perusteella
+            if (feature.geometry.type === 'Point') {
+                let lon = feature.geometry.coordinates[0];
+                let lat = feature.geometry.coordinates[1];
+
+                getCityFromCoordinates(lon, lat, function(getCityName) {
+                    resultItem.textContent += ` (${getCityName})`;
+                });
+            } else {
+                resultItem.textContent += ' (Ei tiedossa)';
+            }
 
             resultItem.addEventListener('click', function() {
                 if (currentLayer) {
@@ -235,8 +225,8 @@ function displaySearchResults(features) {
                     },
                     style: function(feature) {
                         return {
-                            color: "#5eff00",
-                            weight: 12,
+                            color: "blue",
+                            weight: 8,
                             opacity: 1
                         };
                     },
@@ -252,6 +242,7 @@ function displaySearchResults(features) {
                     });
                 }
             });
+
             resultsDiv.appendChild(resultItem);
         });
         isSearchActive = true;
@@ -360,10 +351,10 @@ function onEachFeature(feature, layer) {
         }
 
         layer.bindTooltip(tooltipContent, {
-            permanent: true,
+            permanent: false,
             direction: 'auto',
             className: 'custom-tooltip',
-            offset: [0, -15] // Määritä tooltipin ankkurointi
+            offset: [0, -10] // Määritä tooltipin ankkurointi
         });
 
         layer.bindPopup(popupContent, {
