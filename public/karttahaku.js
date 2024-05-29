@@ -246,10 +246,10 @@ async function mapOnClick(e) {
 	viimeisinMarker = L.marker([lat, lng], {
         icon: L.divIcon({
             className: 'custom-div-icon',
-            html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'>+</span>`,
+            html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'></span>`,
             iconSize: [30, 42],
             iconAnchor: [15, 48],
-            popupAnchor: [0, -48]
+            popupAnchor: [-1, -48]
         })
     }).addTo(map).bindPopup(tempPopupContent).openPopup();
 
