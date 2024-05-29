@@ -620,10 +620,9 @@ function resetSearch() {
 function clearResults() {
     const resultsDiv = document.getElementById('results');
 	const kmDiv = document.getElementById('km');
-    resultsDiv.innerHTML = '';
+    	resultsDiv.innerHTML = '';
 	kmDiv.innerHTML = '';
-    resultsDiv.style.display = 'none';
-	kmDiv.style.display = 'none';
+    	resultsDiv.style.display = 'none';
 	map.removeLayer(currentLayer);
 }
 
