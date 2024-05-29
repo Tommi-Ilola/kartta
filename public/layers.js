@@ -290,6 +290,47 @@ fetch('tunnelit.geojson')
             })
         };
 
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.nimi) {
+                var popupContent = `<strong>Nimi:</strong> ${feature.properties.nimi}`;
+
+                if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
+                    var ratakmvalit = feature.properties.ratakmvalit[0];
+                    popupContent += `<br><strong>Ratanumero:</strong> ${ratakmvalit.ratanumero}`;
+                    popupContent += `<br><strong>Ratakilometriväli:</strong> ${ratakmvalit.alku.ratakm}+${ratakmvalit.alku.etaisyys} - ${ratakmvalit.loppu.ratakm}+${ratakmvalit.loppu.etaisyys}`;
+                }
+
+                if (feature.geometry && feature.geometry.coordinates && feature.geometry.coordinates.length > 0) {
+                    const firstCoordinate = feature.geometry.coordinates[0][0]; // Using the first coordinate of the first line
+                    const lat = firstCoordinate[1];
+                    const lon = firstCoordinate[0];
+                    popupContent += `<br><a href="https://www.google.com/maps/?q=${lat},${lon}" target="_blank">Näytä Google Mapsissa</a>`;
+                }
+
+                layer.bindTooltip(feature.properties.nimi, {
+                    permanent: false,
+                    direction: 'auto',
+                    className: 'custom-tooltip',
+                    offset: [0, -10] // Määritä tooltipin ankkurointi
+                });
+
+                layer.bindPopup(popupContent, {
+                    offset: L.point(0, -10) // Määritä popupin ankkurointi
+                });
+            }
+        }
+
+        L.geoJSON(transformedData, {
+			style: function(feature) {
+				return { color: "blue", weight: 5, zIndex: 1000 };
+			},
+            onEachFeature: onEachFeature
+        }).addTo(tunnelitLayerGroup);
+    })
+    .catch(error => {
+        console.error('Virhe ladattaessa GeoJSON-tiedostoa:', error);
+    });
+
         const geoLayer = L.geoJSON(transformedData, {
 			style: function(feature) {
 				return { color: "blue", weight: 5, zIndex: 1000 };
