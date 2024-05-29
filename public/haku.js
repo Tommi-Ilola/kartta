@@ -281,7 +281,7 @@ Promise.all([
     var combinedGeoJsonData = {
         type: "FeatureCollection",
         features: [].concat(...datas.map((data, index) => {
-            const types = ['tunneli', 'silta', 'tasoristeykset', 'SA', 'VK'];
+            const types = ['tunnelit', 'sillat', 'tasoristeykset', 'Syöttöasemat', 'Välikytkinasemat'];
             data.features.forEach(feature => {
                 feature.properties.type = types[index];
             });
