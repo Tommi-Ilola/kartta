@@ -10,8 +10,6 @@ var globalGeoJsonData = {
     features: []
 };
 
-// Määritä projektiot
-proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
 
@@ -164,7 +162,43 @@ document.getElementById('searchInput').addEventListener('input', function() {
             });
 
             if (filteredData.length > 0) {
-                displaySearchResults(filteredData);
+				displaySearchResults(filteredData);
+                filteredData.forEach(function(feature) {
+                    var resultItem = document.createElement('div');
+                    resultItem.className = 'resultItem';
+                    resultItem.textContent = feature.properties.nimi;
+
+                    resultItem.addEventListener('click', function() {
+                        if (currentLayer) {
+                            map.removeLayer(currentLayer);
+                        }
+
+                        currentLayer = L.geoJSON(feature, {
+                            pointToLayer: function(feature, latlng) {
+                                var icon = getIconForFeature(feature);
+                                return L.marker(latlng, { icon: icon });
+                            },
+                            style: function(feature) {
+                                return {
+                                    color: "blue",
+                                    weight: 8,
+                                    opacity: 1
+                                };
+                            },
+                            onEachFeature: onEachFeature
+                        }).addTo(map);
+
+                        if (feature.geometry.type === 'Point') {
+                            var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                            map.setView(latLng, 12);
+                        } else {
+                            map.fitBounds(currentLayer.getBounds(), {
+                                maxZoom: 12
+                            });
+                        }
+                    });
+                    resultsDiv.appendChild(resultItem);
+                });
                 isSearchActive = true;
                 showCloseIcon();
             }
@@ -176,19 +210,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
 
 var currentLayer;
 
-function getCity(lon, lat, callback) {
-  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-    .then(response => response.json())
-    .then(data => {
-      let getCityName = data.address.city || data.address.town || 'Ei tiedossa';
-      callback(getCityName);
-    })
-    .catch(error => {
-      console.error("Error fetching city:", error);
-      callback('Ei tiedossa');
-    });
-}
-
 function displaySearchResults(features) {
     let resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
@@ -196,45 +217,60 @@ function displaySearchResults(features) {
     if (features.length > 0) {
         resultsDiv.style.display = 'block';
 
-        features.forEach(function(feature) {
-            let resultItem = document.createElement('div');
-            resultItem.className = 'resultItem';
-            resultItem.textContent = feature.properties.nimi;
+        // Ryhmittele hakutulokset tyypin mukaan
+        var groupedResults = features.reduce((acc, feature) => {
+            const type = feature.properties.type;
+            if (!acc[type]) {
+                acc[type] = [];
+            }
+            acc[type].push(feature);
+            return acc;
+        }, {});
 
-            resultItem.addEventListener('click', function() {
-                if (currentLayer) {
-                    map.removeLayer(currentLayer);
-                }
+        // Luo ryhmätulokset ja lisää ne resultsDiv-elementtiin
+        for (const [type, features] of Object.entries(groupedResults)) {
+            var groupHeader = document.createElement('div');
+            groupHeader.className = 'groupHeader';
+            groupHeader.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            resultsDiv.appendChild(groupHeader);
 
-                currentLayer = L.geoJSON(feature, {
-                    pointToLayer: function(feature, latlng) {
-                        var icon = getIconForFeature(feature);
-                        return L.marker(latlng, { icon: icon });
-                    },
-                    style: function(feature) {
-                        return {
-                            color: "blue",
-                            weight: 8,
-                            opacity: 1
-                        };
-                    },
-                    onEachFeature: onEachFeature
-                }).addTo(map);
+            features.forEach(function(feature) {
+                var resultItem = document.createElement('div');
+                resultItem.className = 'resultItem';
+                resultItem.textContent = feature.properties.nimi;
 
-                if (feature.geometry.type === 'Point') {
-                    var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                    map.setView(latLng, 12);
-                } else {
-                    map.fitBounds(currentLayer.getBounds(), {
-                        maxZoom: 12
-                    });
-                }
+                resultItem.addEventListener('click', function() {
+                    if (currentLayer) {
+                        map.removeLayer(currentLayer);
+                    }
+
+                    currentLayer = L.geoJSON(feature, {
+                        pointToLayer: function(feature, latlng) {
+                            var icon = getIconForFeature(feature);
+                            return L.marker(latlng, { icon: icon });
+                        },
+                        style: function(feature) {
+                            return {
+                                color: "#5eff00",
+                                weight: 8,
+                                opacity: 1
+                            };
+                        },
+                        onEachFeature: onEachFeature
+                    }).addTo(map);
+
+                    if (feature.geometry.type === 'Point') {
+                        var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                        map.setView(latLng, 12);
+                    } else {
+                        map.fitBounds(currentLayer.getBounds(), {
+                            maxZoom: 12
+                        });
+                    }
+                });
+                resultsDiv.appendChild(resultItem);
             });
-
-            resultsDiv.appendChild(resultItem);
-        });
-        isSearchActive = true;
-        showCloseIcon();
+        }
     } else {
         resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
         isSearchActive = false;
@@ -244,7 +280,7 @@ function displaySearchResults(features) {
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
         return {
-            color: "blue",
+            color: "#5eff00",
             weight: 8,
             opacity: 1
         };
@@ -318,35 +354,80 @@ function drawGeoJsonOnMap(geoJsonData) {
 function onEachFeature(feature, layer) {
     if (feature.properties && feature.properties.nimi) {
         var tooltipContent = feature.properties.nimi;
-        var popupContent = '<strong>Nimi:</strong> ' + feature.properties.nimi;
+        var popupContent = '';
+        const coords = feature.geometry.type === 'MultiLineString' ? feature.geometry.coordinates[0][0] : feature.geometry.coordinates;
 
         switch (feature.properties.type) {
             case 'tunneli':
-                popupContent += '<br><strong>Tyyppi:</strong> Tunneli';
+				popupContent += `<b><strong>Tunneli</strong></b><br>`;
+                popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
+                if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
+                    var ratakmvalit = feature.properties.ratakmvalit[0];
+                    popupContent += `<br><strong>Ratanumero:</strong> ${ratakmvalit.ratanumero}
+                                     <br><strong>Ratakm alku:</strong> ${ratakmvalit.alku.ratakm}+${ratakmvalit.alku.etaisyys} - ${ratakmvalit.loppu.ratakm}+${ratakmvalit.loppu.etaisyys}`;
+                }
+                popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'silta':
-                popupContent += '<br><strong>Tyyppi:</strong> Silta';
+				popupContent += `<b><strong>Silta</strong></b><br>`;
+                popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                                <b>Tunnus:</b> ${feature.properties['Tunnus']}<br>
+                                <b>Väylänpito:</b> ${feature.properties.Väylänpito}<br>
+                                <b>Ratanumero:</b> ${feature.properties.Ratanumero}<br>
+                                <b>Ratakilometrisijainti:</b> ${feature.properties.Ratakilometrisijainti}<br>
+                                <b>Tilirataosa:</b> ${feature.properties.Tilirataosa}<br>
+                                <b>Kunnossapitoalue:</b> ${feature.properties.Kunnossapitoalue}<br>
+                                <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
+                                <b>Omistaja:</b> ${feature.properties.Omistaja}<br>
+                                <b>Sijaintikunta:</b> ${feature.properties.Sijaintikunnat}<br>
+                                <b>Katuosoite:</b> ${feature.properties.Katuosoitteet}<br>
+                                <b>Käyttötarkoitus:</b> ${feature.properties.Käyttötarkoitus}<br>
+                                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'tasoristeys':
-                popupContent += '<b>Nimi:</b> ${properties.nimi}<br><b>Tunnus:</b> ${properties.tunnus}<br><b>Varoituslaitos:</b> ${properties.varoituslaitos}<br><b>Tielaji:</b> ${properties.tielaji}<br><b>Ratanumero:</b> ${properties.virallinenSijainti.ratanumero}<br><b>Ratakilometrisijainti:</b> ${properties.virallinenSijainti.ratakm}+${properties.virallinenSijainti.etaisyys}<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>';
+				popupContent += `<b><strong>Tasoristeys</strong></b><br>`;
+                popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                                <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
+                                <strong>Varoituslaitos:</strong> ${feature.properties.varoituslaitos}<br>
+                                <strong>Tielaji:</strong> ${feature.properties.tielaji}<br>
+                                <strong>Ratanumero:</strong> ${feature.properties.virallinenSijainti.ratanumero}<br>
+                                <strong>Ratakilometrisijainti:</strong> ${feature.properties.virallinenSijainti.ratakm}+${feature.properties.virallinenSijainti.etaisyys}<br>
+                                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'SA':
-                popupContent += '<b>Nimi:</b> ${properties.nimi}<br><b>Tunnus:</b> ${properties.SyöttöasemanTunnus}<br><b>Tyyppi:</b> ${properties.Tyyppi}<br><b>Ratanumero:</b> ${properties.Ratanumero}<br><b>Ratakilometrisijainti:</b> ${properties.Ratakilometrisijainti}<br><b>Tilirataosa:</b> ${properties.Tilirataosa}<br><b>Kunnossapitoalue:</b> ${properties.Kunnossapitoalue}<br><b>Isännöintialue:</b> ${properties.Isännöintialue}<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>';
+				popupContent += `<b><strong>Syöttöasema</strong></b><br>`;
+                popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                                <b>Tunnus:</b> ${feature.properties['SyöttöasemanTunnus']}<br>
+                                <b>Tyyppi:</b> ${feature.properties.Tyyppi}<br>
+                                <b>Ratanumero:</b> ${feature.properties.Ratanumero}<br>
+                                <b>Ratakilometrisijainti:</b> ${feature.properties.Ratakilometrisijainti}<br>
+                                <b>Tilirataosa:</b> ${feature.properties.Tilirataosa}<br>
+                                <b>Kunnossapitoalue:</b> ${feature.properties.Kunnossapitoalue}<br>
+                                <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
+                                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'VK':
-                popupContent += '<br><strong>Tyyppi:</strong> VK';
+				popupContent += `<b><strong>Välikytkinasema</strong></b><br>`;
+                popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                                <b>Tyyppi:</b> ${feature.properties.Tyyppi}<br>
+                                <b>Ratanumero:</b> ${feature.properties.Ratanumero}<br>
+                                <b>Ratakilometrisijainti:</b> ${feature.properties.Ratakilometrisijainti}<br>
+                                <b>Tilirataosa:</b> ${feature.properties.Tilirataosa}<br>
+                                <b>Kunnossapitoalue:</b> ${feature.properties.Kunnossapitoalue}<br>
+                                <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
+                                <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
         }
 
         layer.bindTooltip(tooltipContent, {
-            permanent: false,
+            permanent: true,
             direction: 'auto',
             className: 'custom-tooltip',
-            offset: [0, -10] // Määritä tooltipin ankkurointi
+            offset: [0, -10]
         });
 
         layer.bindPopup(popupContent, {
-            offset: L.point(0, -10) // Määritä popupin ankkurointi
+            offset: L.point(0, -10)
         });
     }
 }
