@@ -618,12 +618,17 @@ function resetSearch() {
 }
 
 function clearResults() {
+    const kmDiv = document.getElementById('km');
     const resultsDiv = document.getElementById('results');
-	const kmDiv = document.getElementById('km');
-    	resultsDiv.innerHTML = '';
-	kmDiv.innerHTML = '';
-    	resultsDiv.style.display = 'none';
-	map.removeLayer(currentLayer);
+    kmDiv.innerHTML = '';
+    resultsDiv.innerHTML = '';
+    kmDiv.style.display = 'none';
+    resultsDiv.style.display = 'none';
+
+    if (currentLayer) {
+        map.removeLayer(currentLayer);
+        currentLayer = null;
+    }
 }
 
 function showMagnifierIcon() {
