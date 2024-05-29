@@ -290,6 +290,7 @@ fetch('tunnelit.geojson')
             })
         };
 
+        // Function to handle each feature and add a popup
         function onEachFeature(feature, layer) {
             if (feature.properties && feature.properties.nimi) {
                 var popupContent = `<strong>Nimi:</strong> ${feature.properties.nimi}`;
@@ -329,27 +330,6 @@ fetch('tunnelit.geojson')
     })
     .catch(error => {
         console.error('Virhe ladattaessa GeoJSON-tiedostoa:', error);
-    });
-
-        const geoLayer = L.geoJSON(transformedData, {
-			style: function(feature) {
-				return { color: "blue", weight: 5, zIndex: 1000 };
-			},
-			onEachFeature: function(feature, layer) {
-				if (feature.properties && feature.properties.nimi) {
-					layer.bindTooltip(feature.properties.nimi, {
-						className: 'custom-tooltip',
-						sticky: true  // Tämä saa tooltipin seuraamaan hiirtä
-					});
-				}
-			}
-
-		}).addTo(tunnelitLayerGroup);
-
-        map.fitBounds(geoLayer.getBounds());
-    })
-    .catch(error => {
-        console.error("Virhe ladattaessa tunneleiden geometriaa:", error);
     });
 
 // Siltojen lisääminen karttaan
