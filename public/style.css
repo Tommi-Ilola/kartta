@@ -1195,6 +1195,10 @@ button {
     transform: translateX(-100vw);
 }
 
+#loadData{
+    display: none;
+}
+
 @font-face {
   font-family: "San Francisco";
   font-weight: 400;
