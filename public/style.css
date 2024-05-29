@@ -445,6 +445,21 @@ h1 {
     background-color: #ccc;
 }
 
+.kmItem {
+    padding: 5px 10px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    column-width: 10px;
+    width: -webkit-fill-available;
+    text-align: left;
+    display: flex;
+}
+
+.kmItem:hover {
+    background-color: #ccc;
+}
+
 .result:hover {
     background-color: rgb(54 142 233 / 22%);
 }
@@ -566,6 +581,16 @@ td {
 }
 
 #results {
+    z-index: 1001;
+    width: 100%;
+    font-family: calibri;
+    display: none;
+    background-color: white;
+	max-height: 90vh;
+    overflow: auto
+}
+
+#km {
     z-index: 1001;
     width: 100%;
     font-family: calibri;
@@ -929,6 +954,15 @@ th {
 }
 
 #results {
+    z-index: 1001;
+    width: 100%;
+    font-family: calibri;
+    background-color: white;
+    max-height: 168pt;
+    overflow: auto;
+}
+
+#km {
     z-index: 1001;
     width: 100%;
     font-family: calibri;
