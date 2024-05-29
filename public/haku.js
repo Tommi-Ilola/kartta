@@ -341,17 +341,17 @@ function onEachFeature(feature, layer) {
             case 'sillat':
 				popupContent += `<b><strong>Silta</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
-                                <b>Tunnus:</b> ${feature.properties['Tunnus']}<br>
-                                <b>Väylänpito:</b> ${feature.properties.Väylänpito}<br>
-                                <b>Ratanumero:</b> ${feature.properties.Ratanumero}<br>
-                                <b>Ratakilometrisijainti:</b> ${feature.properties.Ratakilometrisijainti}<br>
-                                <b>Tilirataosa:</b> ${feature.properties.Tilirataosa}<br>
-                                <b>Kunnossapitoalue:</b> ${feature.properties.Kunnossapitoalue}<br>
-                                <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
-                                <b>Omistaja:</b> ${feature.properties.Omistaja}<br>
-                                <b>Sijaintikunta:</b> ${feature.properties.Sijaintikunnat}<br>
-                                <b>Katuosoite:</b> ${feature.properties.Katuosoitteet}<br>
-                                <b>Käyttötarkoitus:</b> ${feature.properties.Käyttötarkoitus}<br>
+                                Tunnus: ${feature.properties['Tunnus']}<br>
+                                Väylänpito: ${feature.properties.Väylänpito}<br>
+                                Ratanumero: ${feature.properties.Ratanumero}<br>
+                                Ratakilometrisijainti: ${feature.properties.Ratakilometrisijainti}<br>
+                                Tilirataosa: ${feature.properties.Tilirataosa}<br>
+                                Kunnossapitoalue: ${feature.properties.Kunnossapitoalue}<br>
+                                Isännöintialue: ${feature.properties.Isännöintialue}<br>
+                                Omistaja: ${feature.properties.Omistaja}<br>
+                                Sijaintikunta: ${feature.properties.Sijaintikunnat}<br>
+                                Katuosoite: ${feature.properties.Katuosoitteet}<br>
+                                Käyttötarkoitus: ${feature.properties.Käyttötarkoitus}<br>
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'tasoristeykset':
@@ -367,24 +367,24 @@ function onEachFeature(feature, layer) {
             case 'Syöttöasemat':
 				popupContent += `<b><strong>Syöttöasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
-                                <b>Tunnus:</b> ${feature.properties['SyöttöasemanTunnus']}<br>
-                                <b>Tyyppi:</b> ${feature.properties.Tyyppi}<br>
-                                <b>Ratanumero:</b> ${feature.properties.Ratanumero}<br>
-                                <b>Ratakilometrisijainti:</b> ${feature.properties.Ratakilometrisijainti}<br>
-                                <b>Tilirataosa:</b> ${feature.properties.Tilirataosa}<br>
-                                <b>Kunnossapitoalue:</b> ${feature.properties.Kunnossapitoalue}<br>
-                                <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
+                                Tunnus: ${feature.properties['SyöttöasemanTunnus']}<br>
+                                Tyyppi: ${feature.properties.Tyyppi}<br>
+                                Ratanumero: ${feature.properties.Ratanumero}<br>
+                                Ratakilometrisijainti: ${feature.properties.Ratakilometrisijainti}<br>
+                                Tilirataosa: ${feature.properties.Tilirataosa}<br>
+                                Kunnossapitoalue: ${feature.properties.Kunnossapitoalue}<br>
+                                Isännöintialue: ${feature.properties.Isännöintialue}<br>
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Välikytkinasemat':
 				popupContent += `<b><strong>Välikytkinasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
-                                <b>Tyyppi:</b> ${feature.properties.Tyyppi}<br>
-                                <b>Ratanumero:</b> ${feature.properties.Ratanumero}<br>
-                                <b>Ratakilometrisijainti:</b> ${feature.properties.Ratakilometrisijainti}<br>
-                                <b>Tilirataosa:</b> ${feature.properties.Tilirataosa}<br>
-                                <b>Kunnossapitoalue:</b> ${feature.properties.Kunnossapitoalue}<br>
-                                <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
+                                Tyyppi: ${feature.properties.Tyyppi}<br>
+                                Ratanumero: ${feature.properties.Ratanumero}<br>
+                                Ratakilometrisijainti: ${feature.properties.Ratakilometrisijainti}<br>
+                                Tilirataosa: ${feature.properties.Tilirataosa}<br>
+                                Kunnossapitoalue: ${feature.properties.Kunnossapitoalue}<br>
+                                Isännöintialue: ${feature.properties.Isännöintialue}<br>
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
         }
