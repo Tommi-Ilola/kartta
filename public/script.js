@@ -619,9 +619,12 @@ function resetSearch() {
 
 function clearResults() {
     const resultsDiv = document.getElementById('results');
+	const kmDiv = document.getElementById('km');
     resultsDiv.innerHTML = '';
+	kmDiv.innerHTML = '';
     resultsDiv.style.display = 'none';
-    map.removeLayer(currentLayer);
+	kmDiv.style.display = 'none';
+	map.removeLayer(currentLayer);
 }
 
 function showMagnifierIcon() {
