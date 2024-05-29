@@ -76,15 +76,15 @@ var VKIcon = L.icon({
 function getIconForFeature(feature) {
     if (feature.properties && feature.properties.type) {
         switch (feature.properties.type) {
-            case 'silta':
+            case 'sillat':
                 return bridgeIcon;
-            case 'SA':
+            case 'Syöttöasemat':
                 return SAIcon;
-            case 'VK':
+            case 'Välikytkinasemat':
                 return VKIcon;
-            case 'tunneli':
+            case 'tunnelit':
                 return customIcon;
-            case 'tasoristeys':
+            case 'tasoristeykset':
                 return customIcon;
             default:
                 return customIcon;
@@ -290,7 +290,7 @@ Promise.all([
     };
 
     combinedGeoJsonData.features.forEach(feature => {
-        if (feature.properties.type !== 'tasoristeys') {
+        if (feature.properties.type !== 'tasoristeykset') {
             convertCoordinates(feature);
         }
     });
@@ -328,7 +328,7 @@ function onEachFeature(feature, layer) {
         const coords = feature.geometry.type === 'MultiLineString' ? feature.geometry.coordinates[0][0] : feature.geometry.coordinates;
 
         switch (feature.properties.type) {
-            case 'tunneli':
+            case 'tunnelit':
 				popupContent += `<b><strong>Tunneli</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
                 if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
@@ -338,7 +338,7 @@ function onEachFeature(feature, layer) {
                 }
                 popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
-            case 'silta':
+            case 'sillat':
 				popupContent += `<b><strong>Silta</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <b>Tunnus:</b> ${feature.properties['Tunnus']}<br>
@@ -354,7 +354,7 @@ function onEachFeature(feature, layer) {
                                 <b>Käyttötarkoitus:</b> ${feature.properties.Käyttötarkoitus}<br>
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
-            case 'tasoristeys':
+            case 'tasoristeykset':
 				popupContent += `<b><strong>Tasoristeys</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
@@ -364,7 +364,7 @@ function onEachFeature(feature, layer) {
                                 <strong>Ratakilometrisijainti:</strong> ${feature.properties.virallinenSijainti.ratakm}+${feature.properties.virallinenSijainti.etaisyys}<br>
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
-            case 'SA':
+            case 'Syöttöasemat':
 				popupContent += `<b><strong>Syöttöasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <b>Tunnus:</b> ${feature.properties['SyöttöasemanTunnus']}<br>
@@ -376,7 +376,7 @@ function onEachFeature(feature, layer) {
                                 <b>Isännöintialue:</b> ${feature.properties.Isännöintialue}<br>
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
-            case 'VK':
+            case 'Välikytkinasemat':
 				popupContent += `<b><strong>Välikytkinasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <b>Tyyppi:</b> ${feature.properties.Tyyppi}<br>
