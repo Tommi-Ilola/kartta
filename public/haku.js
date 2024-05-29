@@ -35,11 +35,11 @@ function combineAllGeoJsonData(data) {
 }
 
 // Lataa GeoJSON-data ja lisää `type`-ominaisuus
-loadGeoJsonData(geojsonUrl, 'tunneli', data => combineAllGeoJsonData(data));
-loadGeoJsonData(anotherGeojsonUrl, 'silta', data => combineAllGeoJsonData(data));
-loadGeoJsonData(thirdGeojsonUrl, 'tasoristeys', data => combineAllGeoJsonData(data));
-loadGeoJsonData(SAGeojsonUrl, 'SA', data => combineAllGeoJsonData(data));
-loadGeoJsonData(VKGeojsonUrl, 'VK', data => combineAllGeoJsonData(data));
+loadGeoJsonData(geojsonUrl, 'tunnelit', data => combineAllGeoJsonData(data));
+loadGeoJsonData(anotherGeojsonUrl, 'sillat', data => combineAllGeoJsonData(data));
+loadGeoJsonData(thirdGeojsonUrl, 'tasoristeykset', data => combineAllGeoJsonData(data));
+loadGeoJsonData(SAGeojsonUrl, 'Syöttöasemat', data => combineAllGeoJsonData(data));
+loadGeoJsonData(VKGeojsonUrl, 'Välikytkinasemat', data => combineAllGeoJsonData(data));
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
@@ -93,6 +93,7 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
+
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -128,33 +129,33 @@ function searchLocation(searchTerm) {
 
 document.getElementById('searchInput').addEventListener('input', function() {
     var searchTerm = this.value.trim();
+    var kmDiv = document.getElementById('km');
     var resultsDiv = document.getElementById('results');
+    kmDiv.innerHTML = '';
     resultsDiv.innerHTML = '';
 
     // Näytä "km: [syöte]" -ehdotus, jos hakutermissä on vain numeroita tai numeroita plus-merkillä
     if (searchTerm.length > 0) {
         if (!isNaN(searchTerm) || searchTerm.match(/^\d+\+\d+$/)) {
             var kmSuggestion = document.createElement('div');
-            kmSuggestion.className = 'resultItem';
+            kmSuggestion.className = 'kmItem';
             kmSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmSuggestion.addEventListener('click', function() {
                 haeRatakilometrinSijainnit(searchTerm);
             });
-            resultsDiv.appendChild(kmSuggestion);
+            kmDiv.appendChild(kmSuggestion);
         }
 
         // Lisää ehdotus ratakilometrivälille
         if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
             var kmValiSuggestion = document.createElement('div');
-            kmValiSuggestion.className = 'resultItem';
+            kmValiSuggestion.className = 'kmItem';
             kmValiSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmValiSuggestion.addEventListener('click', function() {
                 haeRatakilometriValinSijainnit(searchTerm);
             });
-            resultsDiv.appendChild(kmValiSuggestion);
+            kmDiv.appendChild(kmValiSuggestion);
         }
-
-        resultsDiv.style.display = 'block';
 
         if (globalGeoJsonData) {
             var filteredData = globalGeoJsonData.features.filter(function(feature) {
@@ -162,48 +163,16 @@ document.getElementById('searchInput').addEventListener('input', function() {
             });
 
             if (filteredData.length > 0) {
-				displaySearchResults(filteredData);
-                filteredData.forEach(function(feature) {
-                    var resultItem = document.createElement('div');
-                    resultItem.className = 'resultItem';
-                    resultItem.textContent = feature.properties.nimi;
-
-                    resultItem.addEventListener('click', function() {
-                        if (currentLayer) {
-                            map.removeLayer(currentLayer);
-                        }
-
-                        currentLayer = L.geoJSON(feature, {
-                            pointToLayer: function(feature, latlng) {
-                                var icon = getIconForFeature(feature);
-                                return L.marker(latlng, { icon: icon });
-                            },
-                            style: function(feature) {
-                                return {
-                                    color: "blue",
-                                    weight: 8,
-                                    opacity: 1
-                                };
-                            },
-                            onEachFeature: onEachFeature
-                        }).addTo(map);
-
-                        if (feature.geometry.type === 'Point') {
-                            var latLng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            map.setView(latLng, 12);
-                        } else {
-                            map.fitBounds(currentLayer.getBounds(), {
-                                maxZoom: 12
-                            });
-                        }
-                    });
-                    resultsDiv.appendChild(resultItem);
-                });
+                displaySearchResults(filteredData);
                 isSearchActive = true;
                 showCloseIcon();
             }
         }
+
+        kmDiv.style.display = 'block';
+        resultsDiv.style.display = 'block';
     } else {
+        kmDiv.style.display = 'none';
         resultsDiv.style.display = 'none';
     }
 });
@@ -251,7 +220,7 @@ function displaySearchResults(features) {
                         },
                         style: function(feature) {
                             return {
-                                color: "#5eff00",
+                                color: "blue",
                                 weight: 8,
                                 opacity: 1
                             };
@@ -276,6 +245,7 @@ function displaySearchResults(features) {
         isSearchActive = false;
     }
 }
+
 
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
@@ -311,7 +281,7 @@ Promise.all([
     var combinedGeoJsonData = {
         type: "FeatureCollection",
         features: [].concat(...datas.map((data, index) => {
-            const types = ['tunneli', 'silta', 'tasoristeys', 'SA', 'VK'];
+            const types = ['tunneli', 'silta', 'tasoristeykset', 'SA', 'VK'];
             data.features.forEach(feature => {
                 feature.properties.type = types[index];
             });
