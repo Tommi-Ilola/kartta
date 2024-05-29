@@ -4,6 +4,17 @@ body, html {
     padding: 0;
 }
 
+.leaflet-container b {
+    font-size: 16px;
+}
+
+.groupHeader {
+    border-top: 0px solid black;
+    font-weight: bold;
+    background-color: #eeeeee;
+    padding: 0px 0px 3px 5px;
+}
+
 #closeSearchBtn {
     margin-left: 10px;
     padding: 6px 8px 11px 8px;
@@ -122,7 +133,7 @@ tbody {
 }
 
 .context-menu-item:hover {
-  background-color: #e0e0e0; /* Hover-efekti */
+  background-color: #e0e0e0;
 }
 
 .leaflet-control-geocoder-icon-close {
@@ -457,7 +468,7 @@ th {
     text-align: center;
     background-color: #00000017;
     border-radius: 1rem 1rem 1rem 1rem;
-    width: 18%;
+    width: 20%;
 }
 
 td {
@@ -494,6 +505,7 @@ td {
     border: none;
     flex-grow: 1;
     border-radius: 2em 0 0 2em;
+	outline: none;
 }
 
 #searchButton {
@@ -561,12 +573,6 @@ td {
     background-color: white;
 	max-height: 90vh;
     overflow: auto
-}
-
-#searchInput {
-    border: 0px solid #0099FF;
-    outline: none;               
-    box-shadow: 0 0 0px rgba(0, 153, 255, 0.5);
 }
 
 .leaflet-tooltip::before {
@@ -862,7 +868,7 @@ th {
     background-color: #00000017;
     border-radius: 1rem 1rem 1rem 1rem;
     padding: 0px 6px 0 6px;
-    width: 12%;
+    width: 20%;
 }
 
 #passwordButton {
