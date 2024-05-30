@@ -7,19 +7,19 @@ let piirtoKaynnissa = false;
 
 function showMeasureTool(e) {
     var measureControl = new L.Control.Measure({
-		position: 'topleft',
+        position: 'topleft',
         primaryLengthUnit: 'meters',
         secondaryLengthUnit: 'kilometers',
         primaryAreaUnit: 'sqmeters',
         secondaryAreaUnit: 'hectares'
     });
-	measureControl.setStyle({className: 'mitta'});
+    measureControl.setStyle({ className: 'mitta' });
     measureControl.addTo(map);
     measureControl._startMeasure();
 }
 
 let measureControl = new L.Control.PolylineMeasure({
-	position: 'topright',
+    position: 'topright',
     unit: 'metres',
     showBearings: false,
     clearMeasurementsOnStop: false,
@@ -27,43 +27,26 @@ let measureControl = new L.Control.PolylineMeasure({
     showUnitControl: true
 }).addTo(map);
 
-L.DomUtil.addClass(measureControl.getContainer(),'mitta')
+L.DomUtil.addClass(measureControl.getContainer(), 'mitta');
 
-let mapClickEvent = mapOnClick;
+let mapClickEvent = handleMapClick;
 
 function toggleMeasureTool() {
     const measureBar = document.querySelector('.mitta');
-    if (measureBar.style.display === 'block') {
-        measureBar.style.display = 'none';
-    } else {
-        measureBar.style.display = 'block';
-    }
+    measureBar.style.display = measureBar.style.display === 'block' ? 'none' : 'block';
 }
 
 function toggleGeocoder() {
     const geocoderBar = document.querySelector('.leaflet-control-geocoder');
-    if (geocoderBar.style.display === 'block') {
-        geocoderBar.style.display = 'none';
-    } else {
-        geocoderBar.style.display = 'block';
-    }
+    geocoderBar.style.display = geocoderBar.style.display === 'block' ? 'none' : 'block';
 }
 
 function togglepmControls() {
     const pmDrawBar = document.querySelector('.leaflet-pm-draw');
     const pmEditBar = document.querySelector('.leaflet-pm-edit');
-    
-    if (pmDrawBar.style.display === 'block') {
-        pmDrawBar.style.display = 'none';
-    } else {
-        pmDrawBar.style.display = 'block';
-    }
-    
-    if (pmEditBar.style.display === 'block') {
-        pmEditBar.style.display = 'none';
-    } else {
-        pmEditBar.style.display = 'block';
-    }
+
+    pmDrawBar.style.display = pmDrawBar.style.display === 'block' ? 'none' : 'block';
+    pmEditBar.style.display = pmEditBar.style.display === 'block' ? 'none' : 'block';
 }
 
 let avoinContextMenu;
@@ -75,16 +58,16 @@ function suljeContextMenu() {
     }
 }
 
-map.on('contextmenu', function(e) {
+map.on('contextmenu', function (e) {
     suljeContextMenu();
 
     e.originalEvent.preventDefault();
-	
-	const { lat, lng } = e.latlng;
-	
-	const contextMenu = document.createElement('div');
+
+    const { lat, lng } = e.latlng;
+
+    const contextMenu = document.createElement('div');
     contextMenu.id = 'map-context-menu';
-	contextMenu.style.fontFamily = 'Calibri';
+    contextMenu.style.fontFamily = 'Calibri';
     contextMenu.style.cursor = 'pointer';
     contextMenu.style.borderRadius = '0.5rem';
     contextMenu.style.position = 'absolute';
@@ -95,31 +78,31 @@ map.on('contextmenu', function(e) {
     contextMenu.style.backgroundColor = 'white';
     contextMenu.style.border = '1px solid #999';
     contextMenu.style.boxShadow = '3px 3px 5px #999';
-	
-	const coordinatesItem = document.createElement('div');
+
+    const coordinatesItem = document.createElement('div');
     coordinatesItem.innerHTML = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     coordinatesItem.className = 'context-menu-item';
     coordinatesItem.style.padding = '8px';
     contextMenu.appendChild(coordinatesItem);
 
-	const measureItem = document.createElement('div');
-	measureItem.innerHTML = 'Etäisyyden mittaus';
-	measureItem.className = 'context-menu-item';
-	contextMenu.appendChild(measureItem);
+    const measureItem = document.createElement('div');
+    measureItem.innerHTML = 'Etäisyyden mittaus';
+    measureItem.className = 'context-menu-item';
+    contextMenu.appendChild(measureItem);
 
-	const geocoderItem = document.createElement('div');
-	geocoderItem.innerHTML = 'Osoitehaku';
-	geocoderItem.className = 'context-menu-item';
-	contextMenu.appendChild(geocoderItem);
+    const geocoderItem = document.createElement('div');
+    geocoderItem.innerHTML = 'Osoitehaku';
+    geocoderItem.className = 'context-menu-item';
+    contextMenu.appendChild(geocoderItem);
 
-	const pmControlsItem = document.createElement('div');
-	pmControlsItem.innerHTML = 'Piirtotyökalut';
-	pmControlsItem.className = 'context-menu-item';
-	contextMenu.appendChild(pmControlsItem);
+    const pmControlsItem = document.createElement('div');
+    pmControlsItem.innerHTML = 'Piirtotyökalut';
+    pmControlsItem.className = 'context-menu-item';
+    contextMenu.appendChild(pmControlsItem);
 
-	document.body.appendChild(contextMenu);
+    document.body.appendChild(contextMenu);
 
-    coordinatesItem.addEventListener('click', function() {
+    coordinatesItem.addEventListener('click', function () {
         const coordsText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         navigator.clipboard.writeText(coordsText).then(() => {
             alert('Koordinaatit kopioitu leikepöydälle: ' + coordsText);
@@ -129,27 +112,27 @@ map.on('contextmenu', function(e) {
         suljeContextMenu();
     });
 
-    measureItem.addEventListener('click', function() {
+    measureItem.addEventListener('click', function () {
         toggleMeasureTool();
         suljeContextMenu();
     });
 
-    geocoderItem.addEventListener('click', function() {
+    geocoderItem.addEventListener('click', function () {
         toggleGeocoder();
         suljeContextMenu();
     });
-	
-    pmControlsItem.addEventListener('click', function() {
+
+    pmControlsItem.addEventListener('click', function () {
         togglepmControls();
         suljeContextMenu();
-    });	
+    });
 
     avoinContextMenu = contextMenu;
 
     e.originalEvent.stopPropagation();
 });
 
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     if (!avoinContextMenu) return;
     if (!avoinContextMenu.contains(event.target)) {
         suljeContextMenu();
@@ -160,35 +143,29 @@ var searchMarker;
 
 var geocoder = L.Control.geocoder({
     defaultMarkGeocode: false
-}).on('markgeocode', function(e) {
-    // Aseta marker, kuten aiemmin
+}).on('markgeocode', function (e) {
     searchMarker = L.marker(e.geocode.center).addTo(map)
         .bindPopup(e.geocode.name)
         .openPopup();
 
-    // Muuta suurennuslasin ikonia "X" ikoniksi
     var geocoderIcon = document.querySelector('.leaflet-control-geocoder-icon');
     geocoderIcon.classList.add('leaflet-control-geocoder-icon-close');
 
-function handleGeocoderIconClick() {
-    if (searchMarker) {
-        map.removeLayer(searchMarker); // Poista marker kartalta
-        searchMarker = null;
+    function handleGeocoderIconClick() {
+        if (searchMarker) {
+            map.removeLayer(searchMarker);
+            searchMarker = null;
+        }
+        document.querySelector('.leaflet-control-geocoder-form input').value = '';
+
+        var geocoderIcon = document.querySelector('.leaflet-control-geocoder-icon');
+        geocoderIcon.classList.remove('leaflet-control-geocoder-icon-close');
+        geocoderIcon.removeEventListener('click', handleGeocoderIconClick);
     }
-    // Tyhjennä hakukenttä
-    document.querySelector('.leaflet-control-geocoder-form input').value = '';
 
-    // Palauta alkuperäinen suurennuslasin ikoni
-    var geocoderIcon = document.querySelector('.leaflet-control-geocoder-icon');
-    geocoderIcon.classList.remove('leaflet-control-geocoder-icon-close');
-    geocoderIcon.removeEventListener('click', handleGeocoderIconClick);
-}
-
-geocoderIcon.addEventListener('click', handleGeocoderIconClick);
+    geocoderIcon.addEventListener('click', handleGeocoderIconClick);
 
 }).addTo(map);
-
-
 
 function checkToolActive() {
     const pmContainer = document.querySelector('.button-container.active');
@@ -198,12 +175,11 @@ function checkToolActive() {
     return false;
 }
 
-// Odotetaan, että kartta on kokonaan latautunut
-map.whenReady(function() {
+map.whenReady(function () {
     let measureControlButton = document.querySelector('.polyline-measure-unicode-icon');
 
     if (measureControlButton) {
-        measureControlButton.addEventListener('click', function() {
+        measureControlButton.addEventListener('click', function () {
             mittausKaynnissa = !mittausKaynnissa;
 
             if (mittausKaynnissa) {
@@ -235,81 +211,101 @@ async function alustaGeojsonData() {
 
 alustaGeojsonData();
 
-async function mapOnClick(e) {
+function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+let touchTimer;
+const longPressDuration = 800; // Määritä pitkä painalluksen kesto millisekunneissa
+
+if (!isMobileDevice()) {
+    map.on('click', async function (e) {
+        await handleMapClick(e);
+    });
+} else {
+    map.on('touchstart', function (e) {
+        touchTimer = setTimeout(async function () {
+            await handleMapClick(e);
+        }, longPressDuration);
+    });
+
+    map.on('touchend', function (e) {
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+    });
+}
+
+async function handleMapClick(e) {
     if (checkToolActive()) {
-        console.log('Ttyökalu aktiivinen, klikkausta ei käsitellä.');
+        console.log('Työkalu aktiivinen, klikkausta ei käsitellä.');
         return;
     }
-	
-	if (avoinContextMenu) {
+
+    if (avoinContextMenu) {
         console.log('Valikko aktiivinen, klikkausta ei käsitellä.');
         return;
     }
-	
-	klikkausLaskuri++; // Kasvatetaan klikkauslaskuria jokaisella klikkauksella
 
-    // Jos on pariton klikkaus, lisätään marker
+    klikkausLaskuri++;
+
     if (klikkausLaskuri % 2 !== 0) {
         const { lat, lng } = e.latlng;
         const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
         const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
 
-    const tempPopupContent = "Haetaan tietoja...";
-        
-	viimeisinMarker = L.marker([lat, lng], {
-        icon: L.divIcon({
-            className: 'custom-div-icon',
-            html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'></span>`,
-            iconSize: [30, 42],
-            iconAnchor: [15, 48],
-            popupAnchor: [-1, -48]
-        })
-    }).addTo(map).bindPopup(tempPopupContent).openPopup();
+        const tempPopupContent = "Haetaan tietoja...";
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        if (data.features && data.features.length > 0) {
-            const properties = data.features[0].properties;
-            const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
-            const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
+        viimeisinMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'></span>`,
+                iconSize: [30, 42],
+                iconAnchor: [15, 48],
+                popupAnchor: [-1, -48]
+            })
+        }).addTo(map).bindPopup(tempPopupContent).openPopup();
 
-            let rautatieliikennepaikanNimi = await haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste);
-            let liikennepaikkavalinNimi = await haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste);
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+                const properties = data.features[0].properties;
+                const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
+                const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
 
-            let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
-            let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
+                let rautatieliikennepaikanNimi = await haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste);
+                let liikennepaikkavalinNimi = await haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste);
 
-            let popupContent = `
-				${liikennepaikkaHtml}
-				${liikennepaikkavaliHtml}	   
-				<strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
-				<strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-				<strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
-                <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
-            `;
+                let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
+                let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
 
-            viimeisinMarker.setPopupContent(popupContent);
+                let popupContent = `
+                    ${liikennepaikkaHtml}
+                    ${liikennepaikkavaliHtml}
+                    <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
+                    <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                    <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
+                `;
 
+                viimeisinMarker.setPopupContent(popupContent);
 
-        } else {
-            viimeisinMarker.setPopupContent("Rata-alueen ulkopuolella.");
+            } else {
+                viimeisinMarker.setPopupContent("Rata-alueen ulkopuolella.");
+            }
+        } catch (error) {
+            console.error('Error while fetching data from API:', error);
+            viimeisinMarker.setPopupContent("Virhe tietojen haussa.");
         }
-    } catch (error) {
-        console.error('Error while fetching data from API:', error);
-        viimeisinMarker.setPopupContent("Virhe tietojen haussa.");
-    }
     } else {
-        // Jos klikkausLaskuri on parillinen, poista viimeisin marker ja tyhjennä result item
         if (viimeisinMarker) {
             map.removeLayer(viimeisinMarker);
             viimeisinMarker = null;
         }
-
     }
 }
-
-map.on('click', mapOnClick);
 
 function tyhjennaResultItems() {
     const resultsDiv = document.getElementById('results');
@@ -324,12 +320,10 @@ function haeLiikennepaikanNimiGeojsonista(tunniste) {
 }
 
 async function haeLiikennepaikkavalinNimiGeojsonista(tunniste) {
-    // Tarkista ensin, onko tunniste määritelty
     if (!tunniste) {
         return null;
     }
 
-    // Etsi liikennepaikkaväli käyttäen tunnistetta
     const liikennepaikkavali = liikennepaikkavalitData.features.find(feature => feature.properties.tunniste === tunniste);
     if (!liikennepaikkavali) return null;
 
@@ -343,31 +337,31 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     const item = document.createElement('table');
-	const liikennepaikkaHtml = liikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${liikennepaikanNimi}<br>` : '';
+    const liikennepaikkaHtml = liikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${liikennepaikanNimi}<br>` : '';
     const liikennepaikkavaliHtml = liikennepaikkavaliNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavaliNimi}<br>` : '';
     item.className = 'resultItem';
     item.innerHTML = `
-	<table class="resultItem">
-	 <tr>
-	  <th><strong>+</strong></th>
-	   <td>  
-		${liikennepaikkaHtml}
-		${liikennepaikkavaliHtml}	   
-        <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
-        <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-        <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
-	   </td>
-	 </tr>
-	</table> 
+        <table class="resultItem">
+            <tr>
+                <th><strong>+</strong></th>
+                <td>
+                    ${liikennepaikkaHtml}
+                    ${liikennepaikkavaliHtml}
+                    <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
+                    <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                </td>
+            </tr>
+        </table>
     `;
 
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function () {
         map.setView(marker.getLatLng(), 15);
         marker.openPopup();
     });
 
     resultsDiv.appendChild(item);
     resultsDiv.style.display = 'block';
-	isSearchActive = true;
+    isSearchActive = true;
     showCloseIcon();
 }
