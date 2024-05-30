@@ -1196,7 +1196,7 @@ button {
 }
 
 #loadData{
-    display: none;
+    opacity: 0;
 }
 
 @font-face {
