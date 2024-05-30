@@ -80,6 +80,8 @@ map.on('contextmenu', function(e) {
 
     e.originalEvent.preventDefault();
 	
+	const { lat, lng } = e.latlng;
+	
 	const contextMenu = document.createElement('div');
     contextMenu.id = 'map-context-menu';
 	contextMenu.style.fontFamily = 'Calibri';
@@ -94,6 +96,12 @@ map.on('contextmenu', function(e) {
     contextMenu.style.border = '1px solid #999';
     contextMenu.style.boxShadow = '3px 3px 5px #999';
 	
+	const coordinatesItem = document.createElement('div');
+    coordinatesItem.innerHTML = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    coordinatesItem.className = 'context-menu-item';
+    coordinatesItem.style.padding = '8px';
+    contextMenu.appendChild(coordinatesItem);
+
 	const measureItem = document.createElement('div');
 	measureItem.innerHTML = 'Etäisyyden mittaus';
 	measureItem.className = 'context-menu-item';
@@ -111,19 +119,27 @@ map.on('contextmenu', function(e) {
 
 	document.body.appendChild(contextMenu);
 
-    contextMenu.firstChild.addEventListener('click', function() {
+    coordinatesItem.addEventListener('click', function() {
+        const coordsText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        navigator.clipboard.writeText(coordsText).then(() => {
+            alert('Koordinaatit kopioitu leikepöydälle: ' + coordsText);
+        }).catch(err => {
+            console.error('Koordinaattien kopiointi epäonnistui:', err);
+        });
+        suljeContextMenu();
+    });
+
+    measureItem.addEventListener('click', function() {
         toggleMeasureTool();
         suljeContextMenu();
     });
 
-    const geocoderMenuItem = contextMenu.children[1];
-    geocoderMenuItem.addEventListener('click', function() {
+    geocoderItem.addEventListener('click', function() {
         toggleGeocoder();
         suljeContextMenu();
     });
 	
-    const pmControlsMenuItem = contextMenu.children[2];
-    pmControlsMenuItem.addEventListener('click', function() {
+    pmControlsItem.addEventListener('click', function() {
         togglepmControls();
         suljeContextMenu();
     });	
@@ -172,10 +188,7 @@ geocoderIcon.addEventListener('click', handleGeocoderIconClick);
 
 }).addTo(map);
 
-map.pm.addControls({
-  position: 'topright',
-  drawCircle: false, 
-});
+
 
 function checkToolActive() {
     const pmContainer = document.querySelector('.button-container.active');
