@@ -605,6 +605,7 @@ function performSearch() {
     } else {
         searchLocation(searchTerm);
     }
+    isSearchActive = true;
     showCloseIcon();
 }
 
