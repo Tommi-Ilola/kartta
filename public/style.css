@@ -4,6 +4,12 @@ body, html {
     padding: 0;
 }
 
+.leaflet-touch .leaflet-bar a {
+    width: 0px;
+    height: 0px;
+    line-height: 30px;
+}
+
 .leaflet-container b {
     font-size: 16px;
 }
