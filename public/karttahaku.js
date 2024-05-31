@@ -33,7 +33,8 @@ let mapClickEvent = handleMapClick;
 
 function toggleMeasureTool() {
     const measureBar = document.querySelector('.mitta');
-    measureBar.style.display = measureBar.style.display === 'block' ? 'none' : 'block';
+    mittausKaynnissa = !mittausKaynnissa;
+    measureBar.style.display = mittausKaynnissa ? 'block' : 'none';
 }
 
 function toggleGeocoder() {
@@ -256,51 +257,51 @@ async function handleMapClick(e) {
         const googleMapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
         const apiUrl = `https://rata.digitraffic.fi/infra-api/0.7/koordinaatit/${lat},${lng}.geojson?srsName=epsg:4326`;
 
-    const tempPopupContent = "Haetaan tietoja...";
+        const tempPopupContent = "Haetaan tietoja...";
 
-    viimeisinMarker = L.marker([lat, lng], {
-        icon: L.divIcon({
-            className: 'custom-div-icon',
-            html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'></span>`,
-            iconSize: [30, 42],
-            iconAnchor: [15, 48],
-            popupAnchor: [-1, -48]
-        })
-    }).addTo(map).bindPopup(tempPopupContent).openPopup();
+        viimeisinMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style='background-image: url(MyClickMarker.png);' class='marker-pin'></div><span class='marker-number'></span>`,
+                iconSize: [30, 42],
+                iconAnchor: [15, 48],
+                popupAnchor: [-1, -48]
+            })
+        }).addTo(map).bindPopup(tempPopupContent).openPopup();
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        if (data.features && data.features.length > 0) {
-            const properties = data.features[0].properties;
-            const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
-            const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+                const properties = data.features[0].properties;
+                const rautatieliikennepaikanTunniste = properties.rautatieliikennepaikka;
+                const liikennepaikkavalinTunniste = properties.liikennepaikkavali;
 
-            let rautatieliikennepaikanNimi = await haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste);
-            let liikennepaikkavalinNimi = await haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste);
+                let rautatieliikennepaikanNimi = await haeLiikennepaikanNimiGeojsonista(rautatieliikennepaikanTunniste);
+                let liikennepaikkavalinNimi = await haeLiikennepaikkavalinNimiGeojsonista(liikennepaikkavalinTunniste);
 
-            let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
-            let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
+                let liikennepaikkaHtml = rautatieliikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${rautatieliikennepaikanNimi}<br>` : '';
+                let liikennepaikkavaliHtml = liikennepaikkavalinNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavalinNimi}<br>` : '';
 
-            let popupContent = `
-                ${liikennepaikkaHtml}
-                ${liikennepaikkavaliHtml}
-                <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
-                <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
-                <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
-            `;
+                let popupContent = `
+                    ${liikennepaikkaHtml}
+                    ${liikennepaikkavaliHtml}
+                    <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
+                    <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                    <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
+                `;
 
-            viimeisinMarker.setPopupContent(popupContent);
+                viimeisinMarker.setPopupContent(popupContent);
 
-        } else {
-            viimeisinMarker.setPopupContent("Rata-alueen ulkopuolella.");
+            } else {
+                viimeisinMarker.setPopupContent("Rata-alueen ulkopuolella.");
+            }
+        } catch (error) {
+            console.error('Error while fetching data from API:', error);
+            viimeisinMarker.setPopupContent("Virhe tietojen haussa.");
         }
-    } catch (error) {
-        console.error('Error while fetching data from API:', error);
-        viimeisinMarker.setPopupContent("Virhe tietojen haussa.");
-    }
-	    } else {
+    } else {
         // Jos klikkausLaskuri on parillinen, poista viimeisin marker ja tyhjennä result item
         if (viimeisinMarker) {
             map.removeLayer(viimeisinMarker);
@@ -352,7 +353,7 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
                     ${liikennepaikkavaliHtml}
                     <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
                     <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadasta.Metria} metriä<br>
                 </td>
             </tr>
         </table>
@@ -368,4 +369,3 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
     isSearchActive = true;
     showCloseIcon();
 }
-
