@@ -1,6 +1,6 @@
-var geojsonUrl = 'tunnelit.geojson';
-var anotherGeojsonUrl = 'sillat.geojson';
-var thirdGeojsonUrl = 'tasoristeykset.geojson';
+var geojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/tunnelit.geojson?';
+var anotherGeojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.7/sillat.geojson?time=2024-02-22T06%3A53%3A28Z%2F2024-02-22T06%3A53%3A28Z';
+var thirdGeojsonUrl = 'https://rata.digitraffic.fi/infra-api/0.8/tasoristeykset.geojson?srsName=crs%3A84&time=2024-05-24T14%3A26%3A22Z%2F2024-05-24T15%3A26%3A22Z';
 
 var SAGeojsonUrl = 'SA.geojson';
 var VKGeojsonUrl = 'VK.geojson';
@@ -10,6 +10,7 @@ var globalGeoJsonData = {
     features: []
 };
 
+proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 var sourceProjection = proj4.defs("EPSG:3067");
 var destinationProjection = proj4.defs("EPSG:4326"); // WGS 84
 
@@ -115,7 +116,6 @@ function searchLocation(searchTerm) {
                 onEachFeature: onEachFeature
             }).addTo(map);
             map.fitBounds(currentLayer.getBounds());
-            isSearchActive = true;
             showCloseIcon();
         } else {
             console.error('Ei hakutuloksia.');
@@ -164,7 +164,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
 
             if (filteredData.length > 0) {
                 displaySearchResults(filteredData);
-                isSearchActive = true;
                 showCloseIcon();
             }
         }
@@ -242,7 +241,6 @@ function displaySearchResults(features) {
         }
     } else {
         resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
-        isSearchActive = false;
     }
 }
 
@@ -401,3 +399,4 @@ function onEachFeature(feature, layer) {
         });
     }
 }
+
