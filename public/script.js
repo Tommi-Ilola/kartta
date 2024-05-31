@@ -524,6 +524,7 @@ function piilotaVirheilmoitus() {
 function showCloseIcon() {
     const searchButton = document.getElementById('searchButton');
     searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
+	isSearchActive = true;
 }
 
 function hideCloseIcon() {
@@ -605,16 +606,13 @@ function performSearch() {
     } else {
         searchLocation(searchTerm);
     }
-    isSearchActive = true;
-    showCloseIcon();
+	showCloseIcon();
 }
 
 function resetSearch() {
     document.getElementById('searchInput').value = '';
     clearResults();
     showMagnifierIcon();
-    isSearchActive = false;
-    hideCloseIcon();
     poistaKaikkiMarkerit();
 }
 
@@ -630,21 +628,6 @@ function clearResults() {
         map.removeLayer(currentLayer);
         currentLayer = null;
     }
-}
-
-function showMagnifierIcon() {
-    const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
-}
-
-function hideCloseIcon() {
-    const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
-}
-
-function showCloseIcon() {
-    const searchButton = document.getElementById('searchButton');
-    searchButton.innerHTML = '<span class="close-icon">&#x2715;</span>';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
