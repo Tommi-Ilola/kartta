@@ -4,10 +4,10 @@ body, html {
     padding: 0;
 }
 
-.leaflet-touch .leaflet-bar a {
-    width: 0px;
-    height: 0px;
-    line-height: 30px;
+.leaflet-control-locate a .leaflet-control-locate-location-arrow {
+    position: relative;
+    margin: 0px !important;
+    top: 4px;
 }
 
 .leaflet-container b {
