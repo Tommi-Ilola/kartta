@@ -43,33 +43,33 @@ loadGeoJsonData(VKGeojsonUrl, 'Välikytkinasemat', data => combineAllGeoJsonData
 
 var customIcon = L.icon({
     className: 'tasoristeys-haku',
-    iconUrl: 'tasoristeys1.png', // Tasoristeyksille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconUrl: 'tasoristeys1.png',
+    iconSize: [38, 38],
+    iconAnchor: [21, 18],
     tooltipAnchor: [1, -10]
 });
 
 var bridgeIcon = L.icon({
     className: 'silta-haku',
-    iconUrl: 'silta1.png', // Silloille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconUrl: 'silta1.png',
+    iconSize: [36, 36],
+    iconAnchor: [17, 20],
     tooltipAnchor: [1, -10]
 });
 
 var SAIcon = L.icon({
     className: 'SA-haku',
     iconUrl: 'SA1.png', // Rampeille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconSize: [36, 36],
+    iconAnchor: [17, 20],
     tooltipAnchor: [1, -10]
 });
 
 var VKIcon = L.icon({
     className: 'VK-haku',
     iconUrl: 'VK1.png', // Alituksille
-    iconSize: [36, 36], // Kuvan koko pikseleinä
-    iconAnchor: [20, 17], // Kuvan ankkuripiste, joka vastaa markerin sijaintia kartalla
+    iconSize: [36, 36],
+    iconAnchor: [17, 20],
     tooltipAnchor: [1, -10]
 });
 
