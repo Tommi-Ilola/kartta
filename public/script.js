@@ -535,12 +535,7 @@ function hideCloseIcon() {
 function showMagnifierIcon() {
     const searchButton = document.getElementById('searchButton');
     searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
-}
-
-function naytaVirheilmoitus(viesti) {
-    const virheDiv = document.getElementById('virhe');
-    virheDiv.innerText = viesti;
-    virheDiv.style.display = 'block';
+	piilotaVirheilmoitus();
 }
 
 function RemoveMarkersButton() {
@@ -577,6 +572,7 @@ document.getElementById('searchButton').addEventListener('click', function(event
     event.preventDefault();
     if (isSearchActive && this.innerHTML.includes('close-icon')) {
         resetSearch();
+		piilotaVirheilmoitus();
     } else {
         performSearch();
     }
@@ -593,6 +589,7 @@ function performSearch() {
     if (!searchTerm) {
         console.error('Hakukenttä on tyhjä');
         naytaVirheilmoitus('Syötä hakutermi');
+	showCloseIcon();
         return;
     }
 
@@ -607,6 +604,7 @@ function performSearch() {
         searchLocation(searchTerm);
     }
 	showCloseIcon();
+	piilotaVirheilmoitus();
 }
 
 function resetSearch() {
