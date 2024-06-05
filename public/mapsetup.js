@@ -64,3 +64,16 @@ var currentBaseLayer = "gm";
 		});
 
 
+document.getElementById('infoButton').addEventListener('click', function() {
+    var infoContent = document.getElementById('infoContent');
+	var infoButton = document.getElementById('infoButton');
+        infoContent.style.display = 'block';
+		infoButton.style.display = 'none';
+});
+
+document.getElementById('closeInfo').addEventListener('click', function() {
+    var infoContent = document.getElementById('infoContent');
+	var infoButton = document.getElementById('infoButton');
+        infoContent.style.display = 'none';
+		infoButton.style.display = 'block';
+});
