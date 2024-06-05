@@ -35,7 +35,7 @@ body, html {
 #infoContent {
     border-radius: 0.5rem;
     position: relative;
-    bottom: 24px;
+    bottom: 0px;
     left: 0px;
     list-style-type: none;
     padding: 15px;
@@ -1197,7 +1197,7 @@ th {
 }
 
 ol, ul {
-    list-style: none;
+        padding-left: 30px;
 }
 
 h1, .tooltip-gm, .tooltip-satellite, .collapsible, #passwordInput, #passwordButton, button, textarea, select {
