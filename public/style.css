@@ -4,6 +4,64 @@ body, html {
     padding: 0;
 }
 
+#infoContainer {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    max-width: 400px;
+}
+
+#infoButton {
+    font-family: calibri;
+    width: 23px;
+    height: 23px;
+    border-radius: 2rem;
+    border-width: 1px;
+    border: solid 1px #fff;
+    font-weight: bold;
+    background-color: #dddddd5e;
+    font-size: 15px;
+    color: white;
+    box-shadow: #8d8d8d 0px 0px 7px 2px;
+    text-shadow: -1px 0px 1px #666666, 0 1px 1px #666666, 1px 0 1px #666666, 0 -1px 1px #666666 !important;
+}
+
+#infoButton:hover {
+	border: solid 2px #fff;
+	font-weight: bold;
+	box-shadow: #8d8d8d 0px 0px 5px 5px;
+}
+
+#infoContent {
+    border-radius: 0.5rem;
+    position: relative;
+    bottom: 24px;
+    left: 0px;
+    list-style-type: none;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid rgb(153, 153, 153);
+    box-shadow: rgb(153, 153, 153) 3px 3px 5px;
+}
+
+#closeInfo {
+    position: absolute;
+    display: flex;
+    right: 5px;
+    top: 5px;
+    height: 23px;
+    width: 23px;
+    justify-content: space-evenly;
+    font-size: 20px;
+    align-items: flex-end;
+	cursor: pointer;
+}
+
+#closeInfo:hover {
+    font-weight: bold;
+}
+
+
 .leaflet-control-locate a .leaflet-control-locate-location-arrow {
     position: relative;
     margin: 0px !important;
@@ -33,7 +91,7 @@ body, html {
 }
 
 #fa-download {
-    display: block;
+    display: none;
     position: absolute;
     bottom: 10px;
 }
@@ -46,8 +104,7 @@ tbody {
     background-color: #aaaaaac4;
     border-radius: 2rem;
     border: 1px solid #ffffff;
-    width: 36px;
-    height: 36px;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1203,6 +1260,26 @@ button {
 
 #loadData{
 	display: none;
+}
+
+#infoContainer {
+    position: absolute;
+    top: unset;
+    bottom: 30px;
+    left: 8px;
+    max-width: 400px;
+}
+
+#infoContent {
+    border-radius: 0.5rem;
+    position: relative;
+    bottom: 5px;
+    left: 0px;
+    list-style-type: none;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid rgb(153, 153, 153);
+    box-shadow: rgb(153, 153, 153) 3px 3px 5px;
 }
 
 @font-face {
