@@ -51,6 +51,9 @@ function togglepmControls() {
 }
 
 let avoinContextMenu;
+let measureToolActive = false;
+let geocoderActive = false;
+let pmControlsActive = false;
 
 function suljeContextMenu() {
     if (avoinContextMenu) {
@@ -81,23 +84,23 @@ map.on('contextmenu', function (e) {
     contextMenu.style.boxShadow = '3px 3px 5px #999';
 
     const coordinatesItem = document.createElement('div');
-    coordinatesItem.innerHTML = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    coordinatesItem.innerHTML = `<img src="copy.png" alt="copy" style="vertical-align: middle;width: 15px;height: 15px;padding: 0px 5px 3px 0px;"> ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     coordinatesItem.className = 'context-menu-item';
     coordinatesItem.style.padding = '8px';
     contextMenu.appendChild(coordinatesItem);
 
     const measureItem = document.createElement('div');
-    measureItem.innerHTML = 'Etäisyyden mittaus';
+    measureItem.innerHTML = `<img src="check.png" alt="check" id="ch1" style="opacity: ${measureToolActive ? 1 : 0}; vertical-align: middle;width: 15px;height: 15px;padding: 0px 5px 3px 0px;"> Etäisyyden mittaus`;
     measureItem.className = 'context-menu-item';
     contextMenu.appendChild(measureItem);
 
     const geocoderItem = document.createElement('div');
-    geocoderItem.innerHTML = 'Osoitehaku';
+    geocoderItem.innerHTML = `<img src="check.png" alt="check" id="ch2" style="opacity: ${geocoderActive ? 1 : 0}; vertical-align: middle;width: 15px;height: 15px;padding: 0px 5px 3px 0px;"> Osoitehaku`;
     geocoderItem.className = 'context-menu-item';
     contextMenu.appendChild(geocoderItem);
 
     const pmControlsItem = document.createElement('div');
-    pmControlsItem.innerHTML = 'Piirtotyökalut';
+    pmControlsItem.innerHTML = `<img src="check.png" alt="check" id="ch3" style="opacity: ${pmControlsActive ? 1 : 0}; vertical-align: middle;width: 15px;height: 15px;padding: 0px 5px 3px 0px;"> Piirtotyökalut`;
     pmControlsItem.className = 'context-menu-item';
     contextMenu.appendChild(pmControlsItem);
 
@@ -115,16 +118,22 @@ map.on('contextmenu', function (e) {
 
     measureItem.addEventListener('click', function () {
         toggleMeasureTool();
+        measureToolActive = !measureToolActive;
+        document.getElementById('ch1').style.opacity = measureToolActive ? 1 : 0;
         suljeContextMenu();
     });
 
     geocoderItem.addEventListener('click', function () {
         toggleGeocoder();
+        geocoderActive = !geocoderActive;
+        document.getElementById('ch2').style.opacity = geocoderActive ? 1 : 0;
         suljeContextMenu();
     });
 
     pmControlsItem.addEventListener('click', function () {
         togglepmControls();
+        pmControlsActive = !pmControlsActive;
+        document.getElementById('ch3').style.opacity = pmControlsActive ? 1 : 0;
         suljeContextMenu();
     });
 
@@ -288,7 +297,7 @@ async function handleMapClick(e) {
                     ${liikennepaikkavaliHtml}
                     <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
                     <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadasta.Metria} metriä<br>
                     <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
                 `;
 
@@ -353,7 +362,7 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
                     ${liikennepaikkavaliHtml}
                     <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
                     <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadasta.Metria} metriä<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
                 </td>
             </tr>
         </table>
