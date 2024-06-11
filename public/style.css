@@ -989,13 +989,13 @@ h1 {
 
 th {
     display: table-cell;
-    vertical-align: inherit;
+    vertical-align: middle;
     font-weight: unset;
     text-align: center;
     background-color: #00000017;
     border-radius: 1rem 1rem 1rem 1rem;
     padding: 0px 6px 0 6px;
-    width: 20%;
+    width: 30px;
 }
 
 #passwordButton {
