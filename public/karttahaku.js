@@ -177,6 +177,11 @@ var geocoder = L.Control.geocoder({
 
 }).addTo(map);
 
+map.pm.addControls({
+  position: 'topright',
+  drawCircle: false, 
+});
+
 function checkToolActive() {
     const pmContainer = document.querySelector('.button-container.active');
     if (pmContainer && window.getComputedStyle(pmContainer).display !== 'none') {
@@ -378,3 +383,4 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
     isSearchActive = true;
     showCloseIcon();
 }
+
