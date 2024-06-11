@@ -297,7 +297,7 @@ async function handleMapClick(e) {
                     ${liikennepaikkavaliHtml}
                     <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
                     <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadasta.Metria} metriä<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
                     <a href="${googleMapsUrl}" target="_blank">Avaa Google Mapsissa</a>
                 `;
 
@@ -362,7 +362,7 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
                     ${liikennepaikkavaliHtml}
                     <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
                     <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadasta.Metria} metriä<br>
                 </td>
             </tr>
         </table>
