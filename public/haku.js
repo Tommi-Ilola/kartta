@@ -163,7 +163,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
 
             if (filteredData.length > 0) {
                 displaySearchResults(filteredData);
-                showCloseIcon();
             }
         }
 
@@ -241,6 +240,7 @@ function displaySearchResults(features) {
     } else {
         resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
     }
+    showCloseIcon();
 }
 
 
