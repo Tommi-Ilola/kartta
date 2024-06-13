@@ -133,6 +133,8 @@ document.getElementById('searchInput').addEventListener('input', function() {
     kmDiv.innerHTML = '';
     resultsDiv.innerHTML = '';
 
+    searchTerm = searchTerm.replace(/\s+/g, '');
+
     // Näytä "km: [syöte]" -ehdotus, jos hakutermissä on vain numeroita tai numeroita plus-merkillä
     if (searchTerm.length > 0) {
         if (!isNaN(searchTerm) || searchTerm.match(/^\d+\+\d+$/)) {
