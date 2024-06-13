@@ -34,7 +34,7 @@ function haeRatakilometrinSijainnit(ratakilometri) {
     let foundResults = false;
 
     const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = ''; // Tyhjennä aiemmat tulokset
+    resultsDiv.innerHTML = '';
 
     const processNextBatch = () => {
         while (activeRequests < MAX_CONCURRENT_REQUESTS && currentIndex < ratanumerot.length) {
@@ -74,37 +74,24 @@ function haeRatakilometrinSijainnit(ratakilometri) {
                         if (!foundResults) {
                             resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
                         }
-                        resultsDiv.style.display = 'block'; // Näytä tulokset, oli niitä tai ei
+                        resultsDiv.style.display = 'block';
                     }
                 });
         }
         if (activeRequests < MAX_CONCURRENT_REQUESTS && currentIndex < ratanumerot.length) {
-            processNextBatch(); // Käsittele seuraava erä pyyntöjä
+            processNextBatch();
         }
     };
 
-    processNextBatch(); // Aloita pyyntöjen käsittely
-}
-
-function getCityFromCoordinates(lat, lon, callback) {
-  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-    .then(response => response.json())
-    .then(data => {
-      let cityName = data.address.city || data.address.town || 'Ei tiedossa';
-      callback(cityName);
-    })
-    .catch(error => {
-      console.error("Error fetching city:", error);
-      callback('Ei tiedossa');
-    });
+    processNextBatch();
 }
 
 function haeRatakilometriValinSijainnit(ratakilometriVali) {
     naytaLatausIndikaattori();
-	currentMarkerNumber = 1;
+    currentMarkerNumber = 1;
 
-    // Erota syöte ratakm ja etäisyys osiin ja muodosta niistä URL
-    const valiOsat = ratakilometriVali.split('-');
+    // Poista välilyönnit ja jaa syöte osiin
+    const valiOsat = ratakilometriVali.replace(/\s+/g, '').split('-');
     if (valiOsat.length === 2) {
         const alkuOsa = valiOsat[0].split('+');
         const loppuOsa = valiOsat[1].split('+');
@@ -125,10 +112,10 @@ function haeRatakilometriValinSijainnit(ratakilometriVali) {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-					piilotaLatausIndikaattori();
-					naytaDatanTiedotResultsDivissa(data); // Näytä data results-divissä
-					visualisoiGeojsonDataKartalla(data); // Visualisoi data kartalla
-				})
+                    piilotaLatausIndikaattori();
+                    naytaDatanTiedotResultsDivissa(data); // Näytä data results-divissä
+                    visualisoiGeojsonDataKartalla(data); // Visualisoi data kartalla
+                })
                 .catch(error => {
                     console.error(`Virhe ladattaessa dataa ratanumerolle ${ratanumero}:`, error);
                     piilotaLatausIndikaattori();
@@ -138,6 +125,19 @@ function haeRatakilometriValinSijainnit(ratakilometriVali) {
         console.error('Syötteen muoto on virheellinen. Odotetaan muotoa "ratakm+etaisyys-ratakm+etaisyys".');
         piilotaLatausIndikaattori();
     }
+}
+
+function getCityFromCoordinates(lat, lon, callback) {
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+    .then(response => response.json())
+    .then(data => {
+      let cityName = data.address.city || data.address.town || data.address.village || 'Ei tiedossa';
+      callback(cityName);
+    })
+    .catch(error => {
+      console.error("Error fetching city:", error);
+      callback('Ei tiedossa');
+    });
 }
 
 function haeRatakilometrinSijainnitJaLisaaMarkerit(ratakm, etaisyys, ratanumero) {
@@ -589,22 +589,24 @@ function performSearch() {
     if (!searchTerm) {
         console.error('Hakukenttä on tyhjä');
         naytaVirheilmoitus('Syötä hakutermi');
-	showCloseIcon();
+        showCloseIcon();
         return;
     }
+
+    searchTerm = searchTerm.replace(/\s+/g, '');
 
     if (searchTerm.match(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/)) {
         const [lat, lng] = searchTerm.split(',').map(Number);
         haeTiedotKoordinaateistaJaLisaaMarker(lat, lng);
-    } else if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
+    } else if (searchTerm.match(/^\d+\+\d+-\d+\+\d+$/)) {
         haeRatakilometriValinSijainnit(searchTerm);
     } else if (searchTerm.includes('+') || !isNaN(searchTerm)) {
         haeRatakilometrinSijainnit(searchTerm);
     } else {
         searchLocation(searchTerm);
     }
-	showCloseIcon();
-	piilotaVirheilmoitus();
+    showCloseIcon();
+    piilotaVirheilmoitus();
 }
 
 function resetSearch() {
@@ -685,4 +687,6 @@ async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
         console.error('Error while fetching data from API:', error);
         marker.setPopupContent("Virhe tietojen haussa.");
     }
+
 }
+
