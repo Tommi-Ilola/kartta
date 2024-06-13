@@ -685,5 +685,4 @@ async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
         console.error('Error while fetching data from API:', error);
         marker.setPopupContent("Virhe tietojen haussa.");
     }
-	RemoveMarkersButton();
 }
