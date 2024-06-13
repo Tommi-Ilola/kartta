@@ -355,32 +355,32 @@ function lisaaResultItem(properties, liikennepaikanNimi, liikennepaikkavaliNimi,
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
     const item = document.createElement('table');
-    const liikennepaikkaHtml = liikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${liikennepaikanNimi}<br>` : '';
+	const liikennepaikkaHtml = liikennepaikanNimi ? `<strong>Liikennepaikka:</strong> ${liikennepaikanNimi}<br>` : '';
     const liikennepaikkavaliHtml = liikennepaikkavaliNimi ? `<strong>Liikennepaikkaväli:</strong> ${liikennepaikkavaliNimi}<br>` : '';
     item.className = 'resultItem';
     item.innerHTML = `
-        <table class="resultItem">
-            <tr>
-                <th><strong>+</strong></th>
-                <td>
-                    ${liikennepaikkaHtml}
-                    ${liikennepaikkavaliHtml}
-                    <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
-                    <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
-                    <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadasta.Metria} metriä<br>
-                </td>
-            </tr>
-        </table>
+	<table class="resultItem">
+	 <tr>
+	  <th><strong>+</strong></th>
+	   <td>  
+		${liikennepaikkaHtml}
+		${liikennepaikkavaliHtml}	   
+        <strong>Ratanumero:</strong> ${properties.ratakmsijainnit.map(r => r.ratanumero).join(', ')}<br>
+        <strong>Ratakm:</strong> ${properties.ratakmsijainnit.map(r => `${r.ratakm}+${r.etaisyys}`).join(', ')}<br>
+        <strong>Etäisyys radasta:</strong> ${properties.etaisyysRadastaMetria} metriä<br>
+	   </td>
+	 </tr>
+	</table> 
     `;
 
-    item.addEventListener('click', function () {
+    item.addEventListener('click', function() {
         map.setView(marker.getLatLng(), 15);
         marker.openPopup();
     });
 
     resultsDiv.appendChild(item);
     resultsDiv.style.display = 'block';
-    isSearchActive = true;
+	isSearchActive = true;
     showCloseIcon();
 }
 
