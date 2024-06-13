@@ -141,6 +141,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
             kmSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmSuggestion.addEventListener('click', function() {
                 haeRatakilometrinSijainnit(searchTerm);
+				showCloseIcon();
             });
             kmDiv.appendChild(kmSuggestion);
         }
@@ -151,7 +152,8 @@ document.getElementById('searchInput').addEventListener('input', function() {
             kmValiSuggestion.className = 'kmItem';
             kmValiSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmValiSuggestion.addEventListener('click', function() {
-                haeRatakilometriValinSijainnit(searchTerm);
+				haeRatakilometriValinSijainnit(searchTerm);
+				showCloseIcon();
             });
             kmDiv.appendChild(kmValiSuggestion);
         }
@@ -178,7 +180,7 @@ var currentLayer;
 
 function displaySearchResults(features) {
     let resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '';
+
 
     if (features.length > 0) {
         resultsDiv.style.display = 'block';
@@ -239,8 +241,9 @@ function displaySearchResults(features) {
         }
     } else {
         resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
+
     }
-    showCloseIcon();
+	showCloseIcon();
 }
 
 
