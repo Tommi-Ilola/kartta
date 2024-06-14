@@ -1356,6 +1356,11 @@ button {
     right: 5px;
 }
 
+#infoIcon {
+    position: absolute;
+    left: 5px;
+}
+
 @font-face {
   font-family: "San Francisco";
   font-weight: 400;
