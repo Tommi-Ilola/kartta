@@ -93,7 +93,6 @@ function getIconForFeature(feature) {
     return customIcon;
 }
 
-
 function searchLocation(searchTerm) {
     var searchTerm = document.getElementById('searchInput').value.trim();
 
@@ -132,10 +131,9 @@ document.getElementById('searchInput').addEventListener('input', function() {
     var resultsDiv = document.getElementById('results');
     kmDiv.innerHTML = '';
     resultsDiv.innerHTML = '';
-
+	
     searchTerm = searchTerm.replace(/\s+/g, '');
 
-    // Näytä "km: [syöte]" -ehdotus, jos hakutermissä on vain numeroita tai numeroita plus-merkillä
     if (searchTerm.length > 0) {
         if (!isNaN(searchTerm) || searchTerm.match(/^\d+\+\d+$/)) {
             var kmSuggestion = document.createElement('div');
@@ -143,19 +141,18 @@ document.getElementById('searchInput').addEventListener('input', function() {
             kmSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmSuggestion.addEventListener('click', function() {
                 haeRatakilometrinSijainnit(searchTerm);
-				showCloseIcon();
+                showCloseIcon();
             });
             kmDiv.appendChild(kmSuggestion);
         }
 
-        // Lisää ehdotus ratakilometrivälille
         if (searchTerm.match(/^\d+(\+\d+)?-\d+(\+\d+)?$/)) {
             var kmValiSuggestion = document.createElement('div');
             kmValiSuggestion.className = 'kmItem';
             kmValiSuggestion.innerHTML = `<strong>km:&nbsp;</strong> ${searchTerm}`;
             kmValiSuggestion.addEventListener('click', function() {
-				haeRatakilometriValinSijainnit(searchTerm);
-				showCloseIcon();
+                haeRatakilometriValinSijainnit(searchTerm);
+                showCloseIcon();
             });
             kmDiv.appendChild(kmValiSuggestion);
         }
@@ -176,18 +173,18 @@ document.getElementById('searchInput').addEventListener('input', function() {
         kmDiv.style.display = 'none';
         resultsDiv.style.display = 'none';
     }
+	hideBackIcon();
 });
 
 var currentLayer;
 
 function displaySearchResults(features) {
     let resultsDiv = document.getElementById('results');
-
+    resultsDiv.innerHTML = ''; // Tyhjennä aiemmat tulokset
 
     if (features.length > 0) {
         resultsDiv.style.display = 'block';
 
-        // Ryhmittele hakutulokset tyypin mukaan
         var groupedResults = features.reduce((acc, feature) => {
             const type = feature.properties.type;
             if (!acc[type]) {
@@ -197,7 +194,6 @@ function displaySearchResults(features) {
             return acc;
         }, {});
 
-        // Luo ryhmätulokset ja lisää ne resultsDiv-elementtiin
         for (const [type, features] of Object.entries(groupedResults)) {
             var groupHeader = document.createElement('div');
             groupHeader.className = 'groupHeader';
@@ -237,17 +233,107 @@ function displaySearchResults(features) {
                             maxZoom: 12
                         });
                     }
+					showBackIcon();
+                    naytaYksittainenResultItem(feature);
                 });
                 resultsDiv.appendChild(resultItem);
             });
         }
     } else {
         resultsDiv.innerHTML = '<p>Ei hakutuloksia</p>';
-
     }
-	showCloseIcon();
+    showCloseIcon();
 }
 
+function naytaYksittainenResultItem(feature) {
+    let resultsDiv = document.getElementById('results');
+
+	let resultItems = document.getElementsByClassName('resultItem');
+	let groupHeader = document.getElementsByClassName('groupHeader');
+	
+	    for (var i = 0; i < resultItems.length; i++) {
+            var currentDisplay = resultItems[i].style.display;
+            resultItems[i].style.display = currentDisplay === 'none' ? 'flex' : 'none';
+        }
+	
+	    for (var i = 0; i < groupHeader.length; i++) {
+            var currentDisplay = groupHeader[i].style.display;
+            groupHeader[i].style.display = currentDisplay === 'none' ? 'block' : 'none';
+        }
+
+    var ExtResultItem = document.createElement('div');
+    ExtResultItem.className = 'ExtResultItem';
+
+    var popupContent = '';
+    const coords = feature.geometry.type === 'MultiLineString' ? feature.geometry.coordinates[0][0] : feature.geometry.coordinates;
+
+    switch (feature.properties.type) {
+        case 'tunnelit':
+            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Tunneli</strong></b><br>`;
+            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
+            if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
+                var ratakmvalit = feature.properties.ratakmvalit[0];
+                popupContent += `<br><strong>Ratanumero:</strong> ${ratakmvalit.ratanumero}
+                                 <br><strong>Ratakm alku:</strong> ${ratakmvalit.alku.ratakm}+${ratakmvalit.alku.etaisyys} - ${ratakmvalit.loppu.ratakm}+${ratakmvalit.loppu.etaisyys}`;
+            }
+            popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+            break;
+        case 'sillat':
+            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Silta</strong></b><br>`;
+            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                            <strong>Tunnus:</strong> ${feature.properties['Tunnus']}<br>
+                            <strong>Väylänpito:</strong> ${feature.properties.Väylänpito}<br>
+                            <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
+                            <strong>Ratakilometrisijainti:</strong> ${feature.properties.Ratakilometrisijainti}<br>
+                            <strong>Tilirataosa:</strong> ${feature.properties.Tilirataosa}<br>
+                            <strong>Kunnossapitoalue:</strong> ${feature.properties.Kunnossapitoalue}<br>
+                            <strong>Isännöintialue:</strong> ${feature.properties.Isännöintialue}<br>
+                            <strong>Omistaja:</strong> ${feature.properties.Omistaja}<br>
+                            <strong>Sijaintikunta:</strong> ${feature.properties.Sijaintikunnat}<br>
+                            <strong>Katuosoite:</strong> ${feature.properties.Katuosoitteet}<br>
+                            <strong>Käyttötarkoitus:</strong> ${feature.properties.Käyttötarkoitus}<br>
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+            break;
+        case 'tasoristeykset':
+            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Tasoristeys</strong></b><br>`;
+            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                            <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
+                            <strong>Varoituslaitos:</strong> ${feature.properties.varoituslaitos}<br>
+                            <strong>Tielaji:</strong> ${feature.properties.tielaji}<br>
+                            <strong>Ratanumero:</strong> ${feature.properties.virallinenSijainti.ratanumero}<br>
+                            <strong>Ratakilometrisijainti:</strong> ${feature.properties.virallinenSijainti.ratakm}+${feature.properties.virallinenSijainti.etaisyys}<br>
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+            break;
+        case 'Syöttöasemat':
+            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Syöttöasema</strong></b><br>`;
+            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                            <strong>Tunnus:</strong> ${feature.properties['SyöttöasemanTunnus']}<br>
+                            <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
+                            <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
+                            <strong>Ratakilometrisijainti:</strong> ${feature.properties.Ratakilometrisijainti}<br>
+                            <strong>Tilirataosa:</strong> ${feature.properties.Tilirataosa}<br>
+                            <strong>Kunnossapitoalue:</strong> ${feature.properties.Kunnossapitoalue}<br>
+                            <strong><strong>Isännöintialue:</strong> ${feature.properties.Isännöintialue}<br>
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+            break;
+        case 'Välikytkinasemat':
+            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Välikytkinasema</strong></b><br>`;
+            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+                            <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
+                            <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
+                            <strong>Ratakilometrisijainti:</strong> ${feature.properties.Ratakilometrisijainti}<br>
+                            <strong>Tilirataosa:</strong> ${feature.properties.Tilirataosa}<br>
+                            <strong>Kunnossapitoalue:</strong> ${feature.properties.Kunnossapitoalue}<br>
+                            <strong>Isännöintialue:</strong> ${feature.properties.Isännöintialue}<br>
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+            break;
+    }
+
+    ExtResultItem.innerHTML = popupContent;
+    resultsDiv.appendChild(ExtResultItem);
+    resultsDiv.style.display = 'block';
+    showCloseIcon();
+}
 
 function style(feature) {
     if (feature.geometry.type === 'MultiLineString') {
@@ -331,7 +417,7 @@ function onEachFeature(feature, layer) {
 
         switch (feature.properties.type) {
             case 'tunnelit':
-				popupContent += `<b><strong>Tunneli</strong></b><br>`;
+                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Tunneli</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
                 if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
                     var ratakmvalit = feature.properties.ratakmvalit[0];
@@ -341,7 +427,7 @@ function onEachFeature(feature, layer) {
                 popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'sillat':
-				popupContent += `<b><strong>Silta</strong></b><br>`;
+                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Silta</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties['Tunnus']}<br>
                                 <strong>Väylänpito:</strong> ${feature.properties.Väylänpito}<br>
@@ -357,7 +443,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'tasoristeykset':
-				popupContent += `<b><strong>Tasoristeys</strong></b><br>`;
+                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Tasoristeys</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
                                 <strong>Varoituslaitos:</strong> ${feature.properties.varoituslaitos}<br>
@@ -367,7 +453,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Syöttöasemat':
-				popupContent += `<b><strong>Syöttöasema</strong></b><br>`;
+                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Syöttöasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties['SyöttöasemanTunnus']}<br>
                                 <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
@@ -379,7 +465,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Välikytkinasemat':
-				popupContent += `<b><strong>Välikytkinasema</strong></b><br>`;
+                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Välikytkinasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
                                 <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
@@ -404,3 +490,35 @@ function onEachFeature(feature, layer) {
     }
 }
 
+function showBackIcon() {
+    document.getElementById('back').style.display = 'block';
+	isSearchActive = true;
+}
+
+function hideBackIcon() {
+	map.setView([67.500, 26.000], 5);
+    document.getElementById('back').style.display = 'none';
+}
+
+document.getElementById('backButton').addEventListener('click', function(event) {
+    let resultItems = document.getElementsByClassName('resultItem');
+    let groupHeaders = document.getElementsByClassName('groupHeader');
+    let extResultItems = document.getElementsByClassName('ExtResultItem');
+    
+    // Poistetaan kaikki ExtResultItem elementit
+    while (extResultItems.length > 0) {
+        extResultItems[0].parentNode.removeChild(extResultItems[0]);
+    }
+
+    // Näytetään kaikki resultItem elementit
+    for (var i = 0; i < resultItems.length; i++) {
+        resultItems[i].style.display = 'flex';
+    }
+
+    // Näytetään kaikki groupHeader elementit
+    for (var i = 0; i < groupHeaders.length; i++) {
+        groupHeaders[i].style.display = 'block';
+    }
+
+    hideBackIcon();
+});
