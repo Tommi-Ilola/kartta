@@ -269,18 +269,20 @@ function naytaYksittainenResultItem(feature) {
 
     switch (feature.properties.type) {
         case 'tunnelit':
-            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Tunneli</strong></b><br>`;
-            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
+            popupContent += `<b id="type"><strong>Tunneli</strong></b><br>`;
+            popupContent += `<t id="cont"><strong>Nimi:</strong> ${feature.properties.nimi}</t>`;
             if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
                 var ratakmvalit = feature.properties.ratakmvalit[0];
-                popupContent += `<br><strong>Ratanumero:</strong> ${ratakmvalit.ratanumero}
-                                 <br><strong>Ratakm alku:</strong> ${ratakmvalit.alku.ratakm}+${ratakmvalit.alku.etaisyys} - ${ratakmvalit.loppu.ratakm}+${ratakmvalit.loppu.etaisyys}`;
+                popupContent += `<t id="cont">
+								 <br><strong>Ratanumero:</strong> ${ratakmvalit.ratanumero}
+                                 <br><strong>Ratakm alku:</strong> ${ratakmvalit.alku.ratakm}+${ratakmvalit.alku.etaisyys} - ${ratakmvalit.loppu.ratakm}+${ratakmvalit.loppu.etaisyys}</t>`;
             }
             popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
             break;
         case 'sillat':
-            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Silta</strong></b><br>`;
-            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+            popupContent += `<b id="type"><strong>Silta</strong></b><br>`;
+            popupContent += `<t id="cont">
+							<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                             <strong>Tunnus:</strong> ${feature.properties['Tunnus']}<br>
                             <strong>Väylänpito:</strong> ${feature.properties.Väylänpito}<br>
                             <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
@@ -292,21 +294,23 @@ function naytaYksittainenResultItem(feature) {
                             <strong>Sijaintikunta:</strong> ${feature.properties.Sijaintikunnat}<br>
                             <strong>Katuosoite:</strong> ${feature.properties.Katuosoitteet}<br>
                             <strong>Käyttötarkoitus:</strong> ${feature.properties.Käyttötarkoitus}<br>
-                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a></t>`;
             break;
         case 'tasoristeykset':
-            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Tasoristeys</strong></b><br>`;
-            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+            popupContent += `<b id="type"><strong>Tasoristeys</strong></b><br>`;
+            popupContent += `<t id="cont">
+							<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                             <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
                             <strong>Varoituslaitos:</strong> ${feature.properties.varoituslaitos}<br>
                             <strong>Tielaji:</strong> ${feature.properties.tielaji}<br>
                             <strong>Ratanumero:</strong> ${feature.properties.virallinenSijainti.ratanumero}<br>
                             <strong>Ratakilometrisijainti:</strong> ${feature.properties.virallinenSijainti.ratakm}+${feature.properties.virallinenSijainti.etaisyys}<br>
-                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a></t>`;
             break;
         case 'Syöttöasemat':
-            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Syöttöasema</strong></b><br>`;
-            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+            popupContent += `<b id="type"><strong>Syöttöasema</strong></b><br>`;
+            popupContent += `<t id="cont">
+							<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                             <strong>Tunnus:</strong> ${feature.properties['SyöttöasemanTunnus']}<br>
                             <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
                             <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
@@ -314,18 +318,19 @@ function naytaYksittainenResultItem(feature) {
                             <strong>Tilirataosa:</strong> ${feature.properties.Tilirataosa}<br>
                             <strong>Kunnossapitoalue:</strong> ${feature.properties.Kunnossapitoalue}<br>
                             <strong><strong>Isännöintialue:</strong> ${feature.properties.Isännöintialue}<br>
-                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a></t>`;
             break;
         case 'Välikytkinasemat':
-            popupContent += `<b style="font-size: 20px; text-decoration: underline;"><strong>Välikytkinasema</strong></b><br>`;
-            popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
+            popupContent += `<b id="type"><strong>Välikytkinasema</strong></b><br>`;
+            popupContent += `<t id="cont">
+							<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                             <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
                             <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
                             <strong>Ratakilometrisijainti:</strong> ${feature.properties.Ratakilometrisijainti}<br>
                             <strong>Tilirataosa:</strong> ${feature.properties.Tilirataosa}<br>
                             <strong>Kunnossapitoalue:</strong> ${feature.properties.Kunnossapitoalue}<br>
                             <strong>Isännöintialue:</strong> ${feature.properties.Isännöintialue}<br>
-                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
+                            <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a></t>`;
             break;
     }
 
@@ -417,7 +422,7 @@ function onEachFeature(feature, layer) {
 
         switch (feature.properties.type) {
             case 'tunnelit':
-                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Tunneli</strong></b><br>`;
+                popupContent += `<b><strong>Tunneli</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
                 if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
                     var ratakmvalit = feature.properties.ratakmvalit[0];
@@ -427,7 +432,7 @@ function onEachFeature(feature, layer) {
                 popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'sillat':
-                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Silta</strong></b><br>`;
+                popupContent += `<b><strong>Silta</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties['Tunnus']}<br>
                                 <strong>Väylänpito:</strong> ${feature.properties.Väylänpito}<br>
@@ -443,7 +448,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'tasoristeykset':
-                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Tasoristeys</strong></b><br>`;
+                popupContent += `<b><strong>Tasoristeys</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
                                 <strong>Varoituslaitos:</strong> ${feature.properties.varoituslaitos}<br>
@@ -453,7 +458,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Syöttöasemat':
-                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Syöttöasema</strong></b><br>`;
+                popupContent += `<b><strong>Syöttöasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties['SyöttöasemanTunnus']}<br>
                                 <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
@@ -465,7 +470,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Välikytkinasemat':
-                popupContent += `<b style="font-size: 16px; text-decoration: underline;"><strong>Välikytkinasema</strong></b><br>`;
+                popupContent += `<b><strong>Välikytkinasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
                                 <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
