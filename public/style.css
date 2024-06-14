@@ -1283,6 +1283,7 @@ h1, .tooltip-gm, .tooltip-satellite, .collapsible, #passwordInput, #passwordButt
 a {
     text-decoration: none;
     color: none;
+    font-size: 12px;
 }
 
 button {
