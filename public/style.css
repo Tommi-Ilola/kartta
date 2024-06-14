@@ -8,6 +8,15 @@ a {
     color: #0078A8;
 }
 
+#type {
+	font-size: 20px; 
+	text-decoration: underline;
+}
+
+#cont {
+	font-size: 16px; 
+}
+
 #backButton {
     height: 22px;
     width: 20px;
@@ -1348,7 +1357,7 @@ button {
 }
 
 #searchButton .close-icon {
-    bottom: 1pt;
+    bottom: 2pt;
 }
 
 #backButton {
@@ -1358,6 +1367,15 @@ button {
 
 #infoIcon {
     left: 40px;
+}
+
+#type {
+	font-size: 16px; 
+	text-decoration: underline;
+}
+
+#cont {
+	font-size: 12px; 
 }
 
 @font-face {
