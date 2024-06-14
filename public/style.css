@@ -4,6 +4,19 @@ body, html {
     padding: 0;
 }
 
+a {
+    color: #0078A8;
+}
+
+#backButton {
+    height: 22px;
+    width: 20px;
+    background-color: #ffffff00;
+    border: none;
+    cursor: pointer;
+    padding: 1px 5px 2px 1px;
+}
+
 #ch1 {
 	vertical-align: middle;
 	width: 15px;
@@ -93,7 +106,7 @@ body, html {
     justify-content: space-evenly;
     font-size: 20px;
     align-items: flex-end;
-    cursor: pointer;
+	cursor: default;
 }
 
 #closeInfo:hover {
@@ -547,6 +560,17 @@ h1 {
     background-color: #ccc;
 }
 
+.ExtResultItem {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    column-width: 10px;
+    width: -webkit-fill-available;
+    text-align: left;
+    display: inline-table;
+    box-shadow: inset 0px 25px 25px -30px rgba(0, 0, 0, 0.5);
+}
+
 .kmItem {
     padding: 5px 10px;
     border-top: 1px solid #ccc;
@@ -679,7 +703,7 @@ td {
     position: relative;
     color: black;
     font-weight: bold;
-    bottom: 3pt;
+    bottom: 2.5pt;
 }
 
 #results {
