@@ -1347,6 +1347,15 @@ button {
     border-top-color: #e3e3e3;
 }
 
+#searchButton .close-icon {
+    bottom: 0pt;
+}
+
+#backButton {
+    position: relative;
+    right: 5px;
+}
+
 @font-face {
   font-family: "San Francisco";
   font-weight: 400;
