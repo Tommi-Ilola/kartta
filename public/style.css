@@ -8,6 +8,10 @@ a {
     color: #0078A8;
 }
 
+b {
+	font-size: 12px;
+}
+
 #type {
 	font-size: 20px; 
 	text-decoration: underline;
