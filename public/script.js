@@ -530,12 +530,14 @@ function showCloseIcon() {
 function hideCloseIcon() {
     const searchButton = document.getElementById('searchButton');
     searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
+	hideBackIcon();
 }
 
 function showMagnifierIcon() {
     const searchButton = document.getElementById('searchButton');
     searchButton.innerHTML = '<span class="magnifier"><img src="magnifier.svg" style="width: 20px;height: 20px;"></span>';
 	piilotaVirheilmoitus();
+	hideBackIcon();
 }
 
 function RemoveMarkersButton() {
@@ -689,4 +691,3 @@ async function haeTiedotKoordinaateistaJaLisaaMarker(lat, lng) {
     }
 
 }
-
