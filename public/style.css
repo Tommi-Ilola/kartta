@@ -1290,6 +1290,11 @@ a {
     font-size: 12px;
 }
 
+
+.leaflet-container b {
+    font-size: 12px;
+}
+
 button {
 	-webkit-tap-highlight-color: transparent;
 	font-family: calibri;
