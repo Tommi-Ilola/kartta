@@ -422,7 +422,7 @@ function onEachFeature(feature, layer) {
 
         switch (feature.properties.type) {
             case 'tunnelit':
-                popupContent += `<b><strong>Tunneli</strong></b><br>`;
+                popupContent += `<b id="type"><strong>Tunneli</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}`;
                 if (feature.properties.ratakmvalit && feature.properties.ratakmvalit.length > 0) {
                     var ratakmvalit = feature.properties.ratakmvalit[0];
@@ -432,7 +432,7 @@ function onEachFeature(feature, layer) {
                 popupContent += `<br><a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'sillat':
-                popupContent += `<b><strong>Silta</strong></b><br>`;
+                popupContent += `<b id="type"><strong>Silta</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties['Tunnus']}<br>
                                 <strong>Väylänpito:</strong> ${feature.properties.Väylänpito}<br>
@@ -448,7 +448,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'tasoristeykset':
-                popupContent += `<b><strong>Tasoristeys</strong></b><br>`;
+                popupContent += `<b id="type"><strong>Tasoristeys</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties.tunnus}<br>
                                 <strong>Varoituslaitos:</strong> ${feature.properties.varoituslaitos}<br>
@@ -458,7 +458,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Syöttöasemat':
-                popupContent += `<b><strong>Syöttöasema</strong></b><br>`;
+                popupContent += `<b id="type"><strong>Syöttöasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tunnus:</strong> ${feature.properties['SyöttöasemanTunnus']}<br>
                                 <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
@@ -470,7 +470,7 @@ function onEachFeature(feature, layer) {
                                 <a href="https://www.google.com/maps/?q=${coords[1]},${coords[0]}" target="_blank">Näytä Google Mapsissa</a>`;
                 break;
             case 'Välikytkinasemat':
-                popupContent += `<b><strong>Välikytkinasema</strong></b><br>`;
+                popupContent += `<b id="type"><strong>Välikytkinasema</strong></b><br>`;
                 popupContent += `<strong>Nimi:</strong> ${feature.properties.nimi}<br>
                                 <strong>Tyyppi:</strong> ${feature.properties.Tyyppi}<br>
                                 <strong>Ratanumero:</strong> ${feature.properties.Ratanumero}<br>
